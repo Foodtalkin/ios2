@@ -1,0 +1,505 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		7582835B1C0EFBDE002E9EAC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7582835A1C0EFBDE002E9EAC /* AppDelegate.swift */; };
+		7582835D1C0EFBDE002E9EAC /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7582835C1C0EFBDE002E9EAC /* ViewController.swift */; };
+		758283601C0EFBDE002E9EAC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7582835E1C0EFBDE002E9EAC /* Main.storyboard */; };
+		758283621C0EFBDE002E9EAC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 758283611C0EFBDE002E9EAC /* Assets.xcassets */; };
+		758283651C0EFBDE002E9EAC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 758283631C0EFBDE002E9EAC /* LaunchScreen.storyboard */; };
+		758283701C0EFBDE002E9EAC /* FoodTalkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7582836F1C0EFBDE002E9EAC /* FoodTalkTests.swift */; };
+		7582837B1C0EFBDE002E9EAC /* FoodTalkUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7582837A1C0EFBDE002E9EAC /* FoodTalkUITests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		7582836C1C0EFBDE002E9EAC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7582834F1C0EFBDE002E9EAC /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 758283561C0EFBDE002E9EAC;
+			remoteInfo = FoodTalk;
+		};
+		758283771C0EFBDE002E9EAC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7582834F1C0EFBDE002E9EAC /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 758283561C0EFBDE002E9EAC;
+			remoteInfo = FoodTalk;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		758283571C0EFBDE002E9EAC /* FoodTalk.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FoodTalk.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		7582835A1C0EFBDE002E9EAC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		7582835C1C0EFBDE002E9EAC /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		7582835F1C0EFBDE002E9EAC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		758283611C0EFBDE002E9EAC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		758283641C0EFBDE002E9EAC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		758283661C0EFBDE002E9EAC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		7582836B1C0EFBDE002E9EAC /* FoodTalkTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FoodTalkTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		7582836F1C0EFBDE002E9EAC /* FoodTalkTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodTalkTests.swift; sourceTree = "<group>"; };
+		758283711C0EFBDE002E9EAC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		758283761C0EFBDE002E9EAC /* FoodTalkUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FoodTalkUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		7582837A1C0EFBDE002E9EAC /* FoodTalkUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodTalkUITests.swift; sourceTree = "<group>"; };
+		7582837C1C0EFBDE002E9EAC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		758283541C0EFBDE002E9EAC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		758283681C0EFBDE002E9EAC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		758283731C0EFBDE002E9EAC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		7582834E1C0EFBDE002E9EAC = {
+			isa = PBXGroup;
+			children = (
+				758283591C0EFBDE002E9EAC /* FoodTalk */,
+				7582836E1C0EFBDE002E9EAC /* FoodTalkTests */,
+				758283791C0EFBDE002E9EAC /* FoodTalkUITests */,
+				758283581C0EFBDE002E9EAC /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		758283581C0EFBDE002E9EAC /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				758283571C0EFBDE002E9EAC /* FoodTalk.app */,
+				7582836B1C0EFBDE002E9EAC /* FoodTalkTests.xctest */,
+				758283761C0EFBDE002E9EAC /* FoodTalkUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		758283591C0EFBDE002E9EAC /* FoodTalk */ = {
+			isa = PBXGroup;
+			children = (
+				7582835A1C0EFBDE002E9EAC /* AppDelegate.swift */,
+				7582835C1C0EFBDE002E9EAC /* ViewController.swift */,
+				7582835E1C0EFBDE002E9EAC /* Main.storyboard */,
+				758283611C0EFBDE002E9EAC /* Assets.xcassets */,
+				758283631C0EFBDE002E9EAC /* LaunchScreen.storyboard */,
+				758283661C0EFBDE002E9EAC /* Info.plist */,
+			);
+			path = FoodTalk;
+			sourceTree = "<group>";
+		};
+		7582836E1C0EFBDE002E9EAC /* FoodTalkTests */ = {
+			isa = PBXGroup;
+			children = (
+				7582836F1C0EFBDE002E9EAC /* FoodTalkTests.swift */,
+				758283711C0EFBDE002E9EAC /* Info.plist */,
+			);
+			path = FoodTalkTests;
+			sourceTree = "<group>";
+		};
+		758283791C0EFBDE002E9EAC /* FoodTalkUITests */ = {
+			isa = PBXGroup;
+			children = (
+				7582837A1C0EFBDE002E9EAC /* FoodTalkUITests.swift */,
+				7582837C1C0EFBDE002E9EAC /* Info.plist */,
+			);
+			path = FoodTalkUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		758283561C0EFBDE002E9EAC /* FoodTalk */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7582837F1C0EFBDE002E9EAC /* Build configuration list for PBXNativeTarget "FoodTalk" */;
+			buildPhases = (
+				758283531C0EFBDE002E9EAC /* Sources */,
+				758283541C0EFBDE002E9EAC /* Frameworks */,
+				758283551C0EFBDE002E9EAC /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FoodTalk;
+			productName = FoodTalk;
+			productReference = 758283571C0EFBDE002E9EAC /* FoodTalk.app */;
+			productType = "com.apple.product-type.application";
+		};
+		7582836A1C0EFBDE002E9EAC /* FoodTalkTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 758283821C0EFBDE002E9EAC /* Build configuration list for PBXNativeTarget "FoodTalkTests" */;
+			buildPhases = (
+				758283671C0EFBDE002E9EAC /* Sources */,
+				758283681C0EFBDE002E9EAC /* Frameworks */,
+				758283691C0EFBDE002E9EAC /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				7582836D1C0EFBDE002E9EAC /* PBXTargetDependency */,
+			);
+			name = FoodTalkTests;
+			productName = FoodTalkTests;
+			productReference = 7582836B1C0EFBDE002E9EAC /* FoodTalkTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		758283751C0EFBDE002E9EAC /* FoodTalkUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 758283851C0EFBDE002E9EAC /* Build configuration list for PBXNativeTarget "FoodTalkUITests" */;
+			buildPhases = (
+				758283721C0EFBDE002E9EAC /* Sources */,
+				758283731C0EFBDE002E9EAC /* Frameworks */,
+				758283741C0EFBDE002E9EAC /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				758283781C0EFBDE002E9EAC /* PBXTargetDependency */,
+			);
+			name = FoodTalkUITests;
+			productName = FoodTalkUITests;
+			productReference = 758283761C0EFBDE002E9EAC /* FoodTalkUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		7582834F1C0EFBDE002E9EAC /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 0710;
+				LastUpgradeCheck = 0710;
+				ORGANIZATIONNAME = FoodTalkIndia;
+				TargetAttributes = {
+					758283561C0EFBDE002E9EAC = {
+						CreatedOnToolsVersion = 7.1.1;
+					};
+					7582836A1C0EFBDE002E9EAC = {
+						CreatedOnToolsVersion = 7.1.1;
+						TestTargetID = 758283561C0EFBDE002E9EAC;
+					};
+					758283751C0EFBDE002E9EAC = {
+						CreatedOnToolsVersion = 7.1.1;
+						TestTargetID = 758283561C0EFBDE002E9EAC;
+					};
+				};
+			};
+			buildConfigurationList = 758283521C0EFBDE002E9EAC /* Build configuration list for PBXProject "FoodTalk" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 7582834E1C0EFBDE002E9EAC;
+			productRefGroup = 758283581C0EFBDE002E9EAC /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				758283561C0EFBDE002E9EAC /* FoodTalk */,
+				7582836A1C0EFBDE002E9EAC /* FoodTalkTests */,
+				758283751C0EFBDE002E9EAC /* FoodTalkUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		758283551C0EFBDE002E9EAC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				758283651C0EFBDE002E9EAC /* LaunchScreen.storyboard in Resources */,
+				758283621C0EFBDE002E9EAC /* Assets.xcassets in Resources */,
+				758283601C0EFBDE002E9EAC /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		758283691C0EFBDE002E9EAC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		758283741C0EFBDE002E9EAC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		758283531C0EFBDE002E9EAC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7582835D1C0EFBDE002E9EAC /* ViewController.swift in Sources */,
+				7582835B1C0EFBDE002E9EAC /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		758283671C0EFBDE002E9EAC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				758283701C0EFBDE002E9EAC /* FoodTalkTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		758283721C0EFBDE002E9EAC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7582837B1C0EFBDE002E9EAC /* FoodTalkUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		7582836D1C0EFBDE002E9EAC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 758283561C0EFBDE002E9EAC /* FoodTalk */;
+			targetProxy = 7582836C1C0EFBDE002E9EAC /* PBXContainerItemProxy */;
+		};
+		758283781C0EFBDE002E9EAC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 758283561C0EFBDE002E9EAC /* FoodTalk */;
+			targetProxy = 758283771C0EFBDE002E9EAC /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		7582835E1C0EFBDE002E9EAC /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				7582835F1C0EFBDE002E9EAC /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		758283631C0EFBDE002E9EAC /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				758283641C0EFBDE002E9EAC /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		7582837D1C0EFBDE002E9EAC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		7582837E1C0EFBDE002E9EAC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		758283801C0EFBDE002E9EAC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = FoodTalk/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.FoodtalkIndia.FoodTalk;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		758283811C0EFBDE002E9EAC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = FoodTalk/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.FoodtalkIndia.FoodTalk;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		758283831C0EFBDE002E9EAC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				INFOPLIST_FILE = FoodTalkTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.FoodtalkIndia.FoodTalkTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FoodTalk.app/FoodTalk";
+			};
+			name = Debug;
+		};
+		758283841C0EFBDE002E9EAC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				INFOPLIST_FILE = FoodTalkTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.FoodtalkIndia.FoodTalkTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FoodTalk.app/FoodTalk";
+			};
+			name = Release;
+		};
+		758283861C0EFBDE002E9EAC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = FoodTalkUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.FoodtalkIndia.FoodTalkUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_TARGET_NAME = FoodTalk;
+				USES_XCTRUNNER = YES;
+			};
+			name = Debug;
+		};
+		758283871C0EFBDE002E9EAC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = FoodTalkUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.FoodtalkIndia.FoodTalkUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_TARGET_NAME = FoodTalk;
+				USES_XCTRUNNER = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		758283521C0EFBDE002E9EAC /* Build configuration list for PBXProject "FoodTalk" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7582837D1C0EFBDE002E9EAC /* Debug */,
+				7582837E1C0EFBDE002E9EAC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7582837F1C0EFBDE002E9EAC /* Build configuration list for PBXNativeTarget "FoodTalk" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				758283801C0EFBDE002E9EAC /* Debug */,
+				758283811C0EFBDE002E9EAC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		758283821C0EFBDE002E9EAC /* Build configuration list for PBXNativeTarget "FoodTalkTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				758283831C0EFBDE002E9EAC /* Debug */,
+				758283841C0EFBDE002E9EAC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		758283851C0EFBDE002E9EAC /* Build configuration list for PBXNativeTarget "FoodTalkUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				758283861C0EFBDE002E9EAC /* Debug */,
+				758283871C0EFBDE002E9EAC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 7582834F1C0EFBDE002E9EAC /* Project object */;
+}
