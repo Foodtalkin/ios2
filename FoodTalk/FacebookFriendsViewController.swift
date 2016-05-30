@@ -14,6 +14,7 @@ class FacebookFriendsViewController: UIViewController, UITableViewDelegate, UITa
     var arrFbIds = NSMutableArray()
     var strFb = String()
     var arrResponseArray = NSMutableArray()
+    var nextFbString = String()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,12 +34,25 @@ class FacebookFriendsViewController: UIViewController, UITableViewDelegate, UITa
         let tblView =  UIView(frame: CGRectZero)
         tableView!.tableFooterView = tblView
         tableView!.tableFooterView!.hidden = true
+        tableView?.separatorColor = UIColor(red: 47/255, green: 51/255, blue: 60/255, alpha: 1.0)
+        
+        if(NSUserDefaults.standardUserDefaults().objectForKey("nextFb") != nil){
+        nextFbString = NSUserDefaults.standardUserDefaults().objectForKey("nextFb") as! String
+        }
         
         self.title = "Find facebook friends"
         
         showLoader(self.view)
         webServiceCalling()
         delegate = self
+    }
+    
+    
+    
+    //MARK:- Create FBids and string
+    
+    func convertArray(arrarFB : NSMutableArray){
+        
     }
     
     //MARK:- webservice methods
@@ -59,7 +73,7 @@ class FacebookFriendsViewController: UIViewController, UITableViewDelegate, UITa
     func webServiceForNext(){
         if (isConnectedToNetwork()){
             
-            let url = NSUserDefaults.standardUserDefaults().objectForKey("nxtFb") as! String
+            let url = nextFbString
             webServiceGet(url)
         }
     }
@@ -71,6 +85,7 @@ class FacebookFriendsViewController: UIViewController, UITableViewDelegate, UITa
     }
     
     func scrollViewDidEndDragging(scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        if(nextFbString != ""){
         let offset = scrollView.contentOffset
         let bounds = scrollView.bounds
         let size = scrollView.contentSize
@@ -79,14 +94,12 @@ class FacebookFriendsViewController: UIViewController, UITableViewDelegate, UITa
         let h = size.height as CGFloat
         let reload_distance = 0.0 as CGFloat
         if(y > h + reload_distance) {
-            
+             showProcessLoder(self.view)
             dispatch_async(dispatch_get_main_queue()) {
-                showProcessLoder(self.view)
-                
-                NSOperationQueue.mainQueue().addOperationWithBlock {
                     self.webServiceForNext()
-                }
+                
             }
+        }
         }
     }
     
@@ -95,6 +108,7 @@ class FacebookFriendsViewController: UIViewController, UITableViewDelegate, UITa
     func getDataFromWebService(dict: NSMutableDictionary) {
         
         if((dict.objectForKey("api")) != nil){
+            hideProcessLoader(self.view)
         if(dict.objectForKey("api") as! String == "user/getUsersByFacebookIds"){
         if(dict.objectForKey("status") as! String == "OK"){
             arrResponseArray = dict.objectForKey("users") as! NSMutableArray
@@ -104,9 +118,23 @@ class FacebookFriendsViewController: UIViewController, UITableViewDelegate, UITa
         }
         }
         else{
-          print(dict)
+           let arrFbIdArray = NSMutableArray()
+          let arrayFbId = dict.objectForKey("data") as! NSMutableArray
+            for(var index = 0;index < arrayFbId.count; index++){
+                arrFbIdArray.addObject(arrayFbId.objectAtIndex(index).objectForKey("id") as! String)
+                let ids = String(format: "%@,",arrayFbId.objectAtIndex(index).objectForKey("id") as! String)
+                strFb = strFb.stringByAppendingString(ids)
+            }
+            strFb = strFb.substringToIndex(strFb.endIndex.predecessor())
+            webServiceCalling()
+            if((dict.objectForKey("paging")?.objectForKey("next")) != nil){
+            nextFbString = dict.objectForKey("paging")?.objectForKey("next") as! String
+            
+            }
+            else{
+             nextFbString = ""
+            }
         }
-       
     }
     
     func serviceFailedWitherror(error : NSError){
@@ -189,6 +217,7 @@ class FacebookFriendsViewController: UIViewController, UITableViewDelegate, UITa
             cell.contentView.viewWithTag(29)?.removeFromSuperview()
             cell.contentView.viewWithTag(234)?.removeFromSuperview()
         }
+        
         cell.contentView.addSubview(cellText)
         iconView.addSubview(cellIcon)
         cell.contentView.addSubview(iconView)

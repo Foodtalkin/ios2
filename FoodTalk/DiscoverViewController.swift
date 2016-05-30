@@ -488,7 +488,7 @@ class DiscoverViewController: UIViewController, iCarouselDataSource, iCarouselDe
         imgLikeDubleTap?.backgroundColor = UIColor.clearColor()
         sender.view?.addSubview((imgLikeDubleTap)!)
         
-        UIView.animateWithDuration(0.5, animations: {
+        UIView.animateWithDuration(0.2, animations: {
             self.imgLikeDubleTap?.hidden = false
             self.imgLikeDubleTap?.frame = CGRectMake(70, 70, (sender.view?.frame.size.width)! - 140, (sender.view?.frame.size.height)! - 140)
         })
@@ -543,7 +543,7 @@ class DiscoverViewController: UIViewController, iCarouselDataSource, iCarouselDe
     }
     
     func removeDubleTapImage(){
-        UIView.animateWithDuration(0.5, animations: {
+        UIView.animateWithDuration(0.2, animations: {
             //   self.imgLikeDubleTap?.frame = CGRectMake(160, 160, 0, 0)
             self.imgLikeDubleTap?.hidden = true
             

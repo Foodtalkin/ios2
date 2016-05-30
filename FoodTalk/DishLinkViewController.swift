@@ -34,6 +34,8 @@ class DishLinkViewController: UIViewController, iCarouselDataSource, iCarouselDe
     var likeLabel : UIImageView?
     var selectedReport = String()
     var dishLinkArray : NSMutableArray = []
+    
+    var lblNoDish = UILabel()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -68,6 +70,14 @@ class DishLinkViewController: UIViewController, iCarouselDataSource, iCarouselDe
             navigationItem.rightBarButtonItem?.enabled = false
         }
         
+        lblNoDish = UILabel()
+        lblNoDish.frame = CGRectMake(0, 200, self.view.frame.size.width, 15)
+        lblNoDish.text = "No result :("
+        lblNoDish.textAlignment = NSTextAlignment.Center
+        lblNoDish.textColor = UIColor.whiteColor()
+        lblNoDish.font = UIFont(name: fontBold, size: 14)
+        self.view.addSubview(lblNoDish)
+        lblNoDish.hidden = true
         
         carousel.reloadData()
         carousel.scrollToItemAtIndex(selectedProfileIndex, animated: false)
@@ -163,6 +173,7 @@ class DishLinkViewController: UIViewController, iCarouselDataSource, iCarouselDe
                     arrLikeList.addObject(arr.objectAtIndex(index).objectForKey("iLikedIt") as! String)
                     arrFavList.addObject(arr.objectAtIndex(index).objectForKey("iBookark") as! String)
                 }
+                print(dishLinkArray)
             }
             else if(dict.objectForKey("status")!.isEqual("error")){
                 if(dict.objectForKey("errorCode")!.isEqual(6)){
@@ -379,9 +390,11 @@ class DishLinkViewController: UIViewController, iCarouselDataSource, iCarouselDe
 
         if(dishLinkArray.count > 0){
             navigationItem.rightBarButtonItem?.enabled = true
+            lblNoDish.hidden = true
         }
         else{
             navigationItem.rightBarButtonItem?.enabled = false
+            lblNoDish.hidden = false
         }
         
      
@@ -733,7 +746,7 @@ class DishLinkViewController: UIViewController, iCarouselDataSource, iCarouselDe
         imgLikeDubleTap?.backgroundColor = UIColor.clearColor()
         sender.view?.addSubview((imgLikeDubleTap)!)
         
-        UIView.animateWithDuration(0.5, animations: {
+        UIView.animateWithDuration(0.2, animations: {
             self.imgLikeDubleTap?.hidden = false
             self.imgLikeDubleTap?.frame = CGRectMake(70, 70, (sender.view?.frame.size.width)! - 140, (sender.view?.frame.size.height)! - 140)
         })
@@ -788,7 +801,7 @@ class DishLinkViewController: UIViewController, iCarouselDataSource, iCarouselDe
     }
     
     func removeDubleTapImage(){
-        UIView.animateWithDuration(0.5, animations: {
+        UIView.animateWithDuration(0.2, animations: {
             //   self.imgLikeDubleTap?.frame = CGRectMake(160, 160, 0, 0)
             self.imgLikeDubleTap?.hidden = true
             

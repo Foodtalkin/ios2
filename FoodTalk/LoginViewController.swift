@@ -83,11 +83,13 @@ class LoginViewController: UIViewController, WebServiceCallingDelegate {
                    
                     
                     self.dict = result as? NSDictionary
-                    
+                   
                     arrayFacebookFriends = self.dict?.objectForKey("friends")?.objectForKey("data") as! NSMutableArray
                     NSUserDefaults.standardUserDefaults().setObject(arrayFacebookFriends, forKey: "facebookFriends")
-                    let nxtFb = self.dict?.objectForKey("friends")?.objectForKey("next") as! String
+                    if((self.dict?.objectForKey("friends")?.objectForKey("paging")?.objectForKey("next")) != nil){
+                    let nxtFb = self.dict?.objectForKey("friends")?.objectForKey("paging")?.objectForKey("next") as! String
                     NSUserDefaults.standardUserDefaults().setObject(nxtFb, forKey: "nextFb")
+                    }
                     
                     self.fbId = self.dict?.valueForKey("id") as? String
                     let gender = self.dict?.valueForKey("gender") as? String

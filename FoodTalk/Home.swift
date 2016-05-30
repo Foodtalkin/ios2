@@ -735,12 +735,13 @@ class Home: UIViewController, UIActionSheetDelegate, UITableViewDataSource, UITa
             let reload_distance = 0.0 as CGFloat
             if(y > h + reload_distance) {
                 pageList += 1
+                 showProcessLoder(self.view)
                 dispatch_async(dispatch_get_main_queue()) {
-                    showProcessLoder(self.view)
+                   
                     
-                    NSOperationQueue.mainQueue().addOperationWithBlock {
+                  //  NSOperationQueue.mainQueue().addOperationWithBlock {
                         self.webServiceCall()
-                    }
+                  //  }
                 }
             }
         }

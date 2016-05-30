@@ -38,7 +38,7 @@ NSMutableArray *facebookFriendsArray;
 -(IBAction)inviteFriends:(id)sender{
     
     FBSDKAppInviteContent *content =[[FBSDKAppInviteContent alloc] init];
-    content.appLinkURL = [NSURL URLWithString:@"https://fb.me/567830766693152"];
+    content.appLinkURL = [NSURL URLWithString:@"https://fb.me/1698490917038374"];
     content.appInvitePreviewImageURL = [NSURL URLWithString:@"http://res.cloudinary.com/digital-food-talk-pvt-ltd/image/upload/q_60,f_jpg/v1455196794/12722101_10206664827312884_2103895114_n_ag6m3g.jpg"];
     
     [FBSDKAppInviteDialog showFromViewController:self withContent:content delegate:self];

@@ -13,6 +13,7 @@ var postImageOrgnol = String()
 
 var userListType = String()
 var userIdForFollow = String()
+var pointsTap = Int()
 
 class UserProfileViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, WebServiceCallingDelegate, UIGestureRecognizerDelegate,UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UIActionSheetDelegate{
     
@@ -596,6 +597,7 @@ class UserProfileViewController: UIViewController, UITableViewDataSource, UITabl
                 else{
                 firstLabel.text = String(format: "%d Points", y)
                 }
+                pointsTap = y
                 
                  arrValues = dict.objectForKey("imagePosts")?.mutableCopy() as! NSMutableArray
                 

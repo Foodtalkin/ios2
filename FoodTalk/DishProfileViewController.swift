@@ -35,13 +35,18 @@ class DishProfileViewController: UIViewController, iCarouselDataSource, iCarouse
     
     var likeLabel : UIImageView?
     var selectedReport = String()
+    
+    var navTitleLabel = UILabel()
+    var firstLabel = UILabel()
+    
+    var lblNoDish = UILabel()
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
         
-        self.title = comingToDish
+     //   self.title = comingToDish
         navigationItem.rightBarButtonItem?.enabled = false
         Flurry.logEvent("DishProfile Screen")
         carousel.type = .Linear
@@ -104,6 +109,36 @@ class DishProfileViewController: UIViewController, iCarouselDataSource, iCarouse
             navigationItem.rightBarButtonItem?.enabled = false
         }
         
+        if let navigationBar = self.navigationController?.navigationBar {
+            
+            
+            navTitleLabel = UILabel()
+            navTitleLabel.frame = CGRectMake(0, 0, 0, 18)
+            navTitleLabel.textColor = UIColor.whiteColor()
+            navTitleLabel.text = comingToDish
+            navTitleLabel.font = UIFont(name: fontBold, size: 15)
+            navigationItem.titleView = navTitleLabel
+        }
+        
+        if let navigationBar = self.navigationController?.navigationBar {
+            let firstFrame = CGRect(x: 0, y: 28, width: navigationBar.frame.size.width , height: 17)
+            
+            firstLabel = UILabel(frame: firstFrame)
+            
+            firstLabel.textColor = UIColor(red: 4/255.0, green: 209/255.0, blue: 205/255.0, alpha: 1)
+            firstLabel.textAlignment = NSTextAlignment.Center
+            firstLabel.font = UIFont(name: fontName, size: 10)
+            firstLabel.text = String(format: "%d Points", pointsTap)
+            navigationBar.addSubview(firstLabel)
+        }
+        
+        lblNoDish.frame = CGRectMake(0, 200, self.view.frame.size.width, 15)
+        lblNoDish.text = "No result :("
+        lblNoDish.textAlignment = NSTextAlignment.Center
+        lblNoDish.textColor = UIColor.whiteColor()
+        lblNoDish.font = UIFont(name: fontBold, size: 14)
+        self.view.addSubview(lblNoDish)
+        lblNoDish.hidden = true
         
     //    carousel.reloadData()
         carousel.scrollToItemAtIndex(selectedProfileIndex, animated: false)
@@ -111,12 +146,15 @@ class DishProfileViewController: UIViewController, iCarouselDataSource, iCarouse
     
     override func viewWillAppear(animated: Bool) {
         
+        firstLabel.hidden = false
+        navTitleLabel.hidden = false
        self.navigationController?.navigationBarHidden = false 
     }
     
     override func viewWillDisappear(animated : Bool) {
         super.viewWillDisappear(animated)
-       
+       firstLabel.hidden = true
+        navTitleLabel.hidden = true
             cancelRequest()
            
         
@@ -537,9 +575,11 @@ class DishProfileViewController: UIViewController, iCarouselDataSource, iCarouse
         
         if(arrDishList.count > 0){
             navigationItem.rightBarButtonItem?.enabled = true
+            lblNoDish.hidden = true
         }
         else{
             navigationItem.rightBarButtonItem?.enabled = false
+            lblNoDish.hidden = false
         }
 
     //    carousel.scrollToItemAtIndex(selectedProfileIndex, animated: false)
@@ -923,7 +963,7 @@ class DishProfileViewController: UIViewController, iCarouselDataSource, iCarouse
         imgLikeDubleTap?.backgroundColor = UIColor.clearColor()
         sender.view?.addSubview((imgLikeDubleTap)!)
         
-        UIView.animateWithDuration(0.5, animations: {
+        UIView.animateWithDuration(0.2, animations: {
             self.imgLikeDubleTap?.hidden = false
             self.imgLikeDubleTap?.frame = CGRectMake(70, 70, (sender.view?.frame.size.width)! - 140, (sender.view?.frame.size.height)! - 140)
         })
