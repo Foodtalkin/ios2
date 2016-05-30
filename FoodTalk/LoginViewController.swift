@@ -12,6 +12,7 @@ import FBSDKShareKit
 
 var loginAllDetails = NSMutableDictionary()
 var webViewCallingLegal : Bool = false
+var arrayFacebookFriends = NSMutableArray()
 
 class LoginViewController: UIViewController, WebServiceCallingDelegate {
 
@@ -48,7 +49,7 @@ class LoginViewController: UIViewController, WebServiceCallingDelegate {
         loginButton?.enabled = false
         let fbLoginManager : FBSDKLoginManager = FBSDKLoginManager()
         fbLoginManager.loginBehavior = FBSDKLoginBehavior.Native
-        fbLoginManager .logInWithReadPermissions(["email"], fromViewController: self, handler: { (result, error) -> Void in
+        fbLoginManager .logInWithReadPermissions(["email","user_friends"], fromViewController: self, handler: { (result, error) -> Void in
             if (error == nil){
                 let fbloginresult : FBSDKLoginManagerLoginResult = result
                 if(fbloginresult.grantedPermissions.contains("email"))
@@ -76,12 +77,18 @@ class LoginViewController: UIViewController, WebServiceCallingDelegate {
     func getFBUserData(){
         
         if((FBSDKAccessToken.currentAccessToken()) != nil){
-            FBSDKGraphRequest(graphPath: "me", parameters: ["fields": "id, name, first_name, last_name, picture.type(large), email,gender"]).startWithCompletionHandler({ (connection, result, error) -> Void in
+            FBSDKGraphRequest(graphPath: "me", parameters: ["fields": "id, name, first_name, last_name, picture.type(large), email,gender,friends"]).startWithCompletionHandler({ (connection, result, error) -> Void in
                 if (error == nil){
                     
                    
                     
                     self.dict = result as? NSDictionary
+                    
+                    arrayFacebookFriends = self.dict?.objectForKey("friends")?.objectForKey("data") as! NSMutableArray
+                    NSUserDefaults.standardUserDefaults().setObject(arrayFacebookFriends, forKey: "facebookFriends")
+                    let nxtFb = self.dict?.objectForKey("friends")?.objectForKey("next") as! String
+                    NSUserDefaults.standardUserDefaults().setObject(nxtFb, forKey: "nextFb")
+                    
                     self.fbId = self.dict?.valueForKey("id") as? String
                     let gender = self.dict?.valueForKey("gender") as? String
                     NSUserDefaults.standardUserDefaults().setObject(self.fbId, forKey: "fbId")

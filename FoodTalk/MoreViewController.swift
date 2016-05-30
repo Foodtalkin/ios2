@@ -30,7 +30,7 @@ class MoreViewController: UIViewController, UITableViewDataSource, UITableViewDe
         moreArray.addObject("Favorites")
         moreArray.addObject("Delhi-NCR")
         moreArray.addObject("Options")
-        moreArray.addObject("Invite Friends")
+        moreArray.addObject("Find facebook friends")
  //       moreArray.addObject("Events and contests")
         
 //        showLoader(self.view)
@@ -140,7 +140,7 @@ class MoreViewController: UIViewController, UITableViewDataSource, UITableViewDe
             self.navigationController!.visibleViewController!.navigationController!.pushViewController(openPost, animated:true);
         }
         else if(indexPath.row == 4){
-            let openPost = self.storyboard!.instantiateViewControllerWithIdentifier("Invite") as! InviteViewController;
+            let openPost = self.storyboard!.instantiateViewControllerWithIdentifier("facebookFriends") as! FacebookFriendsViewController;
             self.navigationController!.visibleViewController!.navigationController!.pushViewController(openPost, animated:true);
         }
         else if(indexPath.row == 2){

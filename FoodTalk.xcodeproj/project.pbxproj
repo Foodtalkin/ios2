@@ -167,6 +167,7 @@
 		75EB7ED21C6DDCE300D0F320 /* NewPostTap@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 75EB7EC81C6DDCE300D0F320 /* NewPostTap@3x.png */; };
 		75EB7ED31C6DDCE300D0F320 /* NotificationTap@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 75EB7EC91C6DDCE300D0F320 /* NotificationTap@2x.png */; };
 		75EB7ED41C6DDCE300D0F320 /* NotificationTap@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 75EB7ECA1C6DDCE300D0F320 /* NotificationTap@3x.png */; };
+		75F04C811CF83ED4002038D2 /* FacebookFriendsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75F04C801CF83ED4002038D2 /* FacebookFriendsViewController.swift */; };
 		75FF5D261C4AB84900FE2E92 /* searchIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 75FF5D251C4AB84900FE2E92 /* searchIcon.png */; };
 		75FF5D311C4AD31700FE2E92 /* commentIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 75FF5D2D1C4AD31700FE2E92 /* commentIcon.png */; };
 		75FF5D321C4AD31700FE2E92 /* followIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 75FF5D2E1C4AD31700FE2E92 /* followIcon.png */; };
@@ -500,6 +501,7 @@
 		75EB7EC81C6DDCE300D0F320 /* NewPostTap@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "NewPostTap@3x.png"; path = "Images/NewPostTap@3x.png"; sourceTree = "<group>"; };
 		75EB7EC91C6DDCE300D0F320 /* NotificationTap@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "NotificationTap@2x.png"; path = "Images/NotificationTap@2x.png"; sourceTree = "<group>"; };
 		75EB7ECA1C6DDCE300D0F320 /* NotificationTap@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "NotificationTap@3x.png"; path = "Images/NotificationTap@3x.png"; sourceTree = "<group>"; };
+		75F04C801CF83ED4002038D2 /* FacebookFriendsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FacebookFriendsViewController.swift; sourceTree = "<group>"; };
 		75FF5D251C4AB84900FE2E92 /* searchIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = searchIcon.png; path = Images/searchIcon.png; sourceTree = "<group>"; };
 		75FF5D2D1C4AD31700FE2E92 /* commentIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = commentIcon.png; path = Images/commentIcon.png; sourceTree = "<group>"; };
 		75FF5D2E1C4AD31700FE2E92 /* followIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = followIcon.png; path = Images/followIcon.png; sourceTree = "<group>"; };
@@ -875,6 +877,7 @@
 				7579BA0C1C64C0F7002084C4 /* WebLinkViewController.swift */,
 				A304C0471C7701D4004EB4B1 /* DishLinkViewController.swift */,
 				7590DABD1CCDF698009A288D /* CommentTableViewCell.swift */,
+				75F04C801CF83ED4002038D2 /* FacebookFriendsViewController.swift */,
 				7590DABE1CCDF698009A288D /* CommentTableViewCell.xib */,
 				758639D31C50F26E008EAF64 /* InviteViewController.xib */,
 				75A1AA161C4CFF2C0011FA4B /* RestaurantProfileTableViewCell.xib */,
@@ -1241,6 +1244,7 @@
 				A3006E1B1C85C56500CF70FC /* CryptoSwiftMD5.swift in Sources */,
 				7593AC1E1C3BEE20000F0398 /* CroppingImageViewController.swift in Sources */,
 				75699A111CCF89230001076E /* NSString+RemoveEmoji.m in Sources */,
+				75F04C811CF83ED4002038D2 /* FacebookFriendsViewController.swift in Sources */,
 				75794B871C247E2C007B6EC2 /* SearchViewController.swift in Sources */,
 				757091F31C3D3F70004A0FA4 /* NSDictionary+CLUtilities.m in Sources */,
 				A3006E1C1C85C56500CF70FC /* Data.swift in Sources */,
@@ -1384,8 +1388,8 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Digital Food Talk Private limited (V7EESS78JQ)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Digital Food Talk Private limited (V7EESS78JQ)";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Shuchir Suri (C2NFE84K4R)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Shuchir Suri (C2NFE84K4R)";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_BITCODE = NO;
@@ -1414,7 +1418,7 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "$(inherited)";
-				PROVISIONING_PROFILE = "84d1d1fa-b7cc-4dd2-81ec-3b91a0f74589";
+				PROVISIONING_PROFILE = "5ef37e3b-3ae9-43f4-87d5-bf73ed81dd3d";
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				VALID_ARCHS = "armv7 armv7s armv6 arm64";
@@ -1440,8 +1444,8 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Digital Food Talk Private limited (V7EESS78JQ)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Digital Food Talk Private limited (V7EESS78JQ)";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Shuchir Suri (C2NFE84K4R)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Shuchir Suri (C2NFE84K4R)";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_BITCODE = NO;
@@ -1464,7 +1468,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "$(inherited)";
-				PROVISIONING_PROFILE = "84d1d1fa-b7cc-4dd2-81ec-3b91a0f74589";
+				PROVISIONING_PROFILE = "5ef37e3b-3ae9-43f4-87d5-bf73ed81dd3d";
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 				VALID_ARCHS = "armv7 armv7s armv6 arm64";
@@ -1479,8 +1483,8 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Digital Food Talk Private limited (V7EESS78JQ)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Digital Food Talk Private limited (V7EESS78JQ)";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Shuchir Suri (C2NFE84K4R)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Shuchir Suri (C2NFE84K4R)";
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(PROJECT_DIR)",
@@ -1501,7 +1505,7 @@
 				OTHER_LDFLAGS = "$(OTHER_LDFLAGS)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.foodtalkindia.FoodTalk;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "84d1d1fa-b7cc-4dd2-81ec-3b91a0f74589";
+				PROVISIONING_PROFILE = "5ef37e3b-3ae9-43f4-87d5-bf73ed81dd3d";
 				SWIFT_OBJC_BRIDGING_HEADER = "FoodTalk/FoodTalk-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TARGETED_DEVICE_FAMILY = 1;
@@ -1517,8 +1521,8 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Digital Food Talk Private limited (V7EESS78JQ)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Digital Food Talk Private limited (V7EESS78JQ)";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Shuchir Suri (C2NFE84K4R)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Shuchir Suri (C2NFE84K4R)";
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(PROJECT_DIR)",
@@ -1539,7 +1543,7 @@
 				OTHER_LDFLAGS = "$(OTHER_LDFLAGS)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.foodtalkindia.FoodTalk;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "84d1d1fa-b7cc-4dd2-81ec-3b91a0f74589";
+				PROVISIONING_PROFILE = "5ef37e3b-3ae9-43f4-87d5-bf73ed81dd3d";
 				SWIFT_OBJC_BRIDGING_HEADER = "FoodTalk/FoodTalk-Bridging-Header.h";
 				TARGETED_DEVICE_FAMILY = 1;
 				VALID_ARCHS = "armv7 armv7s armv6 arm64";

@@ -1860,6 +1860,63 @@
             <point key="canvasLocation" x="3665" y="4159"/>
         </scene>
         <!--Navigation Controller-->
+        <scene sceneID="Phn-lI-8G0">
+            <objects>
+                <navigationController id="L6q-wu-Wyy" sceneMemberID="viewController">
+                    <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="uLw-jO-NbF">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="EQG-9X-yuU" kind="relationship" relationship="rootViewController" id="jSn-DM-Hgy"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="UNc-np-Fdm" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="300" y="5713"/>
+        </scene>
+        <!--Facebook Friends View Controller-->
+        <scene sceneID="bKU-lY-2kJ">
+            <objects>
+                <viewController storyboardIdentifier="facebookFriends" id="EQG-9X-yuU" customClass="FacebookFriendsViewController" customModule="FoodTalk" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="Syi-7u-mcV"/>
+                        <viewControllerLayoutGuide type="bottom" id="d6C-F9-sAA"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="DAz-Tr-PkI">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" misplaced="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="Itk-6j-kuO">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="sectionIndexBackgroundColor" red="0.078431372549019607" green="0.11372549019607843" blue="0.1764705882352941" alpha="1" colorSpace="calibratedRGB"/>
+                                <connections>
+                                    <outlet property="dataSource" destination="EQG-9X-yuU" id="4oC-Mp-5OS"/>
+                                    <outlet property="delegate" destination="EQG-9X-yuU" id="psh-CI-LgE"/>
+                                </connections>
+                            </tableView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="Itk-6j-kuO" firstAttribute="top" secondItem="DAz-Tr-PkI" secondAttribute="topMargin" id="0tV-LU-I7U"/>
+                            <constraint firstItem="Itk-6j-kuO" firstAttribute="leading" secondItem="DAz-Tr-PkI" secondAttribute="leadingMargin" constant="-20" id="Z0v-hf-Sh1"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="Itk-6j-kuO" secondAttribute="trailing" constant="-20" id="eWA-aS-EJw"/>
+                            <constraint firstItem="d6C-F9-sAA" firstAttribute="top" secondItem="Itk-6j-kuO" secondAttribute="bottom" id="hzb-Sg-kcq"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="u1X-Da-Vtm"/>
+                    <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
+                    <connections>
+                        <outlet property="tableView" destination="Itk-6j-kuO" id="K2G-S6-aBK"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Qco-b3-uGy" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="766" y="5724"/>
+        </scene>
+        <!--Navigation Controller-->
         <scene sceneID="mP5-8L-Tt5">
             <objects>
                 <navigationController id="OjN-2r-Gyf" sceneMemberID="viewController">
