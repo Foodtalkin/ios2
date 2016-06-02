@@ -398,6 +398,7 @@ class CheckInViewController: UIViewController, UISearchBarDelegate, UITableViewD
         let userId = NSUserDefaults.standardUserDefaults().objectForKey("userId")
         
         let params = NSMutableDictionary()
+            
         params.setObject(sessionId!, forKey: "sessionId")
         params.setObject(userId!, forKey: "selectedUserId")
         params.setObject(self.locationVal!.valueForKey("latitude") as! NSNumber, forKey: "latitude")
@@ -528,10 +529,16 @@ class CheckInViewController: UIViewController, UISearchBarDelegate, UITableViewD
         locationVal!.setObject(long, forKey: "longitute")
         locationVal!.setObject(lat, forKey: "latitude")
         
+        
         if(callInt == 0){
+            dispatch_async(dispatch_get_main_queue()){
+                self.setUsersClosestCity()
+            }
+            
             dispatch_async(dispatch_get_main_queue()){
                 self.webServiceCallingForRestaurant()
             }
+         
         }
         callInt += 1
         
@@ -539,6 +546,16 @@ class CheckInViewController: UIViewController, UISearchBarDelegate, UITableViewD
     
     func locationManager(manager: CLLocationManager, didFailWithError error: NSError) {
         print("Error: " + error.localizedDescription)
+    }
+    
+    func locationManager(manager: CLLocationManager, didChangeAuthorizationStatus status: CLAuthorizationStatus) {
+        if (status == CLAuthorizationStatus.Denied) {
+            let alertView = UIAlertView(title: "Location Disabled", message: "Please enable Location Services in your iPhone Setting to share photos of dishes and where to find them on FoodTalk.", delegate: nil, cancelButtonTitle: "Close")
+            alertView.show()
+            
+        } else if (status == CLAuthorizationStatus.AuthorizedAlways) {
+            
+        }
     }
 
     
@@ -750,7 +767,54 @@ class CheckInViewController: UIViewController, UISearchBarDelegate, UITableViewD
         }
     }
 
-
+    func setUsersClosestCity()
+    {
+        let geoCoder = CLGeocoder()
+        let location = locationManager?.location
+        geoCoder.reverseGeocodeLocation(location!)
+        {
+            (placemarks, error) -> Void in
+            
+            let placeArray = placemarks as [CLPlacemark]!
+            
+            // Place details
+            var placeMark: CLPlacemark!
+            placeMark = placeArray?[0]
+            
+            // Address dictionary
+           
+            
+            // Location name
+            if let locationName = placeMark.addressDictionary?["Name"] as? NSString
+            {
+                print(locationName)
+            }
+            
+            // Street address
+            if let street = placeMark.addressDictionary?["Thoroughfare"] as? NSString
+            {
+                print(street)
+            }
+            
+            // City
+            if let city = placeMark.addressDictionary?["City"] as? NSString
+            {
+                print(city)
+            }
+            
+            // Zip code
+            if let zip = placeMark.addressDictionary?["ZIP"] as? NSString
+            {
+                print(zip)
+            }
+            
+            // Country
+            if let country = placeMark.addressDictionary?["Country"] as? NSString
+            {
+                print(country)
+            }
+        }
+    }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()

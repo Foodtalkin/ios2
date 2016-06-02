@@ -110,7 +110,7 @@
     _textView.inputAccessoryView = self.inputAccessoryView;
     _textView.font = [UIFont fontWithName:@"Helvetica" size:18];
     [_textView setTintColor:[UIColor blackColor]];
-    _textView.autocorrectionType = UITextAutocorrectionTypeNo;
+  //  _textView.autocorrectionType = UITextAutocorrectionTypeNo;
     [_textEditorBackgroundView addSubview:_textView];
     _textView.delegate = self;
     _textView.inputAccessoryView = self.inputAccessoryView;

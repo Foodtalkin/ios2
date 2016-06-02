@@ -85,6 +85,7 @@ class UserProfileViewController: UIViewController, UITableViewDataSource, UITabl
     }
     
     override func viewWillAppear(animated: Bool) {
+        showLoader(self.view)
         userLoginAllInfo =  (NSUserDefaults.standardUserDefaults().objectForKey("LoginDetails") as? NSMutableDictionary)!
         arrNumberOfCard = NSMutableArray()
         firstLabel.hidden = false
@@ -433,6 +434,7 @@ class UserProfileViewController: UIViewController, UITableViewDataSource, UITabl
     //MARK:- WebService Delegates
     
     func webserviceForCards(){
+        if(dictLocations.objectForKey("latitude") != nil){
         if (isConnectedToNetwork()){
             pageList = 1
             
@@ -446,6 +448,7 @@ class UserProfileViewController: UIViewController, UITableViewDataSource, UITabl
             followedUserId = openProfileId
         }
         let params = NSMutableDictionary()
+            
         params.setObject(sessionId!, forKey: "sessionId")
         params.setObject(followedUserId, forKey: "selectedUserId")
         params.setObject("1", forKey: "page")
@@ -457,6 +460,11 @@ class UserProfileViewController: UIViewController, UITableViewDataSource, UITabl
         }
         else{
             internetMsg(view)
+        }
+        }
+        else{
+            let alertView = UIAlertView(title: "Location Disabled", message: "Please enable Location Services in your iPhone Setting to share photos of dishes and where to find them on FoodTalk.", delegate: nil, cancelButtonTitle: "Close")
+            alertView.show()
         }
     }
     
@@ -680,7 +688,6 @@ class UserProfileViewController: UIViewController, UITableViewDataSource, UITabl
         self.collectionView.reloadData()
         
         self.performSelector(#selector(UserProfileViewController.removeProcess), withObject: nil, afterDelay: 0.5)
-            
         }
         else{
             self.isComplete = true

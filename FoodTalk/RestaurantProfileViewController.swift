@@ -346,7 +346,7 @@ class RestaurantProfileViewController: UIViewController, UITableViewDataSource, 
     //MARK:- WebServiceCalling & Delagates
     
     func webServiceForRestaurant(){
-        
+       if(dictLocations.objectForKey("latitude") != nil){
         if(isConnectedToNetwork()){
             pageList += 1
             //showLoader(self.view)
@@ -365,6 +365,11 @@ class RestaurantProfileViewController: UIViewController, UITableViewDataSource, 
         }
         else{
             internetMsg(view)
+        }
+        }
+       else{
+        let alertView = UIAlertView(title: "Location Disabled", message: "Please enable Location Services in your iPhone Setting to share photos of dishes and where to find them on FoodTalk.", delegate: nil, cancelButtonTitle: "Close")
+        alertView.show()
         }
     }
     
@@ -421,8 +426,14 @@ class RestaurantProfileViewController: UIViewController, UITableViewDataSource, 
         else{
         
         if(dict.objectForKey("status") as! String == "OK"){
+            print("dict",dict)
             profileInfo = dict.objectForKey("restaurantProfile") as! NSDictionary
+            if(profileInfo.objectForKey("distance") is NSNull){
+               restaurantDistance = 0.0
+            }
+            else{
             restaurantDistance = (profileInfo.objectForKey("distance")?.floatValue)!
+            }
             if((dict.objectForKey("images")?.mutableCopy() as? NSMutableArray)!.count > 0){
                arrImages = dict.objectForKey("images")?.mutableCopy() as! NSMutableArray
             }

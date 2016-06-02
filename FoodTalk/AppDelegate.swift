@@ -241,6 +241,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
     
     func addLocationManager(){
         locationManager = CLLocationManager()
+        
         locationManager!.delegate = self;
         locationManager!.desiredAccuracy = kCLLocationAccuracyBest
         locationManager!.requestAlwaysAuthorization()
@@ -272,6 +273,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
     
     func locationManager(manager: CLLocationManager, didFailWithError error: NSError) {
         print("Error: " + error.localizedDescription)
+    }
+    
+    func locationManager(manager: CLLocationManager, didChangeAuthorizationStatus status: CLAuthorizationStatus) {
+        if (status == CLAuthorizationStatus.Denied) {
+            let alertView = UIAlertView(title: "Location Disabled", message: "Please enable Location Services in your iPhone Setting to share photos of dishes and where to find them on FoodTalk.", delegate: nil, cancelButtonTitle: "Close")
+            alertView.show()
+            
+        } else if (status == CLAuthorizationStatus.AuthorizedAlways) {
+            
+        } 
     }
     
     //MARK:- Push Notification Delegate Methods

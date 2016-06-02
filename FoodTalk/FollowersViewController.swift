@@ -153,6 +153,7 @@ class FollowersViewController: UIViewController, UITableViewDataSource, UITableV
         let cellIcon = UIImageView()
         cellIcon.frame = CGRectMake(2, 2, 32, 32)
         cellIcon.layer.cornerRadius = cellIcon.frame.size.width/2
+        cellIcon.tag = 2223
         cellIcon.clipsToBounds = true
         
         let cellText = UILabel()
@@ -188,6 +189,7 @@ class FollowersViewController: UIViewController, UITableViewDataSource, UITableV
             cell.contentView.viewWithTag(22)?.removeFromSuperview()
             cell.contentView.viewWithTag(28)?.removeFromSuperview()
             cell.contentView.viewWithTag(29)?.removeFromSuperview()
+            cell.contentView.viewWithTag(2223)?.removeFromSuperview()
         }
         cell.contentView.addSubview(cellText)
         iconView.addSubview(cellIcon)

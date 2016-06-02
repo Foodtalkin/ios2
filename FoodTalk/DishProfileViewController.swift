@@ -110,14 +110,14 @@ class DishProfileViewController: UIViewController, iCarouselDataSource, iCarouse
         }
         
         if let navigationBar = self.navigationController?.navigationBar {
-            
-            
+
             navTitleLabel = UILabel()
             navTitleLabel.frame = CGRectMake(0, 0, 0, 18)
             navTitleLabel.textColor = UIColor.whiteColor()
             navTitleLabel.text = comingToDish
             navTitleLabel.font = UIFont(name: fontBold, size: 15)
             navigationItem.titleView = navTitleLabel
+           
         }
         
         if let navigationBar = self.navigationController?.navigationBar {
@@ -130,6 +130,13 @@ class DishProfileViewController: UIViewController, iCarouselDataSource, iCarouse
             firstLabel.font = UIFont(name: fontName, size: 10)
             firstLabel.text = String(format: "%d Points", pointsTap)
             navigationBar.addSubview(firstLabel)
+        }
+        
+        if(comingFrom == "Profile"){
+            firstLabel.hidden = false
+        }
+        else{
+           firstLabel.hidden = true
         }
         
         lblNoDish.frame = CGRectMake(0, 200, self.view.frame.size.width, 15)
@@ -146,7 +153,12 @@ class DishProfileViewController: UIViewController, iCarouselDataSource, iCarouse
     
     override func viewWillAppear(animated: Bool) {
         
-        firstLabel.hidden = false
+        if(comingFrom == "Profile"){
+            firstLabel.hidden = false
+        }
+        else{
+            firstLabel.hidden = true
+        }
         navTitleLabel.hidden = false
        self.navigationController?.navigationBarHidden = false 
     }
@@ -165,6 +177,7 @@ class DishProfileViewController: UIViewController, iCarouselDataSource, iCarouse
     
     //MARK:- WebService Call n Delegates
     func webCallDiscoverDish(){
+        if(dictLocations.objectForKey("latitude") != nil){
         if (isConnectedToNetwork()){
             pageList += 1
             showLoader(self.view)
@@ -186,6 +199,11 @@ class DishProfileViewController: UIViewController, iCarouselDataSource, iCarouse
         }
         else{
             internetMsg(self.view)
+        }
+        }
+        else{
+            let alertView = UIAlertView(title: "Location Disabled", message: "Please enable Location Services in your iPhone Setting to share photos of dishes and where to find them on FoodTalk.", delegate: nil, cancelButtonTitle: "Close")
+            alertView.show()
         }
     }
     
@@ -581,6 +599,7 @@ class DishProfileViewController: UIViewController, iCarouselDataSource, iCarouse
             navigationItem.rightBarButtonItem?.enabled = false
             lblNoDish.hidden = false
         }
+
 
     //    carousel.scrollToItemAtIndex(selectedProfileIndex, animated: false)
     }

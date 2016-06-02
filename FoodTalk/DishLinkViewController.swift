@@ -173,7 +173,6 @@ class DishLinkViewController: UIViewController, iCarouselDataSource, iCarouselDe
                     arrLikeList.addObject(arr.objectAtIndex(index).objectForKey("iLikedIt") as! String)
                     arrFavList.addObject(arr.objectAtIndex(index).objectForKey("iBookark") as! String)
                 }
-                print(dishLinkArray)
             }
             else if(dict.objectForKey("status")!.isEqual("error")){
                 if(dict.objectForKey("errorCode")!.isEqual(6)){

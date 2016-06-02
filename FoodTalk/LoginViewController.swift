@@ -101,15 +101,15 @@ class LoginViewController: UIViewController, WebServiceCallingDelegate {
                //     let locationDetailsDictionary = delegate.locationManager1()
                     let deviceToken = NSUserDefaults.standardUserDefaults().objectForKey("DeviceToken")
                     
-                    
+                    if(dictLocations.objectForKey("latitude") != nil){
                     let params = NSMutableDictionary()
                     params.setObject("F", forKey: "signInType")
                     params.setObject(picUrl, forKey: "image")
                     params.setObject(self.fbId!, forKey: "facebookId")
                     params.setObject(self.fbUserName!, forKey: "fullName")
                     
-                    params.setObject("28.6139", forKey: "latitude")
-                    params.setObject("77.2090", forKey: "longitude")
+                    params.setObject(dictLocations.objectForKey("latitude")!, forKey: "latitude")
+                    params.setObject(dictLocations.objectForKey("longitute")!, forKey: "longitude")
                     params.setObject(deviceToken!, forKey: "deviceToken")
                     params.setObject(gender!, forKey: "gender")
                     
@@ -124,6 +124,12 @@ class LoginViewController: UIViewController, WebServiceCallingDelegate {
                         NSUserDefaults.standardUserDefaults().setObject(params, forKey: "emailVerifyValue")
                         let openPost = self.storyboard!.instantiateViewControllerWithIdentifier("EmailVerification") as! EmailVerificationViewController;
                         self.navigationController!.pushViewController(openPost, animated:true);
+                    }
+                    }
+                    else{
+                        self.loginButton?.enabled = true
+                        let alertView = UIAlertView(title: "Location Disabled", message: "Please enable Location Services in your iPhone Setting to share photos of dishes and where to find them on FoodTalk.", delegate: nil, cancelButtonTitle: "Close")
+                        alertView.show()
                     }
                 }
             })

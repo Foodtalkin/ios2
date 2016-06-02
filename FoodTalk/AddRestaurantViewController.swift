@@ -8,7 +8,7 @@
 
 import UIKit
 
-class AddRestaurantViewController: UIViewController, UITextFieldDelegate, WebServiceCallingDelegate {
+class AddRestaurantViewController: UIViewController, UITextFieldDelegate, WebServiceCallingDelegate, UIPickerViewDataSource, UIPickerViewDelegate {
     
     @IBOutlet var txtRestaurantName : UITextField?
     @IBOutlet var txtAddress : UITextField?
@@ -17,12 +17,28 @@ class AddRestaurantViewController: UIViewController, UITextFieldDelegate, WebSer
     @IBOutlet var lblDescription : UILabel?
     @IBOutlet var viewH : UIView?
     @IBOutlet var addressArea : UILabel?
+    @IBOutlet var btnCity : UIButton?
+    
     var params = NSMutableDictionary()
     var activeTextField = UITextField()
+    
+    var arrCityList = NSMutableArray()
+    
+    var selectedCity = String()
+    var typePickerView: UIPickerView = UIPickerView()
 
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        selectedCity = "delhi"
+        
+        if(isConnectedToNetwork()){
+            webServiceForRegion()
+        }
+        else{
+            internetMsg(self.view)
+        }
 
         // Do any additional setup after loading the view.
         self.title = "Add Restaurant"
@@ -38,6 +54,15 @@ class AddRestaurantViewController: UIViewController, UITextFieldDelegate, WebSer
         
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(AddRestaurantViewController.keyboardWillShow(_:)), name:UIKeyboardWillShowNotification, object: nil);
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(AddRestaurantViewController.keyboardWillHide(_:)), name:UIKeyboardWillHideNotification, object: nil);
+        
+        self.typePickerView.hidden = true
+        self.typePickerView.dataSource = self
+        self.typePickerView.delegate = self
+        self.typePickerView.frame = CGRectMake(0, self.view.frame.size.height - 150, self.view.frame.size.width, 150)
+        self.typePickerView.backgroundColor = UIColor.whiteColor()
+        self.typePickerView.layer.borderColor = UIColor.lightGrayColor().CGColor
+        self.typePickerView.layer.borderWidth = 1
+        self.view.addSubview(self.typePickerView)
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -86,8 +111,10 @@ class AddRestaurantViewController: UIViewController, UITextFieldDelegate, WebSer
             restaurantName = restaurantName!.stringByReplacingOccurrencesOfString("\"", withString: "")
             params.setObject(sessionId!, forKey: "sessionId")
             params.setObject(restaurantName!, forKey: "restaurantName")
+            
             if(txtAddress?.text?.characters.count > 0){
                 params.setObject((txtAddress?.text)!, forKey: "address")
+                params.setObject(selectedCity, forKey: "region")
             }
             
             webServiceCallingPost(url, parameters: params)
@@ -100,8 +127,31 @@ class AddRestaurantViewController: UIViewController, UITextFieldDelegate, WebSer
 
     }
     
+    func webServiceForRegion(){
+        if (isConnectedToNetwork()){
+            let url = String(format: "%@%@%@", baseUrl, "region/", "list")
+            let sessionId = NSUserDefaults.standardUserDefaults().objectForKey("sessionId")
+            
+            let params = NSMutableDictionary()
+            params.setObject(sessionId!, forKey: "sessionId")
+            
+            webServiceCallingPost(url, parameters: params)
+            
+        }
+        else{
+            internetMsg(self.view)
+        }
+        delegate = self
+    }
+    
     func getDataFromWebService(dict : NSMutableDictionary){
         
+        if(dict.objectForKey("api") as! String == "region/list"){
+            if(dict.objectForKey("status") as! String == "OK"){
+                arrCityList = dict.objectForKey("regions") as! NSMutableArray
+            }
+        }
+        else{
         if(dict.objectForKey("status") as! String == "OK"){
             restaurantId = dict.objectForKey("restaurantId") as! String
             selectedRestaurantName = (txtRestaurantName?.text)!
@@ -127,6 +177,7 @@ class AddRestaurantViewController: UIViewController, UITextFieldDelegate, WebSer
                 let openPost = self.storyboard!.instantiateViewControllerWithIdentifier("Login") as! LoginViewController;
                 self.navigationController!.visibleViewController!.navigationController!.pushViewController(openPost, animated:true);
             }
+        }
         }
         stopLoading(self.view)
     }
@@ -181,7 +232,43 @@ class AddRestaurantViewController: UIViewController, UITextFieldDelegate, WebSer
           self.view.frame.origin.y += 120
         }
     }
+    
+    @IBAction func cityButtonTapped(sender : UIButton){
+        typePickerView.hidden = false
+        typePickerView.reloadAllComponents()
+    }
 
+    //MARK:- pickerView Delegates methods
+    func numberOfComponentsInPickerView(pickerView: UIPickerView) -> Int {
+        return 1
+    }
+    
+    func pickerView(pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+        return arrCityList.count
+    }
+    
+    func pickerView(pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+        btnCity?.setTitle((arrCityList.objectAtIndex(row).objectForKey("name") as? String)?.uppercaseString, forState: UIControlState.Normal)
+        selectedCity = (arrCityList.objectAtIndex(row).objectForKey("name") as? String)!
+        typePickerView.hidden = true
+    }
+    
+    func pickerView(pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusingView view: UIView?) -> UIView {
+        let view = UIView(frame: CGRectMake(5,0, pickerView.frame.size.width - 10,44))
+        let label = UILabel(frame:CGRectMake(5,0, pickerView.frame.size.width - 10, 44))
+        label.textAlignment = NSTextAlignment.Center
+        view.addSubview(label)
+        label.text = (arrCityList.objectAtIndex(row).objectForKey("name") as? String)?.uppercaseString
+        return view
+    }
+    
+    func pickerView(pickerView: UIPickerView, widthForComponent component: Int) -> CGFloat {
+        return 36.0
+    }
+    
+    func pickerView(pickerView: UIPickerView, rowHeightForComponent component: Int) -> CGFloat {
+        return 36.0
+    }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()

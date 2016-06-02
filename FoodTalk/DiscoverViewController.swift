@@ -454,10 +454,17 @@ class DiscoverViewController: UIViewController, iCarouselDataSource, iCarouselDe
         
         let distanceLabel = UILabel()
         distanceLabel.frame = CGRectMake(footerView.frame.size.width - 70, 0, 70, 40)
-        var distnce = self.arrDiscoverValues.objectAtIndex(index).objectForKey("restaurantDistance")?.floatValue
+            var distnce = Float()
         
-        distnce = distnce! / 1000
-        distanceLabel.text = String(format: "%.2f KM", distnce!)
+            if(self.arrDiscoverValues.objectAtIndex(index).objectForKey("restaurantDistance") is NSNull){
+                distnce = 0.0
+            }
+            else{
+              distnce = (self.arrDiscoverValues.objectAtIndex(index).objectForKey("restaurantDistance")?.floatValue)!
+            }
+        
+        distnce = distnce / 1000
+        distanceLabel.text = String(format: "%.2f KM", distnce)
         distanceLabel.textColor = UIColor.grayColor()
         distanceLabel.font = UIFont(name: fontName, size: 15)
         footerView.addSubview(distanceLabel)
@@ -1190,6 +1197,17 @@ class DiscoverViewController: UIViewController, iCarouselDataSource, iCarouselDe
                 self.performSelector("webCallDiscover", withObject: nil, afterDelay: 0.1)
         }
         callInt++
+    }
+    
+    func locationManager(manager: CLLocationManager, didChangeAuthorizationStatus status: CLAuthorizationStatus) {
+        if (status == CLAuthorizationStatus.Denied) {
+            let alertView = UIAlertView(title: "Location Disabled", message: "Please enable Location Services in your iPhone Setting to share photos of dishes and where to find them on FoodTalk.", delegate: nil, cancelButtonTitle: "Close")
+            alertView.show()
+            self.tabBarController?.tabBar.userInteractionEnabled = true
+            
+        } else if (status == CLAuthorizationStatus.AuthorizedAlways) {
+            
+        }
     }
     
     func locationManager(manager: CLLocationManager, didFailWithError error: NSError) {

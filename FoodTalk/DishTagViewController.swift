@@ -32,7 +32,7 @@ class DishTagViewController: UIViewController, UITextFieldDelegate, UITableViewD
         navigationItem.rightBarButtonItem?.enabled = false
 
         
-        txtDishName!.autocorrectionType = UITextAutocorrectionType.No
+   //     txtDishName!.autocorrectionType = UITextAutocorrectionType.No
         self.tabBarController?.delegate = self
     }
     
@@ -100,7 +100,6 @@ class DishTagViewController: UIViewController, UITextFieldDelegate, UITableViewD
             else{
                tableView.hidden = false
             }
-           
             
             
         if(NSString(string: textField.text!).length > 3){

@@ -16,6 +16,8 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     @IBOutlet var searchBar : UISearchBar?
     @IBOutlet var searchListTable : UITableView?
     @IBOutlet var viewSelectedBorder : UIView?
+    @IBOutlet var btnCitySelection : UIButton?
+    @IBOutlet var viewsearchupper : UIView?
     
     var searchActive : Bool = false
     var dishData : NSMutableArray = []
@@ -34,10 +36,20 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     
     var imgEmptyScreen = UIImageView()
     var lblEmptyTitle = UILabel()
+    
+    var cityTableView = UITableView()
+    var cityView = UIView()
+    var isCityOn = Bool()
+    var arrCityList = NSMutableArray()
+    
+    var selectedCity = String()
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
+        isCityOn = false
+        selectedCity = "delhi"
+       
         // Do any additional setup after loading the view.
         self.navigationController?.navigationBarHidden = true
         selectedTab = "Dish"
@@ -91,11 +103,24 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         lblEmptyTitle.font = UIFont(name: fontBold, size: 15)
         self.view.addSubview(lblEmptyTitle)
         
+        cityView = UIView()
+        cityView.frame = CGRectMake(0, -150, self.view.frame.size.width, 120)
+        cityView.backgroundColor = UIColor.lightGrayColor()
+        self.view.addSubview(cityView)
+        
+        cityTableView = UITableView()
+        cityTableView.frame = CGRectMake(5, 5, cityView.frame.size.width - 10, cityView.frame.size.height - 10)
+        cityTableView.backgroundColor = UIColor.whiteColor()
+        cityTableView.dataSource = self
+        cityTableView.delegate = self
+        cityView.addSubview(cityTableView)
+        
         Flurry.logEvent("Search Screen")
     }
     
     
     override func viewWillAppear(animated: Bool) {
+        webServiceForRegion()
         self.navigationController?.navigationBarHidden = true
         searchBar!.tintColor = UIColor.whiteColor()
         
@@ -118,6 +143,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     
     override func viewDidAppear(animated: Bool) {
         searchBar?.becomeFirstResponder()
+        
     }
     
     override func preferredStatusBarStyle() -> UIStatusBarStyle {
@@ -309,6 +335,8 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         
     }
     
+   
+    
     func webSearchService(timer : NSTimer){
         
          let searchText = timer.userInfo as! String
@@ -322,6 +350,10 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if(tableView == cityTableView){
+            return arrCityList.count
+        }
+        else{
         if(searchActive) {
             return filtered.count
         }
@@ -334,6 +366,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         else{
             return restaurantData.count
         }
+        }
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
@@ -343,6 +376,14 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         }
         
         cell.selectionStyle = UITableViewCellSelectionStyle.None
+        
+        if(tableView == cityTableView){
+            if(arrCityList.count > 0){
+
+                cell.textLabel?.text = (arrCityList.objectAtIndex(indexPath.row).objectForKey("name") as? String)?.uppercaseString
+            }
+        }
+        else{
         
         let iconView = UIView()
         iconView.frame = CGRectMake(15, 10, 34, 34)
@@ -415,14 +456,35 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         cell.contentView.addSubview(cellText)
         iconView.addSubview(cellIcon)
         cell.contentView.addSubview(iconView)
+        }
         return cell;
     }
     
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+        if(tableView == cityTableView){
+            return 44
+        }
         return 54
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        
+        if(tableView == cityTableView){
+            
+            let str = arrCityList.objectAtIndex(indexPath.row).objectForKey("name") as? String
+           let index1 = str!.endIndex.advancedBy(-(str?.characters.count)! + 3)
+            
+           let substring1 = (arrCityList.objectAtIndex(indexPath.row).objectForKey("name") as? String)!.substringToIndex(index1).uppercaseString
+                            btnCitySelection?.setTitle(substring1, forState: UIControlState.Normal)
+            
+            
+            UIView.animateWithDuration(0.2, animations: { () -> Void in
+                self.cityView.frame = CGRectMake(0, -250, self.view.frame.size.width, 250)
+            })
+            selectedCity = (arrCityList.objectAtIndex(indexPath.row).objectForKey("name") as? String)!
+            isCityOn = false
+        }
+        else{
         if(selectedTab == "Dish"){
             arrDishList.removeAllObjects()
             if(filtered.count > 0){
@@ -465,6 +527,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 }
             }
         }
+        }
     }
     
     //MARK:- backbutton pressed
@@ -497,6 +560,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             let params = NSMutableDictionary()
             params.setObject(sessionId!, forKey: "sessionId")
             params.setObject(searchText, forKey: "search")
+            params.setObject(selectedCity, forKey: "region")
             
             webServiceCallingPost(url, parameters: params)
         }
@@ -507,8 +571,9 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             let params = NSMutableDictionary()
             params.setObject(sessionId!, forKey: "sessionId")
             params.setObject(searchText, forKey: "searchText")
-            params.setObject(dictLocations.valueForKey("latitude") as! NSNumber, forKey: "latitude")
-            params.setObject(dictLocations.valueForKey("longitute") as! NSNumber, forKey: "longitude")
+//            params.setObject(dictLocations.valueForKey("latitude") as! NSNumber, forKey: "latitude")
+//            params.setObject(dictLocations.valueForKey("longitute") as! NSNumber, forKey: "longitude")
+            params.setObject(selectedCity, forKey: "region")
             
             webServiceCallingPost(url, parameters: params)
         }
@@ -520,7 +585,31 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         }
     }
     
+    func webServiceForRegion(){
+        if (isConnectedToNetwork()){
+        let url = String(format: "%@%@%@", baseUrl, "region/", "list")
+        let sessionId = NSUserDefaults.standardUserDefaults().objectForKey("sessionId")
+        
+        let params = NSMutableDictionary()
+        params.setObject(sessionId!, forKey: "sessionId")
+        
+        webServiceCallingPost(url, parameters: params)
+            
+        }
+        else{
+            internetMsg(self.view)
+        }
+        delegate = self
+    }
+    
     func getDataFromWebService(dict : NSMutableDictionary){
+        
+        if(dict.objectForKey("api") as! String == "region/list"){
+            if(dict.objectForKey("status") as! String == "OK"){
+                arrCityList = dict.objectForKey("regions") as! NSMutableArray
+            }
+        }
+        else{
         var str = NSString()
         str = (searchBar?.text)!
         if(dict.objectForKey("api") as! String == "restaurant/list"){
@@ -589,6 +678,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         stopLoading1(self.view)
         self.searchListTable!.reloadData()
         self.searchListTable?.userInteractionEnabled = true
+        }
     }
     
     func serviceFailedWitherror(error : NSError){
@@ -599,6 +689,8 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         stopLoading(self.view)
     }
     
+    //MARK:- gestureMethods
+    
     func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWithGestureRecognizer otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         return true
     }
@@ -607,6 +699,26 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         return true
     }
 
+    //MARK:- city selection methods
+    
+    @IBAction func cityButtonTapped(sender : UIButton){
+        self.view.bringSubviewToFront(viewsearchupper!)
+        if(isCityOn == false){
+        UIView.animateWithDuration(0.5, animations: { () -> Void in
+            self.cityView.frame = CGRectMake(0, 64, self.cityView.frame.size.width, CGFloat(self.arrCityList.count * 44))
+            self.cityTableView.frame = CGRectMake(5, 5, self.cityView.frame.size.width - 10, self.cityView.frame.size.height - 10)
+        })
+            cityTableView.reloadData()
+            isCityOn = true
+        }
+        else{
+            UIView.animateWithDuration(0.5, animations: { () -> Void in
+                self.cityView.frame = CGRectMake(0, -150, self.view.frame.size.width, 150)
+            })
+            isCityOn = false
+        }
+    }
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.

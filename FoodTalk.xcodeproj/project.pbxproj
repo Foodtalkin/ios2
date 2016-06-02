@@ -140,6 +140,7 @@
 		75A1AA181C4CFF2C0011FA4B /* RestaurantProfileTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 75A1AA161C4CFF2C0011FA4B /* RestaurantProfileTableViewCell.xib */; };
 		75A1AA1A1C4D01F60011FA4B /* restaurant_white.png in Resources */ = {isa = PBXBuildFile; fileRef = 75A1AA191C4D01F60011FA4B /* restaurant_white.png */; };
 		75A1AA1C1C4D05B40011FA4B /* RestaurantProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75A1AA1B1C4D05B40011FA4B /* RestaurantProfileViewController.swift */; };
+		75A480121CFDA2710005F396 /* down icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 75A480111CFDA2710005F396 /* down icon.png */; };
 		75A6C9521C61E37D00BE9ECC /* bookmark (1).png in Resources */ = {isa = PBXBuildFile; fileRef = 75A6C9511C61E37D00BE9ECC /* bookmark (1).png */; };
 		75A6C95A1C61E5B000BE9ECC /* bookmark_red.png in Resources */ = {isa = PBXBuildFile; fileRef = 75A6C9591C61E5B000BE9ECC /* bookmark_red.png */; };
 		75ADA1111C1EB7850045CD1B /* CardViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75ADA10F1C1EB7850045CD1B /* CardViewCell.swift */; };
@@ -472,6 +473,7 @@
 		75A1AA161C4CFF2C0011FA4B /* RestaurantProfileTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RestaurantProfileTableViewCell.xib; sourceTree = "<group>"; };
 		75A1AA191C4D01F60011FA4B /* restaurant_white.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = restaurant_white.png; path = Images/restaurant_white.png; sourceTree = "<group>"; };
 		75A1AA1B1C4D05B40011FA4B /* RestaurantProfileViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RestaurantProfileViewController.swift; sourceTree = "<group>"; };
+		75A480111CFDA2710005F396 /* down icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "down icon.png"; path = "Images/down icon.png"; sourceTree = "<group>"; };
 		75A6C9511C61E37D00BE9ECC /* bookmark (1).png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "bookmark (1).png"; path = "Images/bookmark (1).png"; sourceTree = "<group>"; };
 		75A6C9591C61E5B000BE9ECC /* bookmark_red.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = bookmark_red.png; path = Images/bookmark_red.png; sourceTree = "<group>"; };
 		75A972321C537F4500A4AEBD /* SafariServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SafariServices.framework; path = System/Library/Frameworks/SafariServices.framework; sourceTree = SDKROOT; };
@@ -627,6 +629,7 @@
 		7582834E1C0EFBDE002E9EAC = {
 			isa = PBXGroup;
 			children = (
+				75A480111CFDA2710005F396 /* down icon.png */,
 				75902D9D1CEEEC0200B88B98 /* fb-logo.png */,
 				75902D9B1CEEEB2500B88B98 /* fb20.png */,
 				75902D991CEEE5BF00B88B98 /* fb40.png */,
@@ -1100,6 +1103,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7581717C1C312CCC004C7C5F /* Heart Liked.png in Resources */,
+				75A480121CFDA2710005F396 /* down icon.png in Resources */,
 				75A106D21C56094D00F01BCA /* DocSets in Resources */,
 				75A106DA1C56094D00F01BCA /* README.txt in Resources */,
 				75A6C95A1C61E5B000BE9ECC /* bookmark_red.png in Resources */,
@@ -1388,8 +1392,8 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Digital Food Talk Private limited (V7EESS78JQ)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Digital Food Talk Private limited (V7EESS78JQ)";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Shuchir Suri (C2NFE84K4R)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Shuchir Suri (C2NFE84K4R)";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_BITCODE = NO;
@@ -1418,7 +1422,7 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "$(inherited)";
-				PROVISIONING_PROFILE = "84d1d1fa-b7cc-4dd2-81ec-3b91a0f74589";
+				PROVISIONING_PROFILE = "5ef37e3b-3ae9-43f4-87d5-bf73ed81dd3d";
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				VALID_ARCHS = "armv7 armv7s armv6 arm64";
@@ -1444,8 +1448,8 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Digital Food Talk Private limited (V7EESS78JQ)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Digital Food Talk Private limited (V7EESS78JQ)";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Shuchir Suri (C2NFE84K4R)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Shuchir Suri (C2NFE84K4R)";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_BITCODE = NO;
@@ -1468,7 +1472,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "$(inherited)";
-				PROVISIONING_PROFILE = "84d1d1fa-b7cc-4dd2-81ec-3b91a0f74589";
+				PROVISIONING_PROFILE = "5ef37e3b-3ae9-43f4-87d5-bf73ed81dd3d";
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 				VALID_ARCHS = "armv7 armv7s armv6 arm64";
@@ -1483,8 +1487,8 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Digital Food Talk Private limited (V7EESS78JQ)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Digital Food Talk Private limited (V7EESS78JQ)";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Shuchir Suri (C2NFE84K4R)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Shuchir Suri (C2NFE84K4R)";
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(PROJECT_DIR)",
@@ -1505,7 +1509,7 @@
 				OTHER_LDFLAGS = "$(OTHER_LDFLAGS)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.foodtalkindia.FoodTalk;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "84d1d1fa-b7cc-4dd2-81ec-3b91a0f74589";
+				PROVISIONING_PROFILE = "5ef37e3b-3ae9-43f4-87d5-bf73ed81dd3d";
 				SWIFT_OBJC_BRIDGING_HEADER = "FoodTalk/FoodTalk-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TARGETED_DEVICE_FAMILY = 1;
@@ -1521,8 +1525,8 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Digital Food Talk Private limited (V7EESS78JQ)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Digital Food Talk Private limited (V7EESS78JQ)";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Shuchir Suri (C2NFE84K4R)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Shuchir Suri (C2NFE84K4R)";
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(PROJECT_DIR)",
@@ -1543,7 +1547,7 @@
 				OTHER_LDFLAGS = "$(OTHER_LDFLAGS)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.foodtalkindia.FoodTalk;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "84d1d1fa-b7cc-4dd2-81ec-3b91a0f74589";
+				PROVISIONING_PROFILE = "5ef37e3b-3ae9-43f4-87d5-bf73ed81dd3d";
 				SWIFT_OBJC_BRIDGING_HEADER = "FoodTalk/FoodTalk-Bridging-Header.h";
 				TARGETED_DEVICE_FAMILY = 1;
 				VALID_ARCHS = "armv7 armv7s armv6 arm64";
