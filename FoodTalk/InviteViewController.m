@@ -29,10 +29,7 @@ NSMutableArray *facebookFriendsArray;
 
 
 -(IBAction)skipMethod:(id)sender{
-//    UITabBarController *tbc = [self.storyboard instantiateViewControllerWithIdentifier:@"tabBarVC"];
-//    tbc.selectedIndex=0;
-//    [self.navigationController pushViewController:tbc animated:YES];
-    [self.tabBarController setSelectedIndex:0];
+    [self.navigationController popViewControllerAnimated:YES];
 }
 
 -(IBAction)inviteFriends:(id)sender{

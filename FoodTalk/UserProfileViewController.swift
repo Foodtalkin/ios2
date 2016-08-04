@@ -39,8 +39,14 @@ class UserProfileViewController: UIViewController, UITableViewDataSource, UITabl
     var activityIndicator1 = UIActivityIndicatorView()
     
     var isResponseCome : Bool = false
-    var firstLabel = UILabel()
+   // var firstLabel = UILabel()
     var navTitleLabel = UILabel()
+    var imgFullImage = UIImageView()
+    var viewFullImage = UIView()
+    
+    var fullImage = String()
+    
+    var isFullPressed = Bool()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -54,7 +60,8 @@ class UserProfileViewController: UIViewController, UITableViewDataSource, UITabl
         self.view.addSubview(activityIndicator1)
         
         tableView?.separatorColor = UIColor.clearColor()
-        tableView?.backgroundColor = UIColor(red: 21/255.0, green: 29/255.0, blue: 46/255.0, alpha: 1)
+ //       tableView?.backgroundColor = UIColor(red: 21/255.0, green: 29/255.0, blue: 46/255.0, alpha: 1)
+        tableView?.backgroundColor = UIColor.whiteColor()
         tableView!.decelerationRate = UIScrollViewDecelerationRateFast;
    //     self.view.backgroundColor = UIColor(red: 21/255.0, green: 29/255.0, blue: 46/255.0, alpha: 1)
         
@@ -73,22 +80,23 @@ class UserProfileViewController: UIViewController, UITableViewDataSource, UITabl
         }
         
         if let navigationBar = self.navigationController?.navigationBar {
-            let firstFrame = CGRect(x: 0, y: 28, width: navigationBar.frame.size.width , height: 17)
+//            let firstFrame = CGRect(x: 0, y: 28, width: navigationBar.frame.size.width , height: 17)
             
-            firstLabel = UILabel(frame: firstFrame)
-            
-            firstLabel.textColor = UIColor(red: 4/255.0, green: 209/255.0, blue: 205/255.0, alpha: 1)
-            firstLabel.textAlignment = NSTextAlignment.Center
-            firstLabel.font = UIFont(name: fontName, size: 10)
-            navigationBar.addSubview(firstLabel)
+//            firstLabel = UILabel(frame: firstFrame)
+//            
+//            firstLabel.textColor = UIColor(red: 4/255.0, green: 209/255.0, blue: 205/255.0, alpha: 1)
+//            firstLabel.textAlignment = NSTextAlignment.Center
+//            firstLabel.font = UIFont(name: fontName, size: 10)
+//            navigationBar.addSubview(firstLabel)
         }
     }
     
     override func viewWillAppear(animated: Bool) {
         showLoader(self.view)
+        isFullPressed = false
         userLoginAllInfo =  (NSUserDefaults.standardUserDefaults().objectForKey("LoginDetails") as? NSMutableDictionary)!
         arrNumberOfCard = NSMutableArray()
-        firstLabel.hidden = false
+    //    firstLabel.hidden = false
         navTitleLabel.hidden = false
         if(isConnectedToNetwork()){
         dispatch_async(dispatch_get_main_queue()) {
@@ -96,6 +104,7 @@ class UserProfileViewController: UIViewController, UITableViewDataSource, UITabl
         }
         }
         else{
+            internetMsg(self.view)
             stopLoading(self.view)
         }
         
@@ -136,7 +145,7 @@ class UserProfileViewController: UIViewController, UITableViewDataSource, UITabl
     
     override func viewWillDisappear(animated : Bool) {
         super.viewWillDisappear(animated)
-       firstLabel.hidden = true
+   //    firstLabel.hidden = true
         navTitleLabel.hidden = true
             cancelRequest()
         if (self.isMovingFromParentViewController()){
@@ -151,7 +160,9 @@ class UserProfileViewController: UIViewController, UITableViewDataSource, UITabl
     //MARK:- TableView Delegate Methods
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        
+        if(dictProfileInfo.count > 0){
+            return 2
+        }
             return 2
     }
     
@@ -160,15 +171,33 @@ class UserProfileViewController: UIViewController, UITableViewDataSource, UITabl
         if(indexPath.row == 0){
             let cell = tableView.dequeueReusableCellWithIdentifier("ProfileCell", forIndexPath: indexPath) as! UserProfileTableViewCell
             cell.selectionStyle = UITableViewCellSelectionStyle.None
+            cell.btnFollow?.hidden = true
         //    cell.backgroundColor = UIColor.blackColor()
             
-            cell.noOfcheckins?.text = dictProfileInfo.objectForKey("checkInCount") as? String
+           
+            if(dictProfileInfo.count > 0){
+            let numberFormatter = NSNumberFormatter()
+            let number = numberFormatter.numberFromString((dictProfileInfo.objectForKey("score") as? String)!)
+            let numberFloatValue = number!.floatValue
+            
+            let f = numberFloatValue
+            let y = Int(f)
+            
+            if(y == 0 || y == 1){
+                cell.noOfcheckins?.text = String(format: "%d", y)
+            }
+            else{
+                cell.noOfcheckins?.text = String(format: "%d", y)
+            }
+            
+            
+//            cell.noOfcheckins?.text = dictProfileInfo.objectForKey("checkInCount") as? String
             cell.noOfFollowers?.text = dictProfileInfo.objectForKey("followersCount") as? String
             cell.noOfFollowing?.text = dictProfileInfo.objectForKey("followingCount") as? String
             
             cell.btnFollowerList?.addTarget(self, action: #selector(UserProfileViewController.showFollowers(_:)), forControlEvents: UIControlEvents.TouchUpInside)
             cell.btnFollowingList!.addTarget(self, action: #selector(UserProfileViewController.showFollowing(_:)), forControlEvents: UIControlEvents.TouchUpInside)
-            cell.btnCheckInList!.addTarget(self, action: #selector(UserProfileViewController.showCheckIn(_:)), forControlEvents: UIControlEvents.TouchUpInside)
+//            cell.btnCheckInList!.addTarget(self, action: #selector(UserProfileViewController.showCheckIn(_:)), forControlEvents: UIControlEvents.TouchUpInside)
             
             btnFollow = cell.btnFollow
             btnFollow!.tag = indexPath.row
@@ -182,10 +211,11 @@ class UserProfileViewController: UIViewController, UITableViewDataSource, UITabl
                 btnFollow?.backgroundColor = UIColor.greenColor()
                 btnFollow?.setTitle("Following", forState: UIControlState.Normal)
             }
+            }
             
             if(isUserInfo == true){
-                
-            cell.username?.text = dictProfileInfo.objectForKey("fullName") as? String
+                if(dictProfileInfo.count > 0){
+            cell.username?.text = String(format: "%@ | %@", (dictProfileInfo.objectForKey("fullName") as? String)!, (dictProfileInfo.objectForKey("region") as? String)!)
                 dispatch_async(dispatch_get_main_queue()) {
           
                     cell.profilePic!.hnk_setImageFromURL(NSURL(string: (userLoginAllInfo.objectForKey("profile")?.objectForKey("image") as? String)!)!)
@@ -193,11 +223,14 @@ class UserProfileViewController: UIViewController, UITableViewDataSource, UITabl
                     cell.imgBackground!.hnk_setImageFromURL(NSURL(string: (userLoginAllInfo.objectForKey("profile")?.objectForKey("image") as? String)!)!)
                 
                 }
+                    fullImage = (userLoginAllInfo.objectForKey("profile")?.objectForKey("image") as? String)!
                 cell.btnFollow?.hidden = true
+                }
+                
             }
             else{
-               
-                cell.username?.text = dictProfileInfo.objectForKey("fullName") as? String
+               if(dictProfileInfo.count > 0){
+                cell.username?.text = String(format: "%@ | %@", (dictProfileInfo.objectForKey("fullName") as? String)!, (dictProfileInfo.objectForKey("region") as? String)!)
              //   self.title = dictProfileInfo.objectForKey("userName") as? String
                 navTitleLabel.text = dictProfileInfo.objectForKey("userName") as? String
                 dispatch_async(dispatch_get_main_queue()) {
@@ -206,12 +239,13 @@ class UserProfileViewController: UIViewController, UITableViewDataSource, UITabl
            
                     cell.imgBackground!.hnk_setImageFromURL(NSURL(string: (self.thumbImage))!)
                 }
-                
+                fullImage = (dictProfileInfo.objectForKey("image") as? String)!
                 if(postDictHome.objectForKey("userName") as? String != userLoginAllInfo.objectForKey("profile")?.objectForKey("userName") as? String){
                     cell.btnFollow?.hidden = false
                 }
                 else{
                    cell.btnFollow?.hidden = true
+                }
                 }
                 
             }
@@ -219,7 +253,30 @@ class UserProfileViewController: UIViewController, UITableViewDataSource, UITabl
             cell.profilePic?.layer.cornerRadius = 42
             cell.profilePic?.layer.masksToBounds = true
             cell.btnFollow?.layer.cornerRadius = 5
-
+            cell.profilePic?.userInteractionEnabled = true
+            
+            let tap = UITapGestureRecognizer(target: self, action: #selector(UserProfileViewController.imageFull))
+            tap.numberOfTapsRequired = 1
+            cell.profilePic?.tag = indexPath.row
+            cell.profilePic!.addGestureRecognizer(tap)
+            
+            viewFullImage.frame = CGRectMake(cell.profilePic!.frame.origin.x + cell.profilePic!.frame.size.width/2, 114, 1, 1)
+            viewFullImage.userInteractionEnabled = true
+            viewFullImage.backgroundColor = UIColor.clearColor()
+            self.view.addSubview(viewFullImage)
+            
+            let blurEffect1 = UIBlurEffect(style: UIBlurEffectStyle.Dark)
+            let blurEffectView1 = UIVisualEffectView(effect: blurEffect1)
+            blurEffectView1.frame = viewFullImage.bounds
+            blurEffectView1.autoresizingMask = [.FlexibleWidth, .FlexibleHeight] // for supporting device rotation
+            viewFullImage.addSubview(blurEffectView1)
+            
+            let tap1 = UITapGestureRecognizer(target: self, action: #selector(UserProfileViewController.imageSmall))
+            tap1.numberOfTapsRequired = 1
+            viewFullImage.tag = indexPath.row
+            viewFullImage.addGestureRecognizer(tap1)
+            
+            self.imgFullImage.contentMode = UIViewContentMode.ScaleAspectFit;
             
             let blurEffect = UIBlurEffect(style: UIBlurEffectStyle.Dark)
             let blurEffectView = UIVisualEffectView(effect: blurEffect)
@@ -235,7 +292,7 @@ class UserProfileViewController: UIViewController, UITableViewDataSource, UITabl
             if (cell == nil) {
                 cell = UITableViewCell(style:.Default, reuseIdentifier: "CELL")
             }
-            cell.backgroundColor = UIColor(red: 21/255.0, green: 29/255.0, blue: 46/255.0, alpha: 1)
+    //        cell.backgroundColor = UIColor(red: 21/255.0, green: 29/255.0, blue: 46/255.0, alpha: 1)
             
             
             if(arrNumberOfCard.count < 1){
@@ -263,15 +320,17 @@ class UserProfileViewController: UIViewController, UITableViewDataSource, UITabl
             // Register parts(header and cell
             if(view.viewWithTag(59) == nil){
                 if(arrNumberOfCard.count > 3){
-                    self.collectionView.frame = CGRectMake(0, 0, cell.frame.size.width,CGFloat (arrNumberOfCard.count/3) * self.collectionView.frame.size.width / 3 * 2)
+                    
+                    self.collectionView.frame = CGRectMake(0, 0, tableView.frame.size.width,CGFloat (arrNumberOfCard.count/3) * self.collectionView.frame.size.width / 3 * 2)
                 }
                 else{
-                    self.collectionView.frame = CGRectMake(0, 0, cell.frame.size.width,CGFloat (1) * self.collectionView.frame.size.width / 3)
+                    
+                    self.collectionView.frame = CGRectMake(0, 0, tableView.frame.size.width,CGFloat (1) * self.collectionView.frame.size.width / 3)
                 }
-             self.collectionView.reloadItemsAtIndexPaths(self.collectionView.indexPathsForVisibleItems())
+            self.collectionView.reloadItemsAtIndexPaths(self.collectionView.indexPathsForVisibleItems())
             self.collectionView.delegate = self     // delegate  :  UICollectionViewDelegate
             self.collectionView.dataSource = self   // datasource  : UICollectionViewDataSource
-                self.collectionView.tag = 59
+            self.collectionView.tag = 59
             self.collectionView.scrollEnabled = false
             self.collectionView.backgroundColor = UIColor.clearColor()
             self.collectionView.registerClass(PackCollectionViewCell.self, forCellWithReuseIdentifier: kCellReuse) // UICollectionViewCell
@@ -285,10 +344,10 @@ class UserProfileViewController: UIViewController, UITableViewDataSource, UITabl
             cell.contentView.addSubview(self.collectionView)
             }
             if(arrNumberOfCard.count > 3){
-                self.collectionView.frame = CGRectMake(0, 0, cell.frame.size.width,CGFloat (arrNumberOfCard.count/3) * self.collectionView.frame.size.width / 3 * 2 )
+                self.collectionView.frame = CGRectMake(0, 0, tableView.frame.size.width,CGFloat (arrNumberOfCard.count/3) * self.collectionView.frame.size.width / 3 * 2 )
             }
             else{
-                self.collectionView.frame = CGRectMake(0, 0, cell.frame.size.width,CGFloat (1) * self.collectionView.frame.size.width / 3)
+                self.collectionView.frame = CGRectMake(0, 0, tableView.frame.size.width,CGFloat (1) * self.collectionView.frame.size.width / 3)
             }
           //  dispatch_async(dispatch_get_main_queue()) {
         //    self.collectionView.reloadItemsAtIndexPaths(self.collectionView.indexPathsForVisibleItems())
@@ -324,6 +383,29 @@ class UserProfileViewController: UIViewController, UITableViewDataSource, UITabl
             }
         }
         return 44
+    }
+    
+    //MARK:- fullImage
+    
+    func imageFull(){
+        isFullPressed = true
+         UIView.animateWithDuration(0.4, animations: {
+            self.viewFullImage.frame = CGRectMake(0, 0, UIScreen.mainScreen().bounds.size.width, UIScreen.mainScreen().bounds.size.height)
+            self.imgFullImage.frame = CGRectMake(0, UIScreen.mainScreen().bounds.size.height/2 - UIScreen.mainScreen().bounds.size.width/2, UIScreen.mainScreen().bounds.size.width, UIScreen.mainScreen().bounds.size.width)
+           
+            self.viewFullImage.addSubview(self.imgFullImage)
+            self.imgFullImage.hnk_setImageFromURL(NSURL(string: (self.fullImage))!)
+        //    self.imgFullImage.contentMode = UIViewContentMode.ScaleAspectFit;
+        //    self.imgFullImage.hidden = false
+        })
+    }
+    
+    func imageSmall(){
+        UIView.animateWithDuration(0.4, animations: {
+            self.viewFullImage.frame = CGRectMake(UIScreen.mainScreen().bounds.size.width/2, 114, 1, 1)
+            
+            self.imgFullImage.frame = CGRectMake(self.viewFullImage.frame.size.width/2, self.viewFullImage.frame.size.height/2, 0, 0)
+        })
     }
     
     //MARK:- ScrollView Delegates
@@ -434,7 +516,7 @@ class UserProfileViewController: UIViewController, UITableViewDataSource, UITabl
     //MARK:- WebService Delegates
     
     func webserviceForCards(){
-        if(dictLocations.objectForKey("latitude") != nil){
+    //    if(dictLocations.objectForKey("latitude") != nil){
         if (isConnectedToNetwork()){
             pageList = 1
             
@@ -453,19 +535,32 @@ class UserProfileViewController: UIViewController, UITableViewDataSource, UITabl
         params.setObject(followedUserId, forKey: "selectedUserId")
         params.setObject("1", forKey: "page")
         params.setObject("10", forKey: "recordCount")
-        params.setObject(dictLocations.valueForKey("latitude") as! NSNumber, forKey: "latitude")
-        params.setObject(dictLocations.valueForKey("longitute") as! NSNumber, forKey: "longitude")
+//        params.setObject(dictLocations.valueForKey("latitude") as! NSNumber, forKey: "latitude")
+//        params.setObject(dictLocations.valueForKey("longitute") as! NSNumber, forKey: "longitude")
         webServiceCallingPost(url, parameters: params)
         delegate = self
         }
         else{
             internetMsg(view)
         }
-        }
-        else{
-            let alertView = UIAlertView(title: "Location Disabled", message: "Please enable Location Services in your iPhone Setting to share photos of dishes and where to find them on FoodTalk.", delegate: nil, cancelButtonTitle: "Close")
-            alertView.show()
-        }
+//        }
+//        else{
+//            let alertController = UIAlertController(
+//                title: "Location Disabled",
+//                message: "Please enable Location Services in your iPhone Setting to share photos of dishes and where to find them on FoodTalk.'",
+//                preferredStyle: .Alert)
+//            
+//            let cancelAction = UIAlertAction(title: "Cancel", style: .Cancel, handler: nil)
+//            alertController.addAction(cancelAction)
+//            
+//            let openAction = UIAlertAction(title: "Settings", style: .Default) { (action) in
+//                if let url = NSURL(string: UIApplicationOpenSettingsURLString) {
+//                    UIApplication.sharedApplication().openURL(url)
+//                }
+//            }
+//            alertController.addAction(openAction)
+//            self.presentViewController(alertController, animated: true, completion: nil)
+//        }
     }
     
     
@@ -592,20 +687,20 @@ class UserProfileViewController: UIViewController, UITableViewDataSource, UITabl
         else if(dict.objectForKey("api") as! String == "user/getProfile"){
             if(dict.objectForKey("status") as! String == "OK"){
                 
-                let numberFormatter = NSNumberFormatter()
-                let number = numberFormatter.numberFromString((dict.objectForKey("profile")?.objectForKey("score") as? String)!)
-                let numberFloatValue = number!.floatValue
-                
-                let f = numberFloatValue
-                let y = Int(f)
-                
-                if(y == 0 || y == 1){
-                firstLabel.text = String(format: "%d Point", y)
-                }
-                else{
-                firstLabel.text = String(format: "%d Points", y)
-                }
-                pointsTap = y
+//                let numberFormatter = NSNumberFormatter()
+//                let number = numberFormatter.numberFromString((dict.objectForKey("profile")?.objectForKey("score") as? String)!)
+//                let numberFloatValue = number!.floatValue
+//                
+//                let f = numberFloatValue
+//                let y = Int(f)
+//                
+//                if(y == 0 || y == 1){
+//                firstLabel.text = String(format: "%d Point", y)
+//                }
+//                else{
+//                firstLabel.text = String(format: "%d Points", y)
+//                }
+//                pointsTap = y
                 
                  arrValues = dict.objectForKey("imagePosts")?.mutableCopy() as! NSMutableArray
                 
@@ -754,8 +849,7 @@ class UserProfileViewController: UIViewController, UITableViewDataSource, UITabl
         
         let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
         layout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
-        return CGSize(width: (UIScreen.mainScreen().bounds.size.width/3)+1, height: (UIScreen.mainScreen().bounds.size.width/3));
-        
+        return CGSize(width: collectionView.frame.size.width/3-2, height: collectionView.frame.size.width/3-2);
     }
     
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAtIndex section: Int) -> CGFloat {
@@ -763,7 +857,7 @@ class UserProfileViewController: UIViewController, UITableViewDataSource, UITabl
     }
     
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAtIndex section: Int) -> CGFloat {
-        return 1
+        return 0.80
     }
     
 
@@ -811,7 +905,7 @@ class UserProfileViewController: UIViewController, UITableViewDataSource, UITabl
     //MARK:- ShowingFollowersList
     
     func showFollowers(sender : UIButton){
-        firstLabel.hidden = true
+  //      firstLabel.hidden = true
         userListType = "follower"
         if(isUserInfo == true){
             userIdForFollow = NSUserDefaults.standardUserDefaults().objectForKey("userId") as! String
@@ -824,7 +918,7 @@ class UserProfileViewController: UIViewController, UITableViewDataSource, UITabl
     }
     
     func showFollowing(sender : UIButton){
-        firstLabel.hidden = true
+  //      firstLabel.hidden = true
         userListType = "following"
         if(isUserInfo == true){
             userIdForFollow = NSUserDefaults.standardUserDefaults().objectForKey("userId") as! String
@@ -837,7 +931,7 @@ class UserProfileViewController: UIViewController, UITableViewDataSource, UITabl
     }
     
     func showCheckIn(sender : UIButton){
-        firstLabel.hidden = true
+    //    firstLabel.hidden = true
         userListType = "checkIn"
         if(isUserInfo == true){
             userIdForFollow = NSUserDefaults.standardUserDefaults().objectForKey("userId") as! String
@@ -847,6 +941,24 @@ class UserProfileViewController: UIViewController, UITableViewDataSource, UITabl
         }
         let openPost = self.storyboard!.instantiateViewControllerWithIdentifier("followers") as! FollowersViewController;
         self.navigationController!.visibleViewController!.navigationController!.pushViewController(openPost, animated:true);
+    }
+    
+    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        if(isFullPressed == false){
+        if let touch = touches.first {
+            let currentPoint = touch.locationInView(conectivityMsg)
+            // do something with your currentPoint
+            if(isConnectedToNetwork()){
+                conectivityMsg.removeFromSuperview()
+                dispatch_async(dispatch_get_main_queue()) {
+                    self.webserviceForCards()
+                }
+            }
+        }
+        }
+        else{
+            isFullPressed = false
+        }
     }
     
     override func didReceiveMemoryWarning() {

@@ -28,7 +28,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         
-        
         UIApplication.sharedApplication().statusBarStyle = UIStatusBarStyle.LightContent
         if let remoteNotification = launchOptions?[UIApplicationLaunchOptionsRemoteNotificationKey] as? NSDictionary {
             
@@ -73,8 +72,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
             let myCustomBackButtonItem:UIBarButtonItem = UIBarButtonItem(customView: myBackButton)
             navigationItem.leftBarButtonItem  = myCustomBackButtonItem
             
+                let userName = NSUserDefaults.standardUserDefaults().objectForKey("userName") as! String
+            Flurry.setUserID(userName)
+                
+            
             Parse.setApplicationId("RBOZIK8Vti138uqPIucaBherLAB16JFa3ITi4kDu",
                 clientKey: "Kavc924t4PGsZzQdwUoLS6nz3q3Wm5PfRUjEDj9a")
+                
             
             let oldPushHandlerOnly = !self.respondsToSelector(#selector(UIApplicationDelegate.application(_:didReceiveRemoteNotification:fetchCompletionHandler:)))
             let noPushPayload: AnyObject? = launchOptions?[UIApplicationLaunchOptionsRemoteNotificationKey]
@@ -160,10 +164,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
                 myBackButton.sizeToFit()
                 let myCustomBackButtonItem:UIBarButtonItem = UIBarButtonItem(customView: myBackButton)
                 navigationItem.leftBarButtonItem  = myCustomBackButtonItem
+                
+                let userName = NSUserDefaults.standardUserDefaults().objectForKey("userName") as! String
+                Flurry.setUserID(userName)
             
             Parse.setApplicationId("RBOZIK8Vti138uqPIucaBherLAB16JFa3ITi4kDu",
                 clientKey: "Kavc924t4PGsZzQdwUoLS6nz3q3Wm5PfRUjEDj9a")
-            
             
             
             
@@ -182,9 +188,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
         
         Flurry.setCrashReportingEnabled(true)
         Flurry.startSession("KNCBBSX6RCMBNV8FP2TQ")
-        
-        
-
+        Flurry.setShowErrorInLogEnabled(true)
+        Flurry.setDebugLogEnabled(true)
+        Flurry.setBackgroundSessionEnabled(false)
         
         return true
     }
@@ -277,8 +283,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
     
     func locationManager(manager: CLLocationManager, didChangeAuthorizationStatus status: CLAuthorizationStatus) {
         if (status == CLAuthorizationStatus.Denied) {
-            let alertView = UIAlertView(title: "Location Disabled", message: "Please enable Location Services in your iPhone Setting to share photos of dishes and where to find them on FoodTalk.", delegate: nil, cancelButtonTitle: "Close")
-            alertView.show()
+
             
         } else if (status == CLAuthorizationStatus.AuthorizedAlways) {
             
@@ -314,47 +319,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
             
             
             let dict = (userInfo as NSDictionary)
-//            if(dict.objectForKey("eventType") as! String == "1" || dict.objectForKey("eventType") as! String == "2" || dict.objectForKey("eventType") as! String == "4" || dict.objectForKey("eventType") as! String == "9"){
-//                
-//                self.performSelector(#selector(AppDelegate.openOpenPostScreen(_:)), withObject: dict, afterDelay: 2)
-//                
-//            }
-//                
-//            else if(dict.objectForKey("eventType") as! String == "5"){
-//               
-//                self.performSelector(#selector(AppDelegate.openUserProfile(_:)), withObject: dict, afterDelay: 2)
-//                
-//            }
-//            
-//            else if(dict.objectForKey("eventType") as! String == "6"){
-//                
-//                self.performSelector(#selector(AppDelegate.openRestaurantProfile(_:)), withObject: dict, afterDelay: 2)
-//            }
-//            
-//            else if(dict.objectForKey("eventType") as! String == "50"){
-//                
-//                let nav = self.window!.rootViewController as! UINavigationController;
-//                
-//                if((nav.visibleViewController?.isKindOfClass(Home)) != nil){
-//                    let viewControllers = nav.viewControllers
-//                    for viewController in viewControllers {
-//                        // some process
-//                        if viewController.isKindOfClass(Home) {
-//                            nav.visibleViewController?.navigationController?.popToViewController(viewController, animated: false)
-//                        }
-//                    }
-//                }
-//            }
-//                
-//            else if(dict.objectForKey("eventType") as! String == "51"){
-//                
-//               self.performSelector(#selector(AppDelegate.openDiscoverProfile(_:)), withObject: dict, afterDelay: 2)
-//                
-//            }
-//            
-//            else if(dict.objectForKey("eventType") as! String == "52"){
-//                self.performSelector(#selector(AppDelegate.openUserProfile1(_:)), withObject: dict, afterDelay: 2)
-//            }
             self.performSelector(#selector(AppDelegate.singleFunctionForNotification(_:)), withObject: dict, afterDelay: 2)
           //  singleFunctionForNotification(dict)
         }
@@ -419,18 +383,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
         let storyBoard = self.window!.rootViewController!.storyboard;
         let nav = self.window!.rootViewController as! UINavigationController;
         nav.tabBarController?.tabBar.hidden = false
-        
-        
-//        if((nav.visibleViewController?.isKindOfClass(OpenPostViewController)) != nil){
-//            
-//            let viewControllers = nav.viewControllers
-//            for viewController in viewControllers {
-//                // some process
-//                if viewController.isKindOfClass(OpenPostViewController) {
-//                    nav.visibleViewController?.navigationController?.popToViewController(viewController, animated: false)
-//                }
-//            }
-//        }
         
         stopLoading(self.window!)
         if(dict.objectForKey("class") as? String == "Home"){
@@ -623,7 +575,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
         for(var index : Int = 0; index < dishnameArray.count; index += 1){
             dishNames.addObject(dishnameArray.objectAtIndex(index).objectForKey("name") as! String)
         }
-        
+            
         let paths = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0] as String
         let path = (paths as NSString).stringByAppendingPathComponent("DishName.plist")
 

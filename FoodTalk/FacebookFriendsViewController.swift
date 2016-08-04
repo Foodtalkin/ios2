@@ -20,9 +20,11 @@ class FacebookFriendsViewController: UIViewController, UITableViewDelegate, UITa
         super.viewDidLoad()
         
         strFb = ""
+        if(NSUserDefaults.standardUserDefaults().objectForKey("facebookFriends") != nil){
         arrayFacebookFriends = NSUserDefaults.standardUserDefaults().objectForKey("facebookFriends") as! NSMutableArray
-       
+        }
         // Do any additional setup after loading the view.
+        if(arrayFacebookFriends.count > 0){
         for(var index = 0;index < arrayFacebookFriends.count; index++){
             arrFbIds.addObject(arrayFacebookFriends.objectAtIndex(index).objectForKey("id") as! String)
             let ids = String(format: "%@,",arrayFacebookFriends.objectAtIndex(index).objectForKey("id") as! String)
@@ -30,21 +32,26 @@ class FacebookFriendsViewController: UIViewController, UITableViewDelegate, UITa
         }
         strFb = strFb.substringToIndex(strFb.endIndex.predecessor())
         
-        self.tableView!.backgroundColor = UIColor(red: 20/255, green: 29/255, blue: 45/255, alpha: 1.0)
-        let tblView =  UIView(frame: CGRectZero)
-        tableView!.tableFooterView = tblView
-        tableView!.tableFooterView!.hidden = true
-        tableView?.separatorColor = UIColor(red: 47/255, green: 51/255, blue: 60/255, alpha: 1.0)
-        
         if(NSUserDefaults.standardUserDefaults().objectForKey("nextFb") != nil){
         nextFbString = NSUserDefaults.standardUserDefaults().objectForKey("nextFb") as! String
         }
         
         self.title = "Find facebook friends"
         
-        showLoader(self.view)
-        webServiceCalling()
-        delegate = self
+        if(isConnectedToNetwork()){
+         showLoader(self.view)
+         webServiceCalling()
+         delegate = self
+        }
+        else{
+           internetMsg(self.view)
+        }
+        }
+        self.tableView!.backgroundColor = UIColor.whiteColor()
+        let tblView =  UIView(frame: CGRectZero)
+        tableView!.tableFooterView = tblView
+        tableView!.tableFooterView!.hidden = true
+        tableView?.separatorColor = UIColor.lightGrayColor()
     }
     
     
@@ -157,7 +164,7 @@ class FacebookFriendsViewController: UIViewController, UITableViewDelegate, UITa
             cell = UITableViewCell(style:.Default, reuseIdentifier: "CELL")
         }
         cell.selectionStyle = UITableViewCellSelectionStyle.None
-        cell.backgroundColor = UIColor(red: 20/255, green: 29/255, blue: 45/255, alpha: 1.0)
+        cell.backgroundColor = UIColor.clearColor()
         
         let iconView = UIView()
         iconView.frame = CGRectMake(15, 10, 34, 34)
@@ -174,8 +181,8 @@ class FacebookFriendsViewController: UIViewController, UITableViewDelegate, UITa
         
         let cellText = UILabel()
         cellText.frame = CGRectMake(59, 5, self.view.frame.size.width - 59, 20)
-        cellText.font = UIFont(name: fontBold, size: 15)
-        cellText.textColor = UIColor.whiteColor()
+        cellText.font = UIFont(name: fontName, size: 15)
+        cellText.textColor = UIColor.blackColor()
         cellText.tag = 22
         cellText.numberOfLines = 2
         
@@ -191,7 +198,7 @@ class FacebookFriendsViewController: UIViewController, UITableViewDelegate, UITa
         cellFollow.frame = CGRectMake(tableView.frame.size.width - 140, 15, 120, 20)
         cellFollow.font = UIFont(name: fontName, size: 15)
         cellFollow.textAlignment = NSTextAlignment.Right
-        cellFollow.textColor = UIColor.whiteColor()
+        cellFollow.textColor = UIColor.grayColor()
         cellFollow.tag = 234
         
         
@@ -202,12 +209,12 @@ class FacebookFriendsViewController: UIViewController, UITableViewDelegate, UITa
             cellIcon.hnk_setImageFromURL(NSURL(string: (self.arrResponseArray.objectAtIndex(indexPath.row).objectForKey("thumb") as? String)!)!)
             }
             if(self.arrResponseArray.objectAtIndex(indexPath.row).objectForKey("iFollowedIt") as? String == "1"){
-                cellFollow.textColor = UIColor.greenColor()
-                cellFollow.text = "Follow"
+                cellFollow.textColor = UIColor.grayColor()
+                cellFollow.text = "Following"
             }
             else{
-                cellFollow.textColor = UIColor.whiteColor()
-                cellFollow.text = "Following"
+                cellFollow.textColor = UIColor.greenColor()
+                cellFollow.text = "Follow"
             }
         }
         
@@ -228,6 +235,21 @@ class FacebookFriendsViewController: UIViewController, UITableViewDelegate, UITa
     
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
         return 58
+    }
+    
+    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        if let touch = touches.first {
+            let currentPoint = touch.locationInView(conectivityMsg)
+            // do something with your currentPoint
+            if(isConnectedToNetwork()){
+                conectivityMsg.removeFromSuperview()
+                dispatch_async(dispatch_get_main_queue()) {
+                    showLoader(self.view)
+                    self.webServiceCalling()
+                    delegate = self
+                }
+            }
+        }
     }
 
     override func didReceiveMemoryWarning() {

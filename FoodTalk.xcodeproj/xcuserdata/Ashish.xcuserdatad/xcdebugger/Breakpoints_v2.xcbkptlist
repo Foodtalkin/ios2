@@ -19,13 +19,61 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "FoodTalk/CheckInViewController.swift"
-            timestampString = "484052615.268122"
+            filePath = "FoodTalk/FoodTalkSuggestionsViewController.swift"
+            timestampString = "490624427.91121"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "305"
-            endingLineNumber = "305"
-            landmarkName = "searchBar(_:textDidChange:)"
+            startingLineNumber = "311"
+            endingLineNumber = "311"
+            landmarkName = "getDataFromWebService(_:)"
+            landmarkType = "5">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "FoodTalk.FoodTalkSuggestionsViewController.getDataFromWebService (__ObjC.NSMutableDictionary) -&gt; ()"
+                  moduleName = "FoodTalk"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/Ashish/Desktop/FoodTalkNew/FoodTalk%202/FoodTalk/FoodTalkSuggestionsViewController.swift"
+                  timestampString = "490608059.538107"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "277"
+                  endingLineNumber = "277"
+                  offsetFromSymbolStart = "36">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "protocol witness for FoodTalk.WebServiceCallingDelegate.getDataFromWebService (__ObjC.NSMutableDictionary) -&gt; () in conformance FoodTalk.FoodTalkSuggestionsViewController : FoodTalk.WebServiceCallingDelegate in FoodTalk"
+                  moduleName = "FoodTalk"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/Ashish/Desktop/FoodTalkNew/FoodTalk%202/FoodTalk/FoodTalkSuggestionsViewController.swift"
+                  timestampString = "490608059.538295"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "276"
+                  endingLineNumber = "276"
+                  offsetFromSymbolStart = "28">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FoodTalk/FoodTalkSuggestionsViewController.swift"
+            timestampString = "490608437.91554"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "99"
+            endingLineNumber = "99"
+            landmarkName = "addLocationManager()"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
@@ -35,77 +83,13 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "FoodTalk/CheckInViewController.swift"
-            timestampString = "486475455.447221"
+            filePath = "FoodTalk/FoodTalkSuggestionsViewController.swift"
+            timestampString = "490608437.91554"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "524"
-            endingLineNumber = "524"
+            startingLineNumber = "116"
+            endingLineNumber = "116"
             landmarkName = "locationManager(_:didUpdateLocations:)"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "FoodTalk/RestaurantProfileViewController.swift"
-            timestampString = "485255484.414207"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "221"
-            endingLineNumber = "221"
-            landmarkName = "actionSheet(_:clickedButtonAtIndex:)"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "FoodTalk/DishLinkViewController.swift"
-            timestampString = "486308097.510132"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "176"
-            endingLineNumber = "176"
-            landmarkName = "getDataFromWebService(_:)"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "FoodTalk/RestaurantProfileViewController.swift"
-            timestampString = "486476404.706835"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "429"
-            endingLineNumber = "429"
-            landmarkName = "getDataFromWebService(_:)"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "FoodTalk/CheckInViewController.swift"
-            timestampString = "486475455.447221"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "771"
-            endingLineNumber = "771"
-            landmarkName = "setUsersClosestCity()"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

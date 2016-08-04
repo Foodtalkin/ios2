@@ -230,6 +230,35 @@ class FollowersViewController: UIViewController, UITableViewDataSource, UITableV
         }
     }
 
+    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        if let touch = touches.first {
+            let currentPoint = touch.locationInView(conectivityMsg)
+            // do something with your currentPoint
+            if(isConnectedToNetwork()){
+                conectivityMsg.removeFromSuperview()
+                dispatch_async(dispatch_get_main_queue()) {
+                    if(userListType == "follower"){
+                        self.title = "Followers"
+                        dispatch_async(dispatch_get_main_queue()) {
+                            self.webServiceCallFollowers()
+                        }
+                    }
+                    else if(userListType == "following"){
+                        self.title = "Following"
+                        dispatch_async(dispatch_get_main_queue()) {
+                            self.webServiceCallFollowing()
+                        }
+                    }
+                    else{
+                        self.title = "CheckIn"
+                        dispatch_async(dispatch_get_main_queue()) {
+                            self.webServiceCallCheckin()
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()

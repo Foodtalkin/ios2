@@ -43,7 +43,7 @@ class RestaurantProfileViewController: UIViewController, UITableViewDataSource, 
       //  showLoader(self.view)
         
         if(activityIndicator1.isEqual(nil)){
-            activityIndicator1 = UIActivityIndicatorView(activityIndicatorStyle: UIActivityIndicatorViewStyle.White)
+            activityIndicator1 = UIActivityIndicatorView(activityIndicatorStyle: UIActivityIndicatorViewStyle.Gray)
         }
         activityIndicator1.frame = CGRect(x: self.view.frame.size.width/2 - 15, y: 360, width: 30, height: 30)
         activityIndicator1.startAnimating()
@@ -51,10 +51,10 @@ class RestaurantProfileViewController: UIViewController, UITableViewDataSource, 
         
         Flurry.logEvent("Restaurant Profile Screen")
         tableView!.registerNib(UINib(nibName: "RestaurantProfileTableViewCell", bundle: nil), forCellReuseIdentifier: "restaurant")
-        tableView?.backgroundColor = UIColor(red: 21/255.0, green: 29/255.0, blue: 46/255.0, alpha: 1)
+        tableView?.backgroundColor = UIColor.whiteColor()
         tableView?.separatorColor = UIColor.clearColor()
         
-        self.view.backgroundColor = UIColor(red: 21/255.0, green: 29/255.0, blue: 46/255.0, alpha: 1)
+        self.view.backgroundColor = UIColor.whiteColor()
         
         let button: UIButton = UIButton(type: UIButtonType.Custom)
         button.setImage(UIImage(named: "moreWhite.png"), forState: UIControlState.Normal)
@@ -65,7 +65,7 @@ class RestaurantProfileViewController: UIViewController, UITableViewDataSource, 
         self.navigationItem.rightBarButtonItem = barButton
         
         self.title = "Restaurant"
-        
+        comingFrom = "HomeDish"
         
         // (Current navigation item
         dispatch_async(dispatch_get_main_queue()) {
@@ -81,6 +81,7 @@ class RestaurantProfileViewController: UIViewController, UITableViewDataSource, 
         super.viewWillDisappear(animated)
         
         cancelRequest()
+        isSuggestion = false
         if (self.isMovingFromParentViewController()){
            
             self.navigationController?.navigationBarHidden = true
@@ -111,10 +112,27 @@ class RestaurantProfileViewController: UIViewController, UITableViewDataSource, 
             cell.checkInBtn!.layer.borderColor = UIColor.whiteColor().CGColor
             cell.checkInBtn?.layer.cornerRadius = 5
             
+                
             cell.retaurentname?.text = profileInfo.objectForKey("restaurantName") as? String
             cell.address?.text = profileInfo.objectForKey("address") as? String
-            
-            cell.checkInBtn?.setTitle(String(format: "%@ Checkin", profileInfo.objectForKey("checkInCount") as! String), forState: UIControlState.Normal)
+                
+                if((profileInfo.objectForKey("priceRange") as! String).characters.count > 0){
+                let restaurantPrice = profileInfo.objectForKey("priceRange")?.floatValue
+                    
+                if(restaurantPrice < 499){
+                    cell.checkInBtn?.setTitle(("\u{20B9} Budget"), forState: UIControlState.Normal)
+                }
+                else if(restaurantPrice > 499 && restaurantPrice < 1000){
+                    cell.checkInBtn?.setTitle(("\u{20B9} Mid Range"), forState: UIControlState.Normal)
+                }
+                else if(restaurantPrice > 999){
+                    cell.checkInBtn?.setTitle(("\u{20B9} Splurge"), forState: UIControlState.Normal)
+                }
+                }
+                else{
+                    cell.checkInBtn?.setTitle(("No cost"), forState: UIControlState.Normal)
+                }
+                
                 if(self.arrImages.count > 0){
                 dispatch_async(dispatch_get_main_queue()) {
                     cell.imgBackground!.hnk_setImageFromURL(NSURL(string: self.arrImages.objectAtIndex(indexPath.row).objectForKey("postImage") as! String)!)
@@ -135,7 +153,7 @@ class RestaurantProfileViewController: UIViewController, UITableViewDataSource, 
             if (cell == nil) {
                 cell = UITableViewCell(style:.Default, reuseIdentifier: "CELL")
             }
-            cell.backgroundColor = UIColor(red: 21/255.0, green: 29/255.0, blue: 46/255.0, alpha: 1)
+            cell.backgroundColor = UIColor.whiteColor()
             cell.selectionStyle = UITableViewCellSelectionStyle.None
             
             if(arrImages.count < 1){
@@ -153,10 +171,10 @@ class RestaurantProfileViewController: UIViewController, UITableViewDataSource, 
             
             if(view.viewWithTag(59) == nil){
                 if(arrImages.count > 3){
-                self.collectionView.frame = CGRectMake(0, 0, cell.frame.size.width,CGFloat (arrImages.count/3) * self.collectionView.frame.size.width / 3 + cell.frame.size.width / 3)
+                self.collectionView.frame = CGRectMake(0, 0, UIScreen.mainScreen().bounds.size.width,CGFloat (arrImages.count/3) * self.collectionView.frame.size.width / 3 + UIScreen.mainScreen().bounds.size.width / 3)
                 }
                 else{
-                self.collectionView.frame = CGRectMake(0, 0, cell.frame.size.width,CGFloat (1) * self.collectionView.frame.size.width / 3)
+                self.collectionView.frame = CGRectMake(0, 0, UIScreen.mainScreen().bounds.size.width,CGFloat (1) * self.collectionView.frame.size.width / 3)
                 }
                 self.collectionView.delegate = self     // delegate  :  UICollectionViewDelegate
                 self.collectionView.dataSource = self   // datasource  : UICollectionViewDataSource
@@ -173,10 +191,10 @@ class RestaurantProfileViewController: UIViewController, UITableViewDataSource, 
             }
             
             if(arrImages.count > 3){
-                self.collectionView.frame = CGRectMake(0, 0, cell.frame.size.width,CGFloat (arrImages.count/3) * self.collectionView.frame.size.width / 3 + cell.frame.size.width / 3)
+                self.collectionView.frame = CGRectMake(0, 0, UIScreen.mainScreen().bounds.size.width,CGFloat (arrImages.count/3) * self.collectionView.frame.size.width / 3 + UIScreen.mainScreen().bounds.size.width / 3)
             }
             else{
-                self.collectionView.frame = CGRectMake(0, 0, cell.frame.size.width,CGFloat (1) * self.collectionView.frame.size.width / 3)
+                self.collectionView.frame = CGRectMake(0, 0, UIScreen.mainScreen().bounds.size.width,CGFloat (1) * self.collectionView.frame.size.width / 3)
             }
             self.collectionView.reloadData()
             
@@ -332,7 +350,7 @@ class RestaurantProfileViewController: UIViewController, UITableViewDataSource, 
         
         let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
         layout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
-        return CGSize(width: (UIScreen.mainScreen().bounds.size.width/3), height: (UIScreen.mainScreen().bounds.size.width/3));
+        return CGSize(width: (UIScreen.mainScreen().bounds.size.width/3 - 1), height: (UIScreen.mainScreen().bounds.size.width/3 - 1));
     }
     
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAtIndex section: Int) -> CGFloat {
@@ -340,13 +358,13 @@ class RestaurantProfileViewController: UIViewController, UITableViewDataSource, 
     }
     
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAtIndex section: Int) -> CGFloat {
-        return 1
+        return 0.80
     }
     
     //MARK:- WebServiceCalling & Delagates
     
     func webServiceForRestaurant(){
-       if(dictLocations.objectForKey("latitude") != nil){
+    //   if(dictLocations.objectForKey("latitude") != nil){
         if(isConnectedToNetwork()){
             pageList += 1
             //showLoader(self.view)
@@ -357,8 +375,10 @@ class RestaurantProfileViewController: UIViewController, UITableViewDataSource, 
             params.setObject(sessionId!, forKey: "sessionId")
             params.setObject(pageList, forKey: "page")
             params.setObject(restaurantProfileId, forKey: "restaurantId")
+            if(dictLocations.objectForKey("latitude") != nil){
             params.setObject(dictLocations.valueForKey("latitude") as! NSNumber, forKey: "latitude")
             params.setObject(dictLocations.valueForKey("longitute") as! NSNumber, forKey: "longitude")
+            }
             
             webServiceCallingPost(url, parameters: params)
             delegate = self
@@ -366,11 +386,24 @@ class RestaurantProfileViewController: UIViewController, UITableViewDataSource, 
         else{
             internetMsg(view)
         }
-        }
-       else{
-        let alertView = UIAlertView(title: "Location Disabled", message: "Please enable Location Services in your iPhone Setting to share photos of dishes and where to find them on FoodTalk.", delegate: nil, cancelButtonTitle: "Close")
-        alertView.show()
-        }
+//        }
+//       else{
+//        let alertController = UIAlertController(
+//            title: "Location Disabled",
+//            message: "Please enable Location Services in your iPhone Setting to share photos of dishes and where to find them on FoodTalk.'",
+//            preferredStyle: .Alert)
+//        
+//        let cancelAction = UIAlertAction(title: "Cancel", style: .Cancel, handler: nil)
+//        alertController.addAction(cancelAction)
+//        
+//        let openAction = UIAlertAction(title: "Settings", style: .Default) { (action) in
+//            if let url = NSURL(string: UIApplicationOpenSettingsURLString) {
+//                UIApplication.sharedApplication().openURL(url)
+//            }
+//        }
+//        alertController.addAction(openAction)
+//        self.presentViewController(alertController, animated: true, completion: nil)
+//        }
     }
     
     func webServiceRestaurantReport(){
@@ -426,7 +459,7 @@ class RestaurantProfileViewController: UIViewController, UITableViewDataSource, 
         else{
         
         if(dict.objectForKey("status") as! String == "OK"){
-            print("dict",dict)
+           
             profileInfo = dict.objectForKey("restaurantProfile") as! NSDictionary
             if(profileInfo.objectForKey("distance") is NSNull){
                restaurantDistance = 0.0
@@ -444,7 +477,7 @@ class RestaurantProfileViewController: UIViewController, UITableViewDataSource, 
             if((profileInfo.objectForKey("phone2") as! String).characters.count > 2){
                 arrPhoneNumbers.addObject(profileInfo.objectForKey("phone2") as! String)
             }
-            self.collectionView.frame = CGRectMake(0, 0, view.frame.size.width,CGFloat (arrImages.count/3) * self.collectionView.frame.size.width / 3)
+            self.collectionView.frame = CGRectMake(0, 0, UIScreen.mainScreen().bounds.size.width,CGFloat (arrImages.count/3) * self.collectionView.frame.size.width / 3)
             collectionView.reloadData()
         }
         
@@ -526,6 +559,18 @@ class RestaurantProfileViewController: UIViewController, UITableViewDataSource, 
         actionSheet.showInView(self.view)
     }
     
+    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        if let touch = touches.first {
+            let currentPoint = touch.locationInView(conectivityMsg)
+            // do something with your currentPoint
+            if(isConnectedToNetwork()){
+                conectivityMsg.removeFromSuperview()
+                dispatch_async(dispatch_get_main_queue()) {
+                    self.webServiceForRestaurant()
+                }
+            }
+        }
+    }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()

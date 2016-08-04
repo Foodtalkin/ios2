@@ -8,7 +8,7 @@
 
 import UIKit
 
-class AddRestaurantViewController: UIViewController, UITextFieldDelegate, WebServiceCallingDelegate, UIPickerViewDataSource, UIPickerViewDelegate {
+class AddRestaurantViewController: UIViewController, UITextFieldDelegate, WebServiceCallingDelegate, UIPickerViewDataSource, UIPickerViewDelegate, CLLocationManagerDelegate {
     
     @IBOutlet var txtRestaurantName : UITextField?
     @IBOutlet var txtAddress : UITextField?
@@ -26,12 +26,15 @@ class AddRestaurantViewController: UIViewController, UITextFieldDelegate, WebSer
     
     var selectedCity = String()
     var typePickerView: UIPickerView = UIPickerView()
-
+    
+    var locationManager : CLLocationManager?
+    var currentLocation : CLLocation?
+    var callInt : Int = 0
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        selectedCity = "delhi"
+        selectedCity = NSUserDefaults.standardUserDefaults().objectForKey("citySelected") as! String
         
         if(isConnectedToNetwork()){
             webServiceForRegion()
@@ -47,6 +50,9 @@ class AddRestaurantViewController: UIViewController, UITextFieldDelegate, WebSer
         lblImage?.layer.masksToBounds = true
         
         UITextField.appearance().tintColor = UIColor.blackColor()
+        
+        txtRestaurantName?.keyboardType = UIKeyboardType.ASCIICapable
+        txtRestaurantName?.becomeFirstResponder()
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "CheckIn", style: .Plain, target: self, action: #selector(AddRestaurantViewController.addTapped))
         self.navigationItem.rightBarButtonItem!.enabled = false;
@@ -67,6 +73,7 @@ class AddRestaurantViewController: UIViewController, UITextFieldDelegate, WebSer
     
     override func viewWillAppear(animated: Bool) {
         navigationController?.navigationBarHidden = false
+        addLocationManager()
     }
     
     override func viewWillDisappear(animated: Bool) {
@@ -76,6 +83,7 @@ class AddRestaurantViewController: UIViewController, UITextFieldDelegate, WebSer
     
     @IBAction func isSwitchOnOrOff(sender : UISwitch){
         if(sender.on){
+            if(dictLocations.valueForKey("latitude") != nil){
             params = NSMutableDictionary()
             params.setObject(dictLocations.valueForKey("latitude") as! NSNumber, forKey: "latitude")
             params.setObject(dictLocations.valueForKey("longitute") as! NSNumber, forKey: "longitude")
@@ -87,6 +95,29 @@ class AddRestaurantViewController: UIViewController, UITextFieldDelegate, WebSer
             addressArea?.hidden = true
             viewH?.frame = CGRectMake((viewH?.frame.origin.x)!, (viewH?.frame.origin.y)! - 70, (viewH?.frame.size.width)!, (viewH?.frame.size.height)!)
             lblDescription?.frame = CGRectMake((lblDescription?.frame.origin.x)!, (lblDescription?.frame.origin.y)! - 70, (lblDescription?.frame.size.width)!, (lblDescription?.frame.size.height)!)
+            }
+            else{
+                    let alertController = UIAlertController(
+                        title: "Location Disabled",
+                        message: "Please enable Location Services in your iPhone Setting to share photos of dishes and where to find them on FoodTalk.'",
+                        preferredStyle: .Alert)
+                
+                    let cancelAction = UIAlertAction(title: "Cancel", style: .Default) { (action) in
+                         self.moving?.on = false
+                        self.dismissViewControllerAnimated(true, completion: nil)
+                       }
+                
+                    alertController.addAction(cancelAction)
+                
+                let openAction = UIAlertAction(title: "Settings", style: .Default) { (action) in
+                     if let url = NSURL(string: UIApplicationOpenSettingsURLString) {
+                        self.moving?.on = false
+                        UIApplication.sharedApplication().openURL(url)
+                    }
+                }
+                alertController.addAction(openAction)
+                self.presentViewController(alertController, animated: true, completion: nil)
+            }
         }
         else{
             self.navigationItem.rightBarButtonItem!.enabled = false;
@@ -114,9 +145,9 @@ class AddRestaurantViewController: UIViewController, UITextFieldDelegate, WebSer
             
             if(txtAddress?.text?.characters.count > 0){
                 params.setObject((txtAddress?.text)!, forKey: "address")
-                params.setObject(selectedCity, forKey: "region")
+                
             }
-            
+            params.setObject(selectedCity, forKey: "region")
             webServiceCallingPost(url, parameters: params)
             delegate = self
         }
@@ -155,8 +186,11 @@ class AddRestaurantViewController: UIViewController, UITextFieldDelegate, WebSer
         if(dict.objectForKey("status") as! String == "OK"){
             restaurantId = dict.objectForKey("restaurantId") as! String
             selectedRestaurantName = (txtRestaurantName?.text)!
-            let openPost = self.storyboard!.instantiateViewControllerWithIdentifier("imagePicker") as! XMCCameraViewController;
-            self.navigationController!.pushViewController(openPost, animated:true);
+            isComingFromDishTag = true
+            self.navigationController?.popViewControllerAnimated(true)
+//            let openPost = self.storyboard!.instantiateViewControllerWithIdentifier("imagePicker") as! XMCCameraViewController;
+//            self.navigationController!.pushViewController(openPost, animated:true);
+            
         }
         else if(dict.objectForKey("status")!.isEqual("error")){
             if(dict.objectForKey("errorCode")!.isEqual(6)){
@@ -234,6 +268,7 @@ class AddRestaurantViewController: UIViewController, UITextFieldDelegate, WebSer
     }
     
     @IBAction func cityButtonTapped(sender : UIButton){
+        txtRestaurantName?.resignFirstResponder()
         typePickerView.hidden = false
         typePickerView.reloadAllComponents()
     }
@@ -268,6 +303,67 @@ class AddRestaurantViewController: UIViewController, UITextFieldDelegate, WebSer
     
     func pickerView(pickerView: UIPickerView, rowHeightForComponent component: Int) -> CGFloat {
         return 36.0
+    }
+    
+    //Location Manager
+    
+    //MARK:- LocationManager
+    func addLocationManager(){
+        locationManager = CLLocationManager()
+        locationManager!.delegate = self;
+        locationManager!.desiredAccuracy = kCLLocationAccuracyBest
+        locationManager!.requestAlwaysAuthorization()
+        locationManager!.startUpdatingLocation()
+    }
+    
+    //MARK:- UserLocations Methods
+    
+    func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        
+        let userLocation:CLLocation = locations[0]
+        let long = userLocation.coordinate.longitude;
+        let lat = userLocation.coordinate.latitude;
+        //Do What ever you want with it
+        dictLocations = NSMutableDictionary()
+        dictLocations.setObject(long, forKey: "longitute")
+        dictLocations.setObject(lat, forKey: "latitude")
+        
+        
+//        if(callInt == 0){
+//            dispatch_async(dispatch_get_main_queue()){
+//                self.setUsersClosestCity()
+//            }
+//            
+//        }
+//        callInt += 1
+        
+    }
+    
+    func locationManager(manager: CLLocationManager, didFailWithError error: NSError) {
+        print("Error: " + error.localizedDescription)
+    }
+    
+    func locationManager(manager: CLLocationManager, didChangeAuthorizationStatus status: CLAuthorizationStatus) {
+        if (status == CLAuthorizationStatus.Denied) {
+            self.moving?.on = false
+            dictLocations = NSMutableDictionary()
+        }
+        else if (status == CLAuthorizationStatus.AuthorizedAlways) {
+            
+        }
+    }
+
+    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        if let touch = touches.first {
+            let currentPoint = touch.locationInView(conectivityMsg)
+            // do something with your currentPoint
+            if(isConnectedToNetwork()){
+                conectivityMsg.removeFromSuperview()
+                dispatch_async(dispatch_get_main_queue()) {
+                   self.webServiceForRegion()
+                }
+            }
+        }
     }
 
     override func didReceiveMemoryWarning() {

@@ -30,22 +30,23 @@ class NotificationsViewController: UIViewController, UITableViewDataSource, UITa
         
         noNotificationAlert.frame = CGRectMake(0, 150, self.view.frame.size.width, 50)
         noNotificationAlert.text = "No one cares :("
-        noNotificationAlert.textColor = UIColor.whiteColor()
+        noNotificationAlert.textColor = UIColor.lightGrayColor()
         noNotificationAlert.font = UIFont(name: fontBold, size: 15)
         noNotificationAlert.textAlignment = NSTextAlignment.Center
         self.view.addSubview(noNotificationAlert)
         noNotificationAlert.hidden = true
         
-        tableView!.backgroundColor = UIColor(red: 20/255, green: 29/255, blue: 45/255, alpha: 1.0)
-        tableView?.separatorColor = UIColor(red: 47/255, green: 51/255, blue: 60/255, alpha: 1.0)
+        tableView!.backgroundColor = UIColor.whiteColor()
+        tableView?.separatorColor = UIColor.clearColor()
+        tableView?.separatorColor = UIColor.clearColor()
         let tblView =  UIView(frame: CGRectZero)
         tableView!.tableFooterView = tblView
         tableView!.tableFooterView!.hidden = true
         
         self.refreshControl = UIRefreshControl()
-        let attr = [NSForegroundColorAttributeName:UIColor.whiteColor()]
+        let attr = [NSForegroundColorAttributeName:UIColor.grayColor()]
         self.refreshControl.attributedTitle = NSAttributedString(string: "Pull to refresh", attributes:attr)
-        self.refreshControl.tintColor = UIColor.whiteColor()
+        self.refreshControl.tintColor = UIColor.grayColor()
         self.refreshControl.addTarget(self, action: #selector(NotificationsViewController.refresh(_:)), forControlEvents: UIControlEvents.ValueChanged)
         self.tableView!.addSubview(refreshControl)
 
@@ -59,6 +60,31 @@ class NotificationsViewController: UIViewController, UITableViewDataSource, UITa
     }
     
     override func viewWillAppear(animated: Bool) {
+        
+        let notificationType = UIApplication.sharedApplication().currentUserNotificationSettings()!.types
+        if notificationType == UIUserNotificationType.None {
+            
+            let alertController = UIAlertController(
+                title: "Notifications Disabled",
+                message: "Please enable Notifications Services in your iPhone Setting to get notifications of dishes and where to find them on FoodTalk.'",
+                preferredStyle: .Alert)
+            
+            let cancelAction = UIAlertAction(title: "Cancel", style: .Cancel, handler: nil)
+            alertController.addAction(cancelAction)
+            
+            let openAction = UIAlertAction(title: "Settings", style: .Default) { (action) in
+                if let url = NSURL(string: UIApplicationOpenSettingsURLString) {
+                    UIApplication.sharedApplication().openURL(url)
+                }
+            }
+            alertController.addAction(openAction)
+            self.presentViewController(alertController, animated: true, completion: nil)
+            
+        }else{
+            // Push notifications are enabled in setting by user.
+            
+        }
+        
         selectedTabBarIndex = 3
         self.tabBarController?.delegate = self
         self.navigationController?.navigationBarHidden = false
@@ -89,11 +115,15 @@ class NotificationsViewController: UIViewController, UITableViewDataSource, UITa
         dispatch_async(dispatch_get_main_queue()) {
         self.webServiceCall()
         }
-        dispatch_async(dispatch_get_main_queue()) {
-          self.refreshControl.endRefreshing()
-          self.tabBarController?.tabBar.userInteractionEnabled = true
-        }
+        
+        self.performSelector(#selector(NotificationsViewController.endRefresh), withObject: nil, afterDelay: 5)
     }
+    
+    func endRefresh(){
+        self.refreshControl.endRefreshing()
+    }
+    
+    
     
     //MARK:- TableView Delegates
     
@@ -103,12 +133,13 @@ class NotificationsViewController: UIViewController, UITableViewDataSource, UITa
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         var cell = tableView.dequeueReusableCellWithIdentifier("CELL") as UITableViewCell!
-        if (cell == nil) {
+       // if (cell == nil) {
             cell = UITableViewCell(style:.Default, reuseIdentifier: "CELL")
-        }
-        cell.selectionStyle = UITableViewCellSelectionStyle.None
+            
+     //   }
         self.addViewsOnCell(cell, index: indexPath.row)
-        cell.backgroundColor = UIColor(red: 20/255, green: 29/255, blue: 45/255, alpha: 1.0)
+        cell.selectionStyle = UITableViewCellSelectionStyle.None
+        
         return cell
     }
     
@@ -119,7 +150,7 @@ class NotificationsViewController: UIViewController, UITableViewDataSource, UITa
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         
         if(notificationArray.count > 0){
-        if((notificationArray.objectAtIndex(indexPath.row).objectForKey("eventType")!.intValue == 2) || (notificationArray.objectAtIndex(indexPath.row).objectForKey("eventType")!.intValue == 4) || (notificationArray.objectAtIndex(indexPath.row).objectForKey("eventType")!.intValue == 9)){
+        if((notificationArray.objectAtIndex(indexPath.row).objectForKey("eventType")!.intValue == 2) || (notificationArray.objectAtIndex(indexPath.row).objectForKey("eventType")!.intValue == 4) || (notificationArray.objectAtIndex(indexPath.row).objectForKey("eventType")!.intValue == 9) || (notificationArray.objectAtIndex(indexPath.row).objectForKey("eventType")!.intValue == 11) || (notificationArray.objectAtIndex(indexPath.row).objectForKey("eventType")!.intValue == 12)){
             
             let nav = (self.navigationController?.viewControllers)! as NSArray
             if(!nav.objectAtIndex(0).isKindOfClass(OpenPostViewController)){
@@ -127,13 +158,14 @@ class NotificationsViewController: UIViewController, UITableViewDataSource, UITa
                     // some process
                     if viewController.isKindOfClass(OpenPostViewController) {
                         postIdOpenPost = notificationArray.objectAtIndex(indexPath.row).objectForKey("elementId") as! String
+                        print(postIdOpenPost)
                         self.navigationController?.visibleViewController?.navigationController?.popToViewController(viewController as! UIViewController, animated: true)
                         break
                     }
                 }
             }
             postIdOpenPost = notificationArray.objectAtIndex(indexPath.row).objectForKey("elementId") as! String
-            
+            print(postIdOpenPost)
             let openPost = self.storyboard!.instantiateViewControllerWithIdentifier("OpenPost") as! OpenPostViewController;
             self.navigationController!.visibleViewController!.navigationController!.pushViewController(openPost, animated:true);
             
@@ -219,12 +251,19 @@ class NotificationsViewController: UIViewController, UITableViewDataSource, UITa
         
         
         let statuslabel = UILabel()
-        statuslabel.frame = CGRectMake(69, 0, UIScreen.mainScreen().bounds.size.width - 116, 55)
-        statuslabel.textColor = UIColor.whiteColor()
+        statuslabel.frame = CGRectMake(69, 0, UIScreen.mainScreen().bounds.size.width - 120, 55)
+        statuslabel.textColor = UIColor.blackColor()
         statuslabel.tag = 22
         statuslabel.numberOfLines = 0
         statuslabel.backgroundColor = UIColor.clearColor()
         
+        let btnUser = UIButton()
+        btnUser.frame = CGRectMake(69, 8, 100, 23)
+        btnUser.backgroundColor = UIColor.clearColor()
+        btnUser.addTarget(self, action: #selector(NotificationsViewController.userTap(_:)), forControlEvents: UIControlEvents.TouchUpInside)
+        btnUser.tag = index
+        
+        var wholeText = String()
         if(notificationArray.count > 0){
         let notoficationdate = notificationArray.objectAtIndex(index).objectForKey("eventDate") as! String
         let diffTime = differenceDate(notoficationdate)
@@ -233,18 +272,44 @@ class NotificationsViewController: UIViewController, UITableViewDataSource, UITa
         
         let length = (notificationArray.objectAtIndex(index).objectForKey("raiserName") as! String).characters.count
         
-        let wholeText = String(format: "%@ %@", notificationArray.objectAtIndex(index).objectForKey("message") as! String,diffTime)
+        wholeText = String(format: "%@ %@", notificationArray.objectAtIndex(index).objectForKey("message") as! String,diffTime)
+            
+        let wholeLength = wholeText.characters.count
         
-        nameString = NSMutableAttributedString(string: wholeText, attributes: [NSFontAttributeName:UIFont(name: "Helvetica-Bold", size: 13.0)!])
+        nameString = NSMutableAttributedString(string: wholeText, attributes: [NSFontAttributeName:UIFont(name: fontName, size: 15.0)!])
         nameString.addAttribute(NSForegroundColorAttributeName, value: UIColor(red: 28/255, green: 99/255, blue: 199/255, alpha: 1.0), range: NSRange(location:0,length:length))
+            
+            
+            
         if(diffTimeLength < 3){
             nameString.addAttribute(NSForegroundColorAttributeName, value: UIColor.grayColor(), range: NSRange(location:wholeText.characters.count - 2,length:2))
+            if(wholeText.containsString("post")){
+                
+                nameString.addAttribute(NSForegroundColorAttributeName, value: UIColor(red: 28/255, green: 99/255, blue: 199/255, alpha: 1.0), range: NSRange(location:wholeLength - 8,length:4))
+            }
+            if(wholeText.containsString("comment.")){
+                nameString.addAttribute(NSForegroundColorAttributeName, value: UIColor(red: 28/255, green: 99/255, blue: 199/255, alpha: 1.0), range: NSRange(location:wholeLength - 11,length:7))
+            }
+//            let range = wholeText.rangeOfString("dish")
+//            if(wholeText.containsString("dish")){
+//                nameString.addAttribute(NSForegroundColorAttributeName, value: UIColor(red: 28/255, green: 99/255, blue: 199/255, alpha: 1.0), range: NSRange(range))
+//            }
+            statuslabel.text = nil
             statuslabel.attributedText = nameString
         }
         else{
         nameString.addAttribute(NSForegroundColorAttributeName, value: UIColor.grayColor(), range: NSRange(location:wholeText.characters.count - 3,length:diffTimeLength))
+            if(wholeText.containsString("post")){
+                
+                nameString.addAttribute(NSForegroundColorAttributeName, value: UIColor(red: 28/255, green: 99/255, blue: 199/255, alpha: 1.0), range: NSRange(location:wholeLength - 9,length:4))
+            }
+            if(wholeText.containsString("comment.")){
+                nameString.addAttribute(NSForegroundColorAttributeName, value: UIColor(red: 28/255, green: 99/255, blue: 199/255, alpha: 1.0), range: NSRange(location:wholeLength - 12,length:7))
+            }
+        statuslabel.text = nil
         statuslabel.attributedText = nameString
         }
+            
         }
         let iconView = UIView()
         iconView.frame = CGRectMake(self.view.frame.size.width - 48, 9, 40, 40)
@@ -255,10 +320,10 @@ class NotificationsViewController: UIViewController, UITableViewDataSource, UITa
         
         let iconImage = UIImageView()
         iconImage.frame = CGRectMake(5, 5, 30, 30)
-        iconImage.layer.cornerRadius = iconImage.frame.size.width/2
-        iconImage.clipsToBounds = true
+     //   iconImage.layer.cornerRadius = iconImage.frame.size.width/2
+        //iconImage.clipsToBounds = true
         iconImage.tag = 28
-        iconImage.layer.masksToBounds = true
+       // iconImage.layer.masksToBounds = true
         iconView.addSubview(iconImage)
         
 //        loadImageAndCache(profileImage,url: notificationArray.objectAtIndex(index).objectForKey("raiserThumb") as! String)
@@ -285,16 +350,48 @@ class NotificationsViewController: UIViewController, UITableViewDataSource, UITa
             iconImage.image = UIImage(named: "mentionIcon.png")
             iconView.backgroundColor = UIColor(red: 55/255, green: 200/255, blue: 37/255, alpha: 1.0)
         }
-        cell.contentView.addSubview(iconView)
+        else if(notificationArray.objectAtIndex(index).objectForKey("eventType") as? String == "11"){
+                iconImage.frame = CGRectMake(10, 10, 20, 20)
+                iconImage.image = UIImage(named: "bookmark (1).png")
+                iconView.backgroundColor = UIColor(red: 255/255, green: 253/255, blue: 10/255, alpha: 1.0)
+            }
+        else if(notificationArray.objectAtIndex(index).objectForKey("eventType") as? String == "12"){
+            iconImage.image = UIImage(named: "commentIcon.png")
+            iconView.backgroundColor = UIColor(red: 29/255, green: 107/255, blue: 213/255, alpha: 1.0)
+            }
+        
         }
+        
+        let viewH = UIView()
+        viewH.frame = CGRectMake(0, 57, self.view.frame.size.width + 2, 1)
+        viewH.backgroundColor = UIColor.lightGrayColor()
+        viewH.alpha = 0.5
+        viewH.tag = 10121
+        
         if((cell.contentView.viewWithTag(22)) != nil){
             cell.contentView.viewWithTag(22)?.removeFromSuperview()
-            cell.contentView.viewWithTag(28)?.removeFromSuperview()
             cell.contentView.viewWithTag(29)?.removeFromSuperview()
             cell.contentView.viewWithTag(33)?.removeFromSuperview()
+            cell.contentView.viewWithTag(10121)?.removeFromSuperview()
         }
-                
+        
+        cell.contentView.addSubview(btnUser)
+        cell.contentView.addSubview(viewH)
+        cell.contentView.addSubview(iconView)
         cell.contentView.addSubview(statuslabel)
+    }
+
+    func userTap(sender : UIButton){
+        if(notificationArray.count > 0){
+        isUserInfo = false
+        postDictHome = self.notificationArray.objectAtIndex(sender.tag) as! NSDictionary
+        openProfileId = (postDictHome.objectForKey("raiserId") as? String)!
+        postImageOrgnol = (postDictHome.objectForKey("raiserImage") as? String)!
+        postImagethumb = (postDictHome.objectForKey("raiserThumb") as? String)!
+        let openPost = self.storyboard!.instantiateViewControllerWithIdentifier("UserProfile") as! UserProfileViewController;
+        self.navigationController!.visibleViewController!.navigationController!.pushViewController(openPost, animated:true);
+        }
+       
     }
     
     //MARK:- WebServiceCall
@@ -325,9 +422,10 @@ class NotificationsViewController: UIViewController, UITableViewDataSource, UITa
             noNotificationAlert.hidden = false
         }
         else{
+       // tableView?.reloadData()
+        }
+        }
         tableView?.reloadData()
-        }
-        }
         stopLoading(self.view)
         self.refreshControl.endRefreshing()
         
@@ -370,6 +468,20 @@ class NotificationsViewController: UIViewController, UITableViewDataSource, UITa
         tableView!.scrollToRowAtIndexPath(indexPath, atScrollPosition: .Top, animated: true)
         }
         selectedTabBarIndex = 3
+    }
+    
+    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        if let touch = touches.first {
+            let currentPoint = touch.locationInView(conectivityMsg)
+            // do something with your currentPoint
+            if(isConnectedToNetwork()){
+                conectivityMsg.removeFromSuperview()
+                dispatch_async(dispatch_get_main_queue()) {
+                    
+                    self.webServiceCall()
+                }
+            }
+        }
     }
 
     override func didReceiveMemoryWarning() {

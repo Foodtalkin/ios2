@@ -12,13 +12,16 @@ import MessageUI
 class OptionsViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, MFMailComposeViewControllerDelegate, WebServiceCallingDelegate, UIAlertViewDelegate {
     
     @IBOutlet var tableView : UITableView?
-    var optionsArray : NSMutableArray = ["Push Notifications","Contact us","Legal","Logout"]
+    var optionsArray : NSMutableArray = ["Push Notifications","Invite facebook friends","Contact us","Legal","Logout"]
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
-        tableView?.separatorStyle = UITableViewCellSeparatorStyle.None
+        tableView?.separatorColor = UIColor.lightGrayColor()
+        let tblView =  UIView(frame: CGRectZero)
+        tableView!.tableFooterView = tblView
+        tableView!.tableFooterView!.hidden = true
         self.title = "Options"
     }
     
@@ -34,16 +37,17 @@ class OptionsViewController: UIViewController, UITableViewDataSource, UITableVie
             cell = UITableViewCell(style:.Default, reuseIdentifier: "CELL")
         }
         
-        cell.backgroundColor = UIColor(red: 20/255, green: 29/255, blue: 45/255, alpha: 1.0)
-        cell.textLabel?.textColor = UIColor.whiteColor()
+        cell.backgroundColor = UIColor.whiteColor()
+        cell.textLabel?.textColor = UIColor.blackColor()
         cell.textLabel?.text = optionsArray.objectAtIndex(indexPath.row) as? String
         cell.selectionStyle = UITableViewCellSelectionStyle.None
         
         if(indexPath.row == 0){
             let switchO = UISwitch()
-            switchO.frame = CGRectMake(cell.frame.size.width - 60, 10, 60, 30)
+            switchO.frame = CGRectMake(cell.frame.size.width - 60, 7, 60, 30)
             switchO.setOn(false, animated: true)
             switchO.backgroundColor = UIColor.clearColor()
+            switchO.onTintColor = UIColor.blackColor()
             switchO.addTarget(self, action: #selector(OptionsViewController.switchOnOff(_:)), forControlEvents: UIControlEvents.TouchUpInside)
             cell.contentView.addSubview(switchO)
         }
@@ -53,7 +57,12 @@ class OptionsViewController: UIViewController, UITableViewDataSource, UITableVie
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         
-        if(indexPath.row == 1){
+         if(indexPath.row == 1){
+            let openPost = self.storyboard!.instantiateViewControllerWithIdentifier("Invite") as! InviteViewController;
+            self.navigationController!.visibleViewController!.navigationController!.pushViewController(openPost, animated:true);
+        }
+        
+        if(indexPath.row == 2){
             
             let emailTitle = "Contact Us"
             let messageBody = ""
@@ -69,7 +78,7 @@ class OptionsViewController: UIViewController, UITableViewDataSource, UITableVie
             }
         }
         
-        if(indexPath.row == 3){
+        if(indexPath.row == 4){
             let alertController = UIAlertController(title: "", message: "", preferredStyle: .Alert)
             
             let attrubuted = NSMutableAttributedString(string: "Are you sure want to logout?")
@@ -79,6 +88,11 @@ class OptionsViewController: UIViewController, UITableViewDataSource, UITableVie
             let okAction = UIAlertAction(title: "Yes", style: UIAlertActionStyle.Default) {
                 UIAlertAction in
                 self.webserviceCallingLogout()
+                NSUserDefaults.standardUserDefaults().setObject(nil, forKey: "facebookFriends")
+                NSUserDefaults.standardUserDefaults().setObject(nil, forKey: "userName")
+                NSUserDefaults.standardUserDefaults().setObject(nil, forKey: "citySelected")
+                PFUser.logOut()
+                PFInstallation.currentInstallation().deleteEventually()
                 Flurry.logEvent("Logout User Tabbed")
                 NSLog("OK Pressed")
             }
@@ -91,7 +105,7 @@ class OptionsViewController: UIViewController, UITableViewDataSource, UITableVie
 
             self.presentViewController(alertController, animated: true, completion: nil)
         }
-        if(indexPath.row == 2){
+        if(indexPath.row == 3){
             if(isConnectedToNetwork()){
             webViewCallingLegal = true
             let openPost = self.storyboard!.instantiateViewControllerWithIdentifier("WebLink") as! WebLinkViewController;

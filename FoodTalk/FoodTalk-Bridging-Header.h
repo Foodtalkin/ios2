@@ -5,7 +5,6 @@
 #import "iCarousel.h"
 #import "CLCloudinary.h"
 #import "CLUploader.h"
-#import "HFImageEditorViewController+Private.h"
 #import "BDMessagesKeyboardController.h"
 #import "THProgressView.h"
 #import "InviteViewController.h"

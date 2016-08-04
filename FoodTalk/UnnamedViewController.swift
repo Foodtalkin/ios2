@@ -11,6 +11,7 @@ import UIKit
 class UnnamedViewController: UIViewController, UITextFieldDelegate, WebServiceCallingDelegate, UIPickerViewDelegate, UIPickerViewDataSource {
     
     @IBOutlet var btnCheck : UIButton?
+    @IBOutlet var btnCityName : UIButton?
     @IBOutlet var txtName : UITextField?
     @IBOutlet var lblAlreadyTakenname : UILabel?
     @IBOutlet var btnCity : UIButton?
@@ -25,6 +26,7 @@ class UnnamedViewController: UIViewController, UITextFieldDelegate, WebServiceCa
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        txtName?.autocorrectionType = UITextAutocorrectionType.No
         selectedCity = "delhi"
         if(isConnectedToNetwork()){
            webServiceForRegion()
@@ -32,7 +34,10 @@ class UnnamedViewController: UIViewController, UITextFieldDelegate, WebServiceCa
         else{
             internetMsg(self.view)
         }
-
+        
+        self.btnCityName?.frame = CGRectMake(0, btnCheck!.frame.origin.y - 70, self.view.frame.size.width/2, 30)
+        self.btnCity?.frame = CGRectMake(self.view.frame.size.width/2, btnCheck!.frame.origin.y - 70, self.view.frame.size.width/2, 30)
+        self.btnCity?.setTitleColor(UIColor.blueColor(), forState: UIControlState.Normal)
         // Do any additional setup after loading the view.
         self.btnCheck?.enabled = false
         
@@ -56,6 +61,11 @@ class UnnamedViewController: UIViewController, UITextFieldDelegate, WebServiceCa
         NSNotificationCenter.defaultCenter().removeObserver(self, name: UIKeyboardWillShowNotification, object: nil)
         
         NSNotificationCenter.defaultCenter().removeObserver(self, name: UIKeyboardWillHideNotification, object: nil)
+    }
+    
+    override func viewDidAppear(animated: Bool) {
+      //  txtName?.becomeFirstResponder()
+      //  self.view.frame.origin.y -= 90
     }
     
     @IBAction func moveToNew(sender : UIButton){
@@ -144,10 +154,17 @@ class UnnamedViewController: UIViewController, UITextFieldDelegate, WebServiceCa
             
             let currentInstallation = PFInstallation.currentInstallation()
             currentInstallation.setObject(userId, forKey: "userId")
+            currentInstallation.setObject(selectedCity, forKey: "region")
             currentInstallation.saveInBackground()
             
-            let openPost = self.storyboard!.instantiateViewControllerWithIdentifier("Invite") as! InviteViewController;
-            self.navigationController!.visibleViewController!.navigationController!.pushViewController(openPost, animated:true);
+            NSUserDefaults.standardUserDefaults().setObject(selectedCity, forKey: "citySelected")
+            
+            Flurry.setUserID(txtName?.text)
+         
+            var tbc : UITabBarController
+            tbc = self.storyboard!.instantiateViewControllerWithIdentifier("tabBarVC") as! UITabBarController;
+            tbc.selectedIndex=0;
+            self.navigationController!.visibleViewController!.navigationController!.pushViewController(tbc, animated:true);
         }
         else{
             
@@ -172,23 +189,25 @@ class UnnamedViewController: UIViewController, UITextFieldDelegate, WebServiceCa
     
     func textFieldShouldReturn(textField: UITextField) -> Bool {
         textField.resignFirstResponder()
+        
         return true
     }
     
     func keyboardWillShow(sender: NSNotification) {
         
-        self.view.frame.origin.y -= 120
+        self.view.frame.origin.y -= 90
         
     }
     
     func keyboardWillHide(sender: NSNotification) {
-        self.view.frame.origin.y += 120
+        self.view.frame.origin.y += 90
     }
 
     //MARK:- cityButtonAction
     
     @IBAction func cityButtonTapped(sender : UIButton){
         typePickerView.hidden = false
+        txtName?.resignFirstResponder()
         typePickerView.reloadAllComponents()
     }
     

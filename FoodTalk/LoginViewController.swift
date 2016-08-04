@@ -14,14 +14,23 @@ var loginAllDetails = NSMutableDictionary()
 var webViewCallingLegal : Bool = false
 var arrayFacebookFriends = NSMutableArray()
 
-class LoginViewController: UIViewController, WebServiceCallingDelegate {
+
+class LoginViewController: UIViewController, WebServiceCallingDelegate, UIScrollViewDelegate {
 
     
     @IBOutlet var loginButton : UIButton?
+    @IBOutlet var pageControl : UIPageControl?
+    @IBOutlet var scrollView : UIScrollView?
+    @IBOutlet var btnLegal : UIButton?
     var fbId : String?
     var fbUserName : String?
     var dict : NSDictionary?
     var webCall : WebServiceCallingViewController?
+    var imgFirst = UIImageView()
+    
+    
+    let totalPages = 4
+    var arrayImages = NSMutableArray()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,17 +38,125 @@ class LoginViewController: UIViewController, WebServiceCallingDelegate {
         // Do any additional setup after loading the view.
         fbUserName = ""
         loginButton?.enabled = true
+        if(self.view.frame.size.height < 500){
+            arrayImages.addObject("landingIphone4.jpg")
+            arrayImages.addObject("eatIphone4.jpg")
+            arrayImages.addObject("shareIphone4.jpg")
+            arrayImages.addObject("discoverIphone4.jpg")
+        }
+        else if(self.view.frame.size.height < 570){
+            arrayImages.addObject("landingIphone5.jpg")
+            arrayImages.addObject("eatIphone5.jpg")
+            arrayImages.addObject("shareIphone5.jpg")
+            arrayImages.addObject("discoverIphone5.jpg")
+        }
+        else if(self.view.frame.size.height < 670){
+            arrayImages.addObject("landingIphone6.jpg")
+            arrayImages.addObject("eatIphone6.jpg")
+            arrayImages.addObject("shareIphone6.jpg")
+            arrayImages.addObject("discoverIphone6.jpg")
+        }
+        else{
+            arrayImages.addObject("landingIphone6.jpg")
+            arrayImages.addObject("eatIphone6.jpg")
+            arrayImages.addObject("shareIphone6.jpg")
+            arrayImages.addObject("discoverIphone6.jpg")
+        }
+        
+        
+        self.view.backgroundColor = UIColor.whiteColor()
     }
     
     override func viewWillAppear(animated: Bool) {
         self.tabBarController?.tabBar.hidden = true
         self.navigationController?.navigationBarHidden = true
         loginButton?.hidden = false
+        btnLegal?.setTitleColor(UIColor.blueColor(), forState: UIControlState.Normal)
+    }
+    
+    override func prefersStatusBarHidden() -> Bool {
+        return true
+    }
+    
+    override func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        configureScrollView()
+        configurePageControl()
     }
     
     // Inisilize app and return delegate
     func appdelegate () -> AppDelegate{
         return  UIApplication.sharedApplication().delegate as! AppDelegate
+    }
+    
+    // MARK: Custom method implementation
+    
+    func configureScrollView() {
+        // Enable paging.
+        scrollView!.pagingEnabled = true
+        
+        // Set the following flag values.
+        scrollView!.showsHorizontalScrollIndicator = false
+        scrollView!.showsVerticalScrollIndicator = false
+        scrollView!.scrollsToTop = false
+        self.automaticallyAdjustsScrollViewInsets = false;
+        
+        // Set the scrollview content size.
+//        scrollView!.contentSize = CGSizeMake(scrollView!.frame.size.width * CGFloat(totalPages), scrollView!.frame.size.height)
+        scrollView!.contentSize = CGSizeMake(scrollView!.frame.size.width * CGFloat(totalPages),0);
+        
+        // Set self as the delegate of the scrollview.
+        scrollView!.delegate = self
+        
+        // Load the TestView view from the TestView.xib file and configure it properly.
+        for var i=0; i<totalPages; ++i {
+            // Load the TestView view.
+            let testView = UIView()
+            
+            // Set its frame and the background color.
+            testView.frame = CGRectMake(CGFloat(i) * scrollView!.frame.size.width, scrollView!.frame.origin.y, scrollView!.frame.size.width, scrollView!.frame.size.height)
+            let imgView = UIImageView()
+            imgView.frame = CGRectMake(0, 0, testView.frame.size.width, testView.frame.size.height)
+            // Set the proper message to the test view's label.
+            imgView.image = UIImage(named: arrayImages.objectAtIndex(i) as! String)
+            testView.addSubview(imgView)
+            // Add the test view as a subview to the scrollview.
+            scrollView!.addSubview(testView)
+        }
+    }
+    
+    
+    func configurePageControl() {
+        // Set the total pages to the page control.
+        pageControl!.numberOfPages = totalPages
+        
+        // Set the initial page.
+        pageControl!.currentPage = 0
+        pageControl!.pageIndicatorTintColor = UIColor.blackColor()
+    }
+    
+    
+    // MARK: UIScrollViewDelegate method implementation
+    
+    func scrollViewDidScroll(scrollView: UIScrollView) {
+        // Calculate the new page index depending on the content offset.
+        let currentPage = floor(scrollView.contentOffset.x / UIScreen.mainScreen().bounds.size.width);
+        
+        // Set the new page index to the page control.
+        pageControl!.currentPage = Int(currentPage)
+    }
+
+    
+    // MARK: IBAction method implementation
+    
+    @IBAction func changePage(sender: AnyObject) {
+        // Calculate the frame that should scroll to based on the page control current page.
+        var newFrame = scrollView!.frame
+        newFrame.origin.x = newFrame.size.width * CGFloat(pageControl!.currentPage)
+        
+        scrollView!.scrollRectToVisible(newFrame, animated: true)
+        
     }
     
     //MARK:- FBLoginButton Delegate
@@ -80,17 +197,18 @@ class LoginViewController: UIViewController, WebServiceCallingDelegate {
             FBSDKGraphRequest(graphPath: "me", parameters: ["fields": "id, name, first_name, last_name, picture.type(large), email,gender,friends"]).startWithCompletionHandler({ (connection, result, error) -> Void in
                 if (error == nil){
                     
-                   
-                    
                     self.dict = result as? NSDictionary
-                   
+                    
+                    if((self.dict?.objectForKey("friends")) != nil){
+                    if((self.dict?.objectForKey("friends")?.objectForKey("data") as! NSArray).count > 0){
                     arrayFacebookFriends = self.dict?.objectForKey("friends")?.objectForKey("data") as! NSMutableArray
                     NSUserDefaults.standardUserDefaults().setObject(arrayFacebookFriends, forKey: "facebookFriends")
                     if((self.dict?.objectForKey("friends")?.objectForKey("paging")?.objectForKey("next")) != nil){
                     let nxtFb = self.dict?.objectForKey("friends")?.objectForKey("paging")?.objectForKey("next") as! String
                     NSUserDefaults.standardUserDefaults().setObject(nxtFb, forKey: "nextFb")
                     }
-                    
+                    }
+                    }
                     self.fbId = self.dict?.valueForKey("id") as? String
                     let gender = self.dict?.valueForKey("gender") as? String
                     NSUserDefaults.standardUserDefaults().setObject(self.fbId, forKey: "fbId")
@@ -101,15 +219,15 @@ class LoginViewController: UIViewController, WebServiceCallingDelegate {
                //     let locationDetailsDictionary = delegate.locationManager1()
                     let deviceToken = NSUserDefaults.standardUserDefaults().objectForKey("DeviceToken")
                     
-                    if(dictLocations.objectForKey("latitude") != nil){
+                 //   if(dictLocations.objectForKey("latitude") != nil){
                     let params = NSMutableDictionary()
                     params.setObject("F", forKey: "signInType")
                     params.setObject(picUrl, forKey: "image")
                     params.setObject(self.fbId!, forKey: "facebookId")
                     params.setObject(self.fbUserName!, forKey: "fullName")
                     
-                    params.setObject(dictLocations.objectForKey("latitude")!, forKey: "latitude")
-                    params.setObject(dictLocations.objectForKey("longitute")!, forKey: "longitude")
+//                    params.setObject(dictLocations.objectForKey("latitude")!, forKey: "latitude")
+//                    params.setObject(dictLocations.objectForKey("longitute")!, forKey: "longitude")
                     params.setObject(deviceToken!, forKey: "deviceToken")
                     params.setObject(gender!, forKey: "gender")
                     
@@ -124,12 +242,6 @@ class LoginViewController: UIViewController, WebServiceCallingDelegate {
                         NSUserDefaults.standardUserDefaults().setObject(params, forKey: "emailVerifyValue")
                         let openPost = self.storyboard!.instantiateViewControllerWithIdentifier("EmailVerification") as! EmailVerificationViewController;
                         self.navigationController!.pushViewController(openPost, animated:true);
-                    }
-                    }
-                    else{
-                        self.loginButton?.enabled = true
-                        let alertView = UIAlertView(title: "Location Disabled", message: "Please enable Location Services in your iPhone Setting to share photos of dishes and where to find them on FoodTalk.", delegate: nil, cancelButtonTitle: "Close")
-                        alertView.show()
                     }
                 }
             })
@@ -183,6 +295,8 @@ class LoginViewController: UIViewController, WebServiceCallingDelegate {
        
         if(infoDict.objectForKey("status")!.isEqual("OK")){
             
+            
+            
             let sessionId = infoDict.objectForKey("sessionId") as! String
             let userId = infoDict.objectForKey("userId") as! String
             NSUserDefaults.standardUserDefaults().setObject(sessionId, forKey: "sessionId")
@@ -193,12 +307,25 @@ class LoginViewController: UIViewController, WebServiceCallingDelegate {
                 currentInstallation.saveInBackground()
 
             if(infoDict.objectForKey("isNewUser")?.intValue != 0){
+                
+                Parse.setApplicationId("RBOZIK8Vti138uqPIucaBherLAB16JFa3ITi4kDu",
+                                       clientKey: "Kavc924t4PGsZzQdwUoLS6nz3q3Wm5PfRUjEDj9a")
+                
             let searchScreen = self.storyboard!.instantiateViewControllerWithIdentifier("Unnamed") as! UnnamedViewController;
             self.navigationController!.visibleViewController!.navigationController!.pushViewController(searchScreen, animated:true);
             }
             else{
+                let region = infoDict.objectForKey("profile")?.objectForKey("region") as? String
+                selectedCity = region!
+                NSUserDefaults.standardUserDefaults().setObject(selectedCity, forKey: "citySelected")
+                let currentInstallation = PFInstallation.currentInstallation()
+                currentInstallation.setObject(region!, forKey: "region")
+                currentInstallation.saveInBackground()
+                
                 let username = infoDict.objectForKey("userName")
                 NSUserDefaults.standardUserDefaults().setObject(username, forKey: "userName")
+                
+                Flurry.setUserID(username as! String)
                 var tbc : UITabBarController
                 tbc = self.storyboard!.instantiateViewControllerWithIdentifier("tabBarVC") as! UITabBarController;
                 tbc.selectedIndex=0;

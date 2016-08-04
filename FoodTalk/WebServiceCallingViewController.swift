@@ -20,7 +20,16 @@ var request = Alamofire.Request
 
 func webServiceCallingPost (url : String, parameters : NSDictionary){
     var dict = NSMutableDictionary()
-     Alamofire.request(.POST, url, parameters: parameters as? [String : AnyObject], encoding: .JSON)
+    let nsObject: AnyObject? = NSBundle.mainBundle().infoDictionary!["CFBundleShortVersionString"]
+    
+    //Then just cast the object as a String, but be careful, you may want to double check for nil
+    let version = nsObject as! String
+    let versionString = String(format: "iOS - %@",version)
+    let headers = [
+        "User-Agent": versionString
+    ]
+    
+     Alamofire.request(.POST, url, parameters: parameters as? [String : AnyObject], encoding: .JSON, headers: headers)
         .responseJSON { response in
             
             

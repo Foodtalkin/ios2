@@ -1,10 +1,26 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="9532" systemVersion="15C50" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" initialViewController="01J-lp-oVM">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="10116" systemVersion="15E65" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" initialViewController="01J-lp-oVM">
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9530"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
     </dependencies>
     <scenes>
+        <!--Navigation Controller-->
+        <scene sceneID="VOj-49-6Gi">
+            <objects>
+                <navigationController id="a04-Z4-WlQ" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="SJM-bo-I8f">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="01J-lp-oVM" kind="relationship" relationship="rootViewController" id="4JB-dC-0YZ"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="KqL-zB-DzW" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-578" y="227"/>
+        </scene>
         <!--View Controller-->
         <scene sceneID="EHf-IW-A2E">
             <objects>
@@ -14,15 +30,41 @@
                         <viewControllerLayoutGuide type="bottom" id="xb3-aO-Qok"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="Ze5-6b-2t3">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="1v5-HP-Yfi">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            </imageView>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Asset 1mdp.png" translatesAutoresizingMaskIntoConstraints="NO" id="Src-cY-scC">
+                                <rect key="frame" x="96" y="220" width="128" height="128"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="128" id="2Sq-J5-cgE"/>
+                                    <constraint firstAttribute="width" constant="128" id="crx-tf-3Kx"/>
+                                </constraints>
+                            </imageView>
+                        </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="Src-cY-scC" firstAttribute="centerX" secondItem="1v5-HP-Yfi" secondAttribute="centerX" id="BTW-EA-ryz"/>
+                            <constraint firstItem="Src-cY-scC" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="QMS-cQ-ChW"/>
+                            <constraint firstItem="1v5-HP-Yfi" firstAttribute="bottom" secondItem="xb3-aO-Qok" secondAttribute="top" id="Rc2-uv-uaE"/>
+                            <constraint firstItem="Src-cY-scC" firstAttribute="centerY" secondItem="1v5-HP-Yfi" secondAttribute="centerY" id="XZi-6M-AO4"/>
+                            <constraint firstItem="1v5-HP-Yfi" firstAttribute="leading" secondItem="Ze5-6b-2t3" secondAttribute="leading" id="aXP-dc-MFp"/>
+                            <constraint firstItem="Src-cY-scC" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="yHB-U9-gK0"/>
+                        </constraints>
                     </view>
-                    <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina47"/>
+                    <navigationItem key="navigationItem" id="YEP-Kb-wJ1"/>
+                    <nil key="simulatedTopBarMetrics"/>
+                    <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="iYj-Kq-Ea1" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="187" y="325"/>
+            <point key="canvasLocation" x="72.533333333333331" y="301.98666666666668"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="Asset 1mdp.png" width="334" height="335"/>
+    </resources>
 </document>

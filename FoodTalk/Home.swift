@@ -62,35 +62,32 @@ class Home: UIViewController, UIActionSheetDelegate, UITableViewDataSource, UITa
     var searchController : UISearchController!
     
     override func viewDidLoad() {
+        
         super.viewDidLoad()
+        
         pageList = 0
         self.tabBarController?.tabBar.userInteractionEnabled = false
          showLoader(self.view)
         
-//            if(newUpdates() == false){
-//                            if (isConnectedToNetwork()){
-//                                updateCall()
-//                            }
-//             }
-//            else{
         
         if(isConnectedToNetwork()){
          
         dispatch_async(dispatch_get_main_queue()) {
           self.webServiceForDishDetails()
         }
-        }else{
+        }
+        else{
           internetMsg(self.view)
-            stopLoading(self.view)
-           self.tabBarController?.tabBar.userInteractionEnabled = true
+          stopLoading(self.view)
+          self.tabBarController?.tabBar.userInteractionEnabled = true
         }
         Flurry.logEvent("HomeScreen")
-        
         dispatch_async(dispatch_get_main_queue()) {
         self.performSelector(#selector(Home.webServiceCallRating), withObject: nil, afterDelay: 0.1)
         }
         postTableView!.registerNib(UINib(nibName: "CardViewCell", bundle: nil), forCellReuseIdentifier: "CardCell")
-        postTableView?.backgroundColor = UIColor(red: 20/255, green: 29/255, blue: 46/255, alpha: 1.0)
+      //  postTableView?.backgroundColor = UIColor(red: 20/255, green: 29/255, blue: 46/255, alpha: 1.0)
+        postTableView?.backgroundColor = UIColor.whiteColor()
         postTableView?.separatorColor = UIColor.clearColor()
         postTableView?.showsHorizontalScrollIndicator = false
         postTableView?.showsVerticalScrollIndicator = false
@@ -100,39 +97,31 @@ class Home: UIViewController, UIActionSheetDelegate, UITableViewDataSource, UITa
         
         let attr = [NSForegroundColorAttributeName:UIColor.whiteColor()]
         self.refreshControl.attributedTitle = NSAttributedString(string: "Pull to refresh", attributes:attr)
-        self.refreshControl.tintColor = UIColor.whiteColor()
+        self.refreshControl.tintColor = UIColor.grayColor()
         
         self.refreshControl.addTarget(self, action: #selector(Home.refresh(_:)), forControlEvents: UIControlEvents.ValueChanged)
         self.postTableView!.addSubview(refreshControl)
-        
-//        let button: UIButton = UIButton(type: UIButtonType.Custom)
-//        button.setImage(UIImage(named: "search.png"), forState: UIControlState.Normal)
-//        button.addTarget(self, action: #selector(Home.searchButtonPressed(_:)), forControlEvents: UIControlEvents.TouchUpInside)
-//        button.frame = CGRectMake(0, 0, 30, 30)
-//        
-//        let barButton = UIBarButtonItem(customView: button)
-//        self.navigationItem.rightBarButtonItem = barButton
         
         
         self.tabBarController?.view.tintColor = UIColor.whiteColor()
  //       self.performSelector("webServiceCall", withObject: nil, afterDelay: 0.1)
         
-        if(isConnectedToNetwork()){
-            dispatch_async(dispatch_get_main_queue()) {
-                self.arrPostList = NSMutableArray()
-                self.arrLikeList = NSMutableArray()
-                self.arrFavList = NSMutableArray()
-                self.pageList = 0
-                self.pageList += 1
-                self.webServiceCall()
-            }
-            if (isConnectedToNetwork()){
-                updateCall()
-            }
-        }else{
-            internetMsg(self.view)
-        }
-    //    }
+//        if(isConnectedToNetwork()){
+//           
+//                self.arrPostList = NSMutableArray()
+//                self.arrLikeList = NSMutableArray()
+//                self.arrFavList = NSMutableArray()
+//                self.pageList = 1
+//             dispatch_async(dispatch_get_main_queue()) {    
+//                self.webServiceCall()
+//            }
+//            if (isConnectedToNetwork()){
+//                updateCall()
+//            }
+//        }else{
+//            internetMsg(self.view)
+//            self.tabBarController?.tabBar.userInteractionEnabled = true
+//        }
         
     }
     
@@ -210,11 +199,36 @@ class Home: UIViewController, UIActionSheetDelegate, UITableViewDataSource, UITa
                     
                 }else{
                     internetMsg(self.view)
+                    self.tabBarController?.tabBar.userInteractionEnabled = true
+
                 }
             }
             }
         }
+        
+        if(isConnectedToNetwork()){
+            
+            self.arrPostList = NSMutableArray()
+            self.arrLikeList = NSMutableArray()
+            self.arrFavList = NSMutableArray()
+            self.pageList = 1
+            dispatch_async(dispatch_get_main_queue()) {
+                self.webServiceCall()
+            }
+            if (isConnectedToNetwork()){
+                updateCall()
+            }
+        }else{
+            internetMsg(self.view)
+            self.tabBarController?.tabBar.userInteractionEnabled = true
+        }
   //  }
+    }
+    
+    func platform() -> String {
+        var sysinfo = utsname()
+        uname(&sysinfo) // ignore return value
+        return NSString(bytes: &sysinfo.machine, length: Int(_SYS_NAMELEN), encoding: NSASCIIStringEncoding)! as String
     }
     
     //MARK:- SEarchBar Delegates
@@ -362,9 +376,11 @@ class Home: UIViewController, UIActionSheetDelegate, UITableViewDataSource, UITa
         dispatch_async(dispatch_get_main_queue()) {
         self.webServiceCall()
         }
-        dispatch_async(dispatch_get_main_queue()) {
-           self.refreshControl.endRefreshing()
-        }
+        self.performSelector(#selector(Home.endRefresh), withObject: nil, afterDelay: 5)
+    }
+    
+    func endRefresh(){
+       self.refreshControl.endRefreshing()
     }
     
     //MARK:- TableView Datasource and Delegate Methods
@@ -409,15 +425,13 @@ class Home: UIViewController, UIActionSheetDelegate, UITableViewDataSource, UITa
             lengthRestaurantname = (arrPostList.objectAtIndex(indexPath.row).objectForKey("restaurantName") as! String).characters.count
             if(arrPostList.count > 0){
                 if(lengthRestaurantname > 1){
-        status = String(format: "%@ is having %@ at %@", arrPostList.objectAtIndex(indexPath.row).objectForKey("userName") as! String,arrPostList.objectAtIndex(indexPath.row).objectForKey("dishName") as! String,arrPostList.objectAtIndex(indexPath.row).objectForKey("restaurantName") as! String)
+        status = String(format: "%@ is having %@ at %@, %@", arrPostList.objectAtIndex(indexPath.row).objectForKey("userName") as! String,arrPostList.objectAtIndex(indexPath.row).objectForKey("dishName") as! String,arrPostList.objectAtIndex(indexPath.row).objectForKey("restaurantName") as! String, arrPostList.objectAtIndex(indexPath.row).objectForKey("region") as! String)
                 }
                 
                 if(lengthRestaurantname < 1){
-                    status = String(format: "%@ is having %@ %@", arrPostList.objectAtIndex(indexPath.row).objectForKey("userName") as! String,arrPostList.objectAtIndex(indexPath.row).objectForKey("dishName") as! String,arrPostList.objectAtIndex(indexPath.row).objectForKey("restaurantName") as! String)
+                    status = String(format: "%@ is having %@ %@", arrPostList.objectAtIndex(indexPath.row).objectForKey("userName") as! String,arrPostList.objectAtIndex(indexPath.row).objectForKey("dishName") as! String, arrPostList.objectAtIndex(indexPath.row).objectForKey("region") as! String)
                 }
-        
-       cell.labelStatus?.text = status
-        
+        cell.labelStatus?.text = status
             }
         cell.star1?.hidden = false
         cell.star2?.hidden = false
@@ -454,9 +468,6 @@ class Home: UIViewController, UIActionSheetDelegate, UITableViewDataSource, UITa
         tap.numberOfTapsRequired = 2
         cell.imageDishPost?.tag = indexPath.row
         cell.imageDishPost!.addGestureRecognizer(tap)
-            
-            
-            
          
             if(arrPostList.count > 0){
         cell.labelStatus?.attributedTruncationToken = NSAttributedString(string: arrPostList.objectAtIndex(indexPath.row).objectForKey("userName") as! String, attributes: nil)
@@ -491,7 +502,18 @@ class Home: UIViewController, UIActionSheetDelegate, UITableViewDataSource, UITa
                     let nsString2 = status as NSString
                     let length1 = nsString2.length
                     let length2 = (self.arrPostList.objectAtIndex(indexPath.row).objectForKey("restaurantName") as? String)?.characters.count
-                let range2 = NSRange(location: length1 - length2!, length: length2!)
+              //  let range2 = NSRange(location: length1 - length2!, length: length2!)
+                    let city = arrPostList.objectAtIndex(indexPath.row).objectForKey("region") as! String
+                    
+                    var str1 = String()
+                    if(city.characters.count > 0){
+                     str1   = String(format: "%@, %@", arrPostList.objectAtIndex(indexPath.row).objectForKey("restaurantName") as! String, arrPostList.objectAtIndex(indexPath.row).objectForKey("region") as! String)
+                    }
+                    else{
+                     str1   = String(format: "%@", arrPostList.objectAtIndex(indexPath.row).objectForKey("restaurantName") as! String)
+                    }
+                    let range2 = nsString1.rangeOfString(str1)
+                    
                     let trimmedString1 = "restaurantName"
                     let url2 = NSURL(string: "action://restaurant/\(trimmedString1)")!
                     cell.labelStatus!.addLinkToURL(url2, withRange: range2)
@@ -531,14 +553,14 @@ class Home: UIViewController, UIActionSheetDelegate, UITableViewDataSource, UITa
         
  //       if(indexPath.row != 0){
             
-        cell.layer.shadowOffset = CGSizeMake(5, 5);
-        cell.layer.shadowColor = UIColor.darkGrayColor().CGColor
-        cell.layer.shadowRadius = 2;
-        cell.layer.shadowOpacity = 1;
-        
-        let shadowFrame = cell.layer.bounds;
-        let shadowPath = UIBezierPath(rect: shadowFrame).CGPath
-        cell.layer.shadowPath = shadowPath;
+//        cell.layer.shadowOffset = CGSizeMake(5, 5);
+//        cell.layer.shadowColor = UIColor.darkGrayColor().CGColor
+//        cell.layer.shadowRadius = 2;
+//        cell.layer.shadowOpacity = 1;
+//        
+//        let shadowFrame = cell.layer.bounds;
+//        let shadowPath = UIBezierPath(rect: shadowFrame).CGPath
+//        cell.layer.shadowPath = shadowPath;
 //        }
         if(indexPath.row == 0){
          if(arrPostList.count > 0){
@@ -599,6 +621,10 @@ class Home: UIViewController, UIActionSheetDelegate, UITableViewDataSource, UITa
             else{
             //    floatRatingView.removeFromSuperview()
             }
+            cell.blackLabel?.hidden = true
+            }
+        else{
+            cell.blackLabel?.hidden = false
             }
         }
         else{
@@ -609,16 +635,114 @@ class Home: UIViewController, UIActionSheetDelegate, UITableViewDataSource, UITa
     }
     
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
-        return 420
+        if(UIScreen.mainScreen().bounds.size.height > 570 && UIScreen.mainScreen().bounds.size.height < 1140){
+           
+            let lineCount = numberLinesLabel(indexPath)
+            
+            if(UIScreen.mainScreen().bounds.size.height < 730){
+            if(lineCount == 1.0){
+                return 480
+            }
+            else if(lineCount == 2.0){
+                return 480
+            }
+            else if(lineCount == 3.0){
+                return 490
+            }
+            else if(lineCount == 4.0){
+                return 520
+            }
+            else if(lineCount == 100){
+                return 480
+            }
+            else {
+                return 540
+            }
+            }
+            else{
+                if(lineCount == 1.0){
+                    return 520
+                }
+                else if(lineCount == 2.0){
+                    return 520
+                }
+                else if(lineCount == 3.0){
+                    return 530
+                }
+                else if(lineCount == 4.0){
+                    return 560
+                }
+                else if(lineCount == 100){
+                    return 520
+                }
+                else {
+                    return 580
+                }
+            }
+        }
+        else{
+            let lineCount = numberLinesLabel(indexPath)
+            
+            
+            if(lineCount == 1.0){
+                return 420
+            }
+            else if(lineCount == 2.0){
+                return 420
+            }
+            else if(lineCount == 3.0){
+                return 440
+            }
+            else if(lineCount == 4.0){
+                return 460
+            }
+            else if(lineCount == 100){
+                return 420
+            }
+            else {
+                return 480
+            }
+        }
     }
     
-//    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-//        
-//        postIdOpenPost = (arrPostList.objectAtIndex(indexPath.row).objectForKey("id") as? String)!
-//        
-//        let openPost = self.storyboard!.instantiateViewControllerWithIdentifier("OpenPostVC") as! OpenPostViewController;
-//        self.navigationController!.visibleViewController!.navigationController!.pushViewController(openPost, animated:true);
-//    }
+    func numberLinesLabel(indexPath : NSIndexPath) -> CGFloat{
+        if(arrPostList.count > 0){
+        let labelText = UILabel()
+        labelText.font = UIFont(name: fontName, size: 15)
+        labelText.frame = CGRectMake(55, 20, self.view.frame.size.width - 105, 40)
+        labelText.numberOfLines = 0
+        
+        labelText.lineBreakMode = NSLineBreakMode.ByWordWrapping
+        var status = ""
+        var lengthRestaurantname = 0
+        lengthRestaurantname = (arrPostList.objectAtIndex(indexPath.row).objectForKey("restaurantName") as! String).characters.count
+        if(arrPostList.count > 0){
+            if(lengthRestaurantname > 1){
+                status = String(format: "%@ is having %@ at %@, %@", arrPostList.objectAtIndex(indexPath.row).objectForKey("userName") as! String,arrPostList.objectAtIndex(indexPath.row).objectForKey("dishName") as! String,arrPostList.objectAtIndex(indexPath.row).objectForKey("restaurantName") as! String, arrPostList.objectAtIndex(indexPath.row).objectForKey("region") as! String)
+            }
+            
+            if(lengthRestaurantname < 1){
+                status = String(format: "%@ is having %@ %@", arrPostList.objectAtIndex(indexPath.row).objectForKey("userName") as! String,arrPostList.objectAtIndex(indexPath.row).objectForKey("dishName") as! String, arrPostList.objectAtIndex(indexPath.row).objectForKey("region") as! String)
+            }
+            labelText.text = status
+            labelText.sizeToFit()
+            
+            let textSize = CGSizeMake(labelText.frame.size.width, CGFloat(Float.infinity));
+            let rHeight = lroundf(Float(labelText.sizeThatFits(textSize).height))
+            let charSize = lroundf(Float(labelText.font.lineHeight));
+            let lineCount1 = rHeight/charSize
+            
+            let myCGFloat = CGFloat(lineCount1)
+            
+            return myCGFloat
+        }
+        return 100
+        }
+        else{
+            return 100
+        }
+    }
+   
     
     // MARK: FloatRatingViewDelegate
     
@@ -735,13 +859,12 @@ class Home: UIViewController, UIActionSheetDelegate, UITableViewDataSource, UITa
             let reload_distance = 0.0 as CGFloat
             if(y > h + reload_distance) {
                 pageList += 1
+                
                  showProcessLoder(self.view)
                 dispatch_async(dispatch_get_main_queue()) {
-                   
-                    
-                  //  NSOperationQueue.mainQueue().addOperationWithBlock {
+               
                         self.webServiceCall()
-                  //  }
+                  
                 }
             }
         }
@@ -772,11 +895,13 @@ class Home: UIViewController, UIActionSheetDelegate, UITableViewDataSource, UITa
         sender.view?.addSubview((self.imgLikeDubleTap)!)
         UIView.animateWithDuration(0.2, animations: {
             self.imgLikeDubleTap?.hidden = false
-            if(UIScreen.mainScreen().bounds.size.height < 570){
-              self.imgLikeDubleTap?.frame = CGRectMake(70, 70, (sender.view?.frame.size.width)! - 140, (sender.view?.frame.size.height)! - 140)
+            if(self.view.frame.size.height < 570){
+                
+              self.imgLikeDubleTap?.frame = CGRectMake(self.view.frame.size.width/2 - 100, self.view.frame.size.width/2 - 100, 200, 200)
             }
             else{
-            self.imgLikeDubleTap?.frame = CGRectMake(100, 70, (sender.view?.frame.size.width)! - 200, (sender.view?.frame.size.height)! - 140)
+                
+             self.imgLikeDubleTap?.frame = CGRectMake(self.view.frame.size.width/2 - 100, self.view.frame.size.width/2 - 100, 200, 200)
             }
         })
         
@@ -837,6 +962,7 @@ class Home: UIViewController, UIActionSheetDelegate, UITableViewDataSource, UITa
     
     func likeBtnPressed(sender : UIButton){
         
+        if(arrLikeList.count > 0){
         Flurry.logEvent("Like Button Tabbed")
         let buttonPoint = sender.convertPoint(CGPoint.zero, toView: postTableView)
         let indexpath = postTableView?.indexPathForRowAtPoint(buttonPoint)
@@ -875,6 +1001,7 @@ class Home: UIViewController, UIActionSheetDelegate, UITableViewDataSource, UITa
         else{
             
             
+        }
         }
     }
     
@@ -971,7 +1098,7 @@ class Home: UIViewController, UIActionSheetDelegate, UITableViewDataSource, UITa
                             self.arrPostList = NSMutableArray()
                             self.arrLikeList = NSMutableArray()
                             self.arrFavList = NSMutableArray()
-                            self.pageList = 0
+                          //  self.pageList = 0
                             self.floatRatingView.removeFromSuperview()
                             self.submitRatingView.removeFromSuperview()
                 if(actionSheet.tag == 0){
@@ -1069,6 +1196,8 @@ class Home: UIViewController, UIActionSheetDelegate, UITableViewDataSource, UITa
         }
         else{
             internetMsg(self.view)
+            self.tabBarController?.tabBar.userInteractionEnabled = true
+
         }
         stopLoading(self.view)
     }
@@ -1119,6 +1248,8 @@ class Home: UIViewController, UIActionSheetDelegate, UITableViewDataSource, UITa
         else{
             internetMsg(self.view)
             hideProcessLoader(self.view)
+            self.tabBarController?.tabBar.userInteractionEnabled = true
+
         }
         stopLoading(self.view)
          self.refreshControl.endRefreshing()
@@ -1156,7 +1287,7 @@ class Home: UIViewController, UIActionSheetDelegate, UITableViewDataSource, UITa
         arrLikeList = NSMutableArray()
         arrFavList = NSMutableArray()
             
-            pageList = 0
+            pageList = 1
 
         
         webServiceCallingPost(url, parameters: params)
@@ -1165,6 +1296,8 @@ class Home: UIViewController, UIActionSheetDelegate, UITableViewDataSource, UITa
         else{
             internetMsg(self.view)
             hideProcessLoader(self.view)
+            self.tabBarController?.tabBar.userInteractionEnabled = true
+
         }
 
     }
@@ -1291,6 +1424,7 @@ class Home: UIViewController, UIActionSheetDelegate, UITableViewDataSource, UITa
     func getDataFromWebService(dict : NSMutableDictionary){
         
         if(dict.objectForKey("api") as! String == "post/list"){
+            
         homeListInfo = dict
         if(homeListInfo.objectForKey("status")!.isEqual("OK")){
             
@@ -1300,7 +1434,6 @@ class Home: UIViewController, UIActionSheetDelegate, UITableViewDataSource, UITa
                 self.arrPostList.addObject(arrayVal.objectAtIndex(indxing))
                 self.arrLikeList.addObject(arrayVal.objectAtIndex(indxing).objectForKey("iLikedIt") as! String)
                 self.arrFavList.addObject(arrayVal.objectAtIndex(indxing).objectForKey("iBookark") as! String)
-            
             }
 
 //
@@ -1424,7 +1557,7 @@ class Home: UIViewController, UIActionSheetDelegate, UITableViewDataSource, UITa
                 arrLikeList = NSMutableArray()
                 arrFavList = NSMutableArray()
                 
-                pageList = 0
+                pageList = 1
                 dispatch_async(dispatch_get_main_queue()) {
                 self.webServiceCall()
                 }
@@ -1568,6 +1701,7 @@ class Home: UIViewController, UIActionSheetDelegate, UITableViewDataSource, UITa
         else if(dict.objectForKey("api") as! String == "post/delete"){
           //  if(dict.objectForKey("status") as! String == "OK"){
                stopLoading(self.view)
+            pageList = 1
             dispatch_async(dispatch_get_main_queue()) {
                self.webServiceCall()
             }
@@ -1583,7 +1717,7 @@ class Home: UIViewController, UIActionSheetDelegate, UITableViewDataSource, UITa
                 }
 
                 
-                pageList = 0
+            //    pageList = 0
                
                 stopLoading(self.view)
                 self.refreshControl.endRefreshing()
@@ -1593,6 +1727,7 @@ class Home: UIViewController, UIActionSheetDelegate, UITableViewDataSource, UITa
         }
          hideProcessLoader(self.view)
          self.refreshControl.endRefreshing()
+        self.tabBarController?.tabBar.userInteractionEnabled = true
     }
     
     func serviceFailedWitherror(error : NSError){
@@ -1642,7 +1777,7 @@ class Home: UIViewController, UIActionSheetDelegate, UITableViewDataSource, UITa
                         postImagethumb = (postDictHome.objectForKey("userThumb") as? String)!
                         let openPost = self.storyboard!.instantiateViewControllerWithIdentifier("UserProfile") as! UserProfileViewController;
                         self.navigationController!.visibleViewController!.navigationController!.pushViewController(openPost, animated:true);
-                        print("name tapped")
+                        
             }
         }
             
@@ -1663,6 +1798,55 @@ class Home: UIViewController, UIActionSheetDelegate, UITableViewDataSource, UITa
             
                         let openPost = self.storyboard!.instantiateViewControllerWithIdentifier("RestaurantProfile") as! RestaurantProfileViewController;
                         self.navigationController!.visibleViewController!.navigationController!.pushViewController(openPost, animated:true);
+            }
+        }
+    }
+    
+    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        if let touch = touches.first {
+            let currentPoint = touch.locationInView(conectivityMsg)
+            // do something with your currentPoint
+            if(isConnectedToNetwork()){
+                conectivityMsg.removeFromSuperview()
+            self.tabBarController?.tabBar.userInteractionEnabled = true
+            showLoader(self.view)
+            
+            
+            if(isConnectedToNetwork()){
+                
+                dispatch_async(dispatch_get_main_queue()) {
+                    self.webServiceForDishDetails()
+                }
+            }else{
+                internetMsg(self.view)
+                stopLoading(self.view)
+                self.tabBarController?.tabBar.userInteractionEnabled = true
+            }
+            
+            dispatch_async(dispatch_get_main_queue()) {
+                self.performSelector(#selector(Home.webServiceCallRating), withObject: nil, afterDelay: 0.1)
+            }
+            
+            if(isConnectedToNetwork()){
+                
+                self.arrPostList = NSMutableArray()
+                self.arrLikeList = NSMutableArray()
+                self.arrFavList = NSMutableArray()
+                self.pageList = 1
+                dispatch_async(dispatch_get_main_queue()) {
+                    self.webServiceCall()
+                }
+                if (isConnectedToNetwork()){
+                    updateCall()
+                }
+            }else{
+                internetMsg(self.view)
+                self.tabBarController?.tabBar.userInteractionEnabled = true
+            }
+            }
+            else{
+                internetMsg(self.view)
+                self.tabBarController?.tabBar.userInteractionEnabled = true
             }
         }
     }

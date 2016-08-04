@@ -14,7 +14,7 @@ import SystemConfiguration
 var baseUrl = "http://52.74.136.146/index.php/service/"
 //var baseUrl = "http://52.74.136.146/index.php/service/"
 
-let conectivityMsg = UILabel()
+var conectivityMsg = UIView()
 
 var controllerAuth = "auth/"
 var controllerPost = "post/"
@@ -108,7 +108,7 @@ func showLoader(view : UIView){
     
     activityIndicator.frame = CGRectMake(0, 0, 40, 40)
     activityIndicator.center = CGPointMake(overlayView.bounds.width / 2, overlayView.bounds.height / 2)
-    activityIndicator.activityIndicatorViewStyle = .White
+    activityIndicator.activityIndicatorViewStyle = .Gray
     overlayView.addSubview(activityIndicator)
     
     view.addSubview(overlayView)
@@ -173,12 +173,25 @@ func isConnectedToNetwork()->Bool{
 
 func internetMsg(view : UIView){
     
-    conectivityMsg.frame = CGRectMake(0, 64, UIScreen.mainScreen().bounds.size.width, 30)
-    conectivityMsg.text = "No Internet connection."
-    conectivityMsg.backgroundColor = UIColor.redColor()
-    conectivityMsg.textColor = UIColor.whiteColor()
-    conectivityMsg.textAlignment = NSTextAlignment.Center
-    conectivityMsg.font = UIFont(name: fontBold, size: 17)
+    conectivityMsg.frame = CGRectMake(0, 64, UIScreen.mainScreen().bounds.size.width, UIScreen.mainScreen().bounds.size.height - 108)
+    conectivityMsg.tag = 112233
+    conectivityMsg.userInteractionEnabled = true
+    conectivityMsg.backgroundColor = UIColor.whiteColor()
+   
+   
+    let imgWifi = UIImageView()
+    imgWifi.frame = CGRectMake(UIScreen.mainScreen().bounds.size.width/2 - 24, UIScreen.mainScreen().bounds.size.height/2 - 98, 48, 48)
+    imgWifi.image = UIImage(named: "wifi.png")
+    conectivityMsg.addSubview(imgWifi)
+    
+    let lblMsg = UILabel()
+    lblMsg.frame = CGRectMake(50, imgWifi.frame.origin.y + imgWifi.frame.size.height, view.frame.size.width - 100, 60)
+    lblMsg.text = "Cannot connect to internet. Tap to retry."
+    lblMsg.textColor = UIColor.grayColor()
+    lblMsg.textAlignment = NSTextAlignment.Center
+    lblMsg.numberOfLines = 2
+    conectivityMsg.addSubview(lblMsg)
+    
     view.addSubview(conectivityMsg)
 }
 
@@ -277,7 +290,7 @@ func stopLoading(view : UIView){
 func showProcessLoder(view : UIView){
     let bottomView = UIView()
     bottomView.frame = CGRectMake(0, view.frame.size.height - 94, view.frame.size.width, 50)
-    bottomView.backgroundColor = UIColor(red: 21/255.0, green: 29/255.0, blue: 46/255.0, alpha: 1)
+    bottomView.backgroundColor = UIColor.whiteColor()
     bottomView.tag = 2222
     //view.addSubview(bottomView)
     
@@ -285,7 +298,7 @@ func showProcessLoder(view : UIView){
     activityIndicator1.frame = CGRectMake(0, 0, 40, 40)
     activityIndicator1.tag = 2223
     activityIndicator1.center = CGPointMake(bottomView.bounds.width / 2, bottomView.bounds.height / 2)
-    activityIndicator1.activityIndicatorViewStyle = .WhiteLarge
+    activityIndicator1.activityIndicatorViewStyle = .Gray
     bottomView.addSubview(activityIndicator1)
     view.addSubview(bottomView)
     activityIndicator1.startAnimating()

@@ -21,16 +21,16 @@ class FavoriteViewController: UIViewController, UITableViewDataSource, UITableVi
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
-        self.title = "Favorites"
+        self.title = "My Bucket List"
         Flurry.logEvent("Favorite Screen")
         
         imgNoFav.frame = CGRectMake(self.view.frame.size.width / 2 - 11, 150, 22, 26)
-        imgNoFav.image = UIImage(named: "bookMarkNew.png")
+        imgNoFav.image = UIImage(named: "bookmark (1).png")
         self.view.addSubview(imgNoFav)
         
         lblNoFav.frame = CGRectMake(0, 200, self.view.frame.size.width, 20)
-        lblNoFav.text = "You have no Favorites yet."
-        lblNoFav.textColor = UIColor.whiteColor()
+        lblNoFav.text = "Nothing in your bucket list."
+        lblNoFav.textColor = UIColor.grayColor()
         lblNoFav.textAlignment = NSTextAlignment.Center
         lblNoFav.font = UIFont(name: fontBold, size: 15)
         self.view.addSubview(lblNoFav)
@@ -38,14 +38,18 @@ class FavoriteViewController: UIViewController, UITableViewDataSource, UITableVi
         imgNoFav.hidden = true
         lblNoFav.hidden = true
         
-        favTableView?.backgroundColor = UIColor(red: 20/255, green: 29/255, blue: 46/255, alpha: 1.0)
-        favTableView?.separatorColor = UIColor(red: 47/255, green: 51/255, blue: 60/255, alpha: 1.0)
+        favTableView?.backgroundColor = UIColor.whiteColor()
+        favTableView?.separatorColor = UIColor.lightGrayColor()
         let tblView =  UIView(frame: CGRectZero)
         favTableView!.tableFooterView = tblView
         favTableView!.tableFooterView!.hidden = true
         dispatch_async(dispatch_get_main_queue()) {
           self.callWebServiceMethods()
         }
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        self.navigationController?.navigationBarHidden = false
     }
     
     //MARK:- WebServices and Delegates
@@ -70,12 +74,13 @@ class FavoriteViewController: UIViewController, UITableViewDataSource, UITableVi
     
     func getDataFromWebService(dict : NSMutableDictionary){
         stopLoading(self.view)
+        
         if(dict.objectForKey("status") as! String == "OK"){
             let arr = dict.objectForKey("dish")?.mutableCopy() as! NSMutableArray
             for(var index: Int = 0; index < arr.count; index += 1){
                 arrFavList.addObject(arr.objectAtIndex(index))
             }
-            favTableView?.reloadData()
+           
         }
         else if(dict.objectForKey("status")!.isEqual("error")){
             if(dict.objectForKey("errorCode")!.isEqual(6)){
@@ -102,6 +107,7 @@ class FavoriteViewController: UIViewController, UITableViewDataSource, UITableVi
             imgNoFav.hidden = false
             lblNoFav.hidden = false
         }
+         favTableView?.reloadData()
     }
     
     func serviceFailedWitherror(error : NSError){
@@ -127,34 +133,53 @@ class FavoriteViewController: UIViewController, UITableViewDataSource, UITableVi
         cell.backgroundColor = UIColor.clearColor()
         
         if(arrFavList.count > 0){
+         dispatch_async(dispatch_get_main_queue()) {
         let iconView = UIView()
-        iconView.frame = CGRectMake(15, 5, 40, 40)
-        iconView.backgroundColor = UIColor(red: 236/255, green: 237/255, blue: 238/255, alpha: 1.0)
+        iconView.frame = CGRectMake(20, 10, 34, 34)
+        iconView.backgroundColor = UIColor(red: 255/255, green: 253/255, blue: 10/255, alpha: 1.0)
         iconView.tag = 29
         iconView.layer.cornerRadius = iconView.frame.size.width/2
         iconView.clipsToBounds = true
         
         
         let cellIcon = UIImageView()
-        cellIcon.frame = CGRectMake(7, 7, 25, 25)
+        cellIcon.frame = CGRectMake(7, 7, 20, 20)
         cellIcon.layer.cornerRadius = cellIcon.frame.size.width/2
-        cellIcon.image = UIImage(named: "dishIcon.png")
+            dispatch_async(dispatch_get_main_queue()) {
+        cellIcon.image = UIImage(named: "bookmark (1).png")
+            }
         cellIcon.clipsToBounds = true
         iconView.addSubview(cellIcon)
         
         let favName = UILabel()
-        favName.frame = CGRectMake(60, 0, cell.frame.size.width - 60, 50)
+        favName.frame = CGRectMake(70, 5, cell.frame.size.width - 60, 20)
         favName.tag = 1022
-        favName.text = arrFavList.objectAtIndex(indexPath.row).objectForKey("dishName") as? String
-        favName.textColor = UIColor.whiteColor()
-        
+           
+        favName.text = self.arrFavList.objectAtIndex(indexPath.row).objectForKey("dishName") as? String
+            
+            favName.font = UIFont(name: fontName, size: 16)
+        favName.textColor = UIColor.blackColor()
         cell.contentView.addSubview(iconView)
         
+            let favRest = UILabel()
+            favRest.frame = CGRectMake(70, 26, cell.frame.size.width - 60, 20)
+            favRest.tag = 1023
+            if((self.arrFavList.objectAtIndex(indexPath.row).objectForKey("restaurantName") as? String)?.characters.count > 0){
+                
+            favRest.text = self.arrFavList.objectAtIndex(indexPath.row).objectForKey("restaurantName") as? String
+                
+            }
+            favRest.font = UIFont(name: fontName, size: 14)
+            favRest.textColor = UIColor.grayColor()
             
+        
             if((cell.contentView.viewWithTag(1022)) != nil){
                 cell.contentView.viewWithTag(1022)?.removeFromSuperview()
+                cell.contentView.viewWithTag(1023)?.removeFromSuperview()
             }
             cell.contentView.addSubview(favName)
+            cell.contentView.addSubview(favRest)
+            }
         }
         
         
@@ -162,7 +187,14 @@ class FavoriteViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
-        return 50
+        return 54
+    }
+    
+    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        postIdOpenPost = arrFavList.objectAtIndex(indexPath.row).objectForKey("id") as! String
+        
+        let openPost = self.storyboard!.instantiateViewControllerWithIdentifier("OpenPost") as! OpenPostViewController;
+        self.navigationController!.visibleViewController!.navigationController!.pushViewController(openPost, animated:true);
     }
     
     //MARK:- ScrollView Delegates
@@ -179,11 +211,27 @@ class FavoriteViewController: UIViewController, UITableViewDataSource, UITableVi
         let inset = scrollView.contentInset
         let y = offset.y + bounds.size.height - inset.bottom as CGFloat
         let h = size.height as CGFloat
-        let reload_distance = 15.0 as CGFloat
+        let reload_distance = 0.0 as CGFloat
         if(y > h + reload_distance) {
+            showProcessLoder(self.view)
             dispatch_async(dispatch_get_main_queue()) {
-             showProcessLoder(self.view)
-             self.callWebServiceMethods()
+               self.callWebServiceMethods()
+                
+            }
+        }
+        
+    }
+    
+    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        if let touch = touches.first {
+            let currentPoint = touch.locationInView(conectivityMsg)
+            // do something with your currentPoint
+            if(isConnectedToNetwork()){
+                conectivityMsg.removeFromSuperview()
+                dispatch_async(dispatch_get_main_queue()) {
+                    self.pageList = 0
+                    self.callWebServiceMethods()
+                }
             }
         }
     }

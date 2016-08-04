@@ -8,6 +8,9 @@
 
 import UIKit
 
+var searchDishCity = ""
+var selectedCity = String()
+
 class SearchViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate, WebServiceCallingDelegate, UIGestureRecognizerDelegate {
     
     @IBOutlet var btnDishes : UIButton?
@@ -42,13 +45,14 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     var isCityOn = Bool()
     var arrCityList = NSMutableArray()
     
-    var selectedCity = String()
+    
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
         isCityOn = false
-        selectedCity = "delhi"
+        selectedCity = NSUserDefaults.standardUserDefaults().objectForKey("citySelected") as! String
+        searchDishCity = ""
        
         // Do any additional setup after loading the view.
         self.navigationController?.navigationBarHidden = true
@@ -479,9 +483,22 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             
             
             UIView.animateWithDuration(0.2, animations: { () -> Void in
-                self.cityView.frame = CGRectMake(0, -250, self.view.frame.size.width, 250)
+                self.cityView.frame = CGRectMake(0, -254, self.view.frame.size.width, 254)
             })
             selectedCity = (arrCityList.objectAtIndex(indexPath.row).objectForKey("name") as? String)!
+            
+            dispatch_async(dispatch_get_main_queue()) {
+                if(self.searchBar?.text?.characters.count > 0){
+                    self.searchBar(self.searchBar!, textDidChange: (self.searchBar?.text)!)
+                    self.imgEmptyScreen.hidden = true
+                    self.lblEmptyTitle.hidden = true
+                }
+                else{
+                    self.imgEmptyScreen.hidden = false
+                    self.lblEmptyTitle.hidden = false
+                }
+            }
+            
             isCityOn = false
         }
         else{
@@ -492,6 +509,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             }
             comingFrom = "HomeDish"
             comingToDish = selectedDishHome
+            searchDishCity = selectedCity
             self.navigationController?.navigationBarHidden = false
             let openPost = self.storyboard!.instantiateViewControllerWithIdentifier("DishProfile") as! DishProfileViewController;
             self.navigationController!.visibleViewController!.navigationController!.pushViewController(openPost, animated:true);
@@ -678,6 +696,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         stopLoading1(self.view)
         self.searchListTable!.reloadData()
         self.searchListTable?.userInteractionEnabled = true
+        conectivityMsg.removeFromSuperview()
         }
     }
     
@@ -705,19 +724,45 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         self.view.bringSubviewToFront(viewsearchupper!)
         if(isCityOn == false){
         UIView.animateWithDuration(0.5, animations: { () -> Void in
+            if(self.arrCityList.count < 7){
             self.cityView.frame = CGRectMake(0, 64, self.cityView.frame.size.width, CGFloat(self.arrCityList.count * 44))
             self.cityTableView.frame = CGRectMake(5, 5, self.cityView.frame.size.width - 10, self.cityView.frame.size.height - 10)
+            }
+            else{
+                self.cityView.frame = CGRectMake(0, 64, self.cityView.frame.size.width, 254)
+                self.cityTableView.frame = CGRectMake(5, 5, self.cityView.frame.size.width - 10, self.cityView.frame.size.height - 10)
+            }
         })
             cityTableView.reloadData()
             isCityOn = true
         }
         else{
             UIView.animateWithDuration(0.5, animations: { () -> Void in
-                self.cityView.frame = CGRectMake(0, -150, self.view.frame.size.width, 150)
+                self.cityView.frame = CGRectMake(0, -254, self.view.frame.size.width, 254)
             })
             isCityOn = false
         }
     }
+    
+    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        if let touch = touches.first {
+            let currentPoint = touch.locationInView(conectivityMsg)
+            // do something with your currentPoint
+            if(isConnectedToNetwork()){
+                conectivityMsg.removeFromSuperview()
+                if(self.searchBar?.text?.characters.count > 0){
+                    self.searchBar(self.searchBar!, textDidChange: (self.searchBar?.text)!)
+                    self.imgEmptyScreen.hidden = true
+                    self.lblEmptyTitle.hidden = true
+                }
+                else{
+                    self.imgEmptyScreen.hidden = false
+                    self.lblEmptyTitle.hidden = false
+                }
+            }
+        }
+    }
+
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()

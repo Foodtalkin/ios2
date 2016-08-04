@@ -36,6 +36,7 @@ class DishLinkViewController: UIViewController, iCarouselDataSource, iCarouselDe
     var dishLinkArray : NSMutableArray = []
     
     var lblNoDish = UILabel()
+    var btnNext = UIButton()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -74,7 +75,7 @@ class DishLinkViewController: UIViewController, iCarouselDataSource, iCarouselDe
         lblNoDish.frame = CGRectMake(0, 200, self.view.frame.size.width, 15)
         lblNoDish.text = "No result :("
         lblNoDish.textAlignment = NSTextAlignment.Center
-        lblNoDish.textColor = UIColor.whiteColor()
+        lblNoDish.textColor = UIColor.grayColor()
         lblNoDish.font = UIFont(name: fontBold, size: 14)
         self.view.addSubview(lblNoDish)
         lblNoDish.hidden = true
@@ -84,7 +85,21 @@ class DishLinkViewController: UIViewController, iCarouselDataSource, iCarouselDe
     }
     
     override func viewWillAppear(animated: Bool) {
+        self.navigationController?.navigationBarHidden = false
         
+        btnNext.frame = CGRectMake(self.view.frame.size.width - 30, self.view.frame.size.height/2 - 25, 30, 50)
+        btnNext.setImage(UIImage(named : "next icon.png"), forState: UIControlState.Normal)
+        btnNext.addTarget(self, action: #selector(DiscoverViewController.openNext), forControlEvents: UIControlEvents.TouchUpInside)
+        btnNext.backgroundColor = UIColor.grayColor()
+        btnNext.hidden = false
+        self.view.addSubview(btnNext)
+    }
+    
+    //MARK:- nextCarousalIndex
+    
+    func openNext(){
+        carousel.scrollToItemAtIndex(carousel.currentItemIndex + 1, animated: true)
+        btnNext.hidden = true
     }
     
     override func viewWillDisappear(animated: Bool) {
@@ -102,8 +117,10 @@ class DishLinkViewController: UIViewController, iCarouselDataSource, iCarouselDe
             let params = NSMutableDictionary()
             
             params.setObject(sessionId!, forKey: "sessionId")
+            if(dictLocations.objectForKey("latitude") != nil){
             params.setObject(dictLocations.valueForKey("latitude") as! NSNumber, forKey: "latitude")
             params.setObject(dictLocations.valueForKey("longitute") as! NSNumber, forKey: "longitude")
+            }
             params.setObject("12", forKey: "recordCount")
             params.setObject("", forKey: "exceptions")
             params.setObject("", forKey: "hashtag")
@@ -422,11 +439,11 @@ class DishLinkViewController: UIViewController, iCarouselDataSource, iCarouselDe
         {
             //don't do anything specific to the index within
             if(UIScreen.mainScreen().bounds.size.height < 570){
-                itemView = UIView(frame:CGRect(x:0, y:0, width:carousel.frame.size.width - 40, height:370))
+                itemView = UIView(frame:CGRect(x:0, y:64, width:carousel.frame.size.width, height:self.view.frame.size.height - 64))
                 itemView.contentMode = .Top
             }
             else{
-                itemView = UIView(frame:CGRect(x:0, y:0, width:carousel.frame.size.width - 40, height:445))
+                itemView = UIView(frame:CGRect(x:0, y:64, width:carousel.frame.size.width, height:self.view.frame.size.height - 64))
                 itemView.contentMode = .Center
             }
             self.addSubViewsOnCarousal(index,itemView: itemView)
@@ -451,20 +468,37 @@ class DishLinkViewController: UIViewController, iCarouselDataSource, iCarouselDe
     }
     
     func carouselCurrentItemIndexDidChange(carousel: iCarousel) {
-        
+        if(carousel.currentItemIndex != 0){
+            btnNext.hidden = true
+        }
+        else{
+            //   btnNext.hidden = false
+        }
     }
 
     //MARK:- AddSubViewsOnCarousal
     
     func addSubViewsOnCarousal(index : Int, itemView : UIView){
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2), dispatch_get_main_queue()) {
-            let upperView = UIView()
-            upperView.frame = CGRectMake(0, 0, itemView.frame.size.width, 50)
-            upperView.backgroundColor = UIColor.whiteColor()
-            itemView.addSubview(upperView)
-            
+        
+        //MARK:- upperView
+        let upperView = UIView()
+        if(UIScreen.mainScreen().bounds.size.height < 570){
+            upperView.frame = CGRectMake(0, 25, itemView.frame.size.width, 60)
+        }
+        else{
+            upperView.frame = CGRectMake(0, 25, itemView.frame.size.width, 60)
+        }
+        
+        upperView.backgroundColor = UIColor.whiteColor()
+        itemView.addSubview(upperView)
+        
+        let tapDish = UITapGestureRecognizer(target: self, action: #selector(DishLinkViewController.dishNameTapped(_:)))
+        tapDish.numberOfTapsRequired = 1
+        upperView.tag = index
+        upperView.addGestureRecognizer(tapDish)
+        
             let imgView = UIImageView()
-            imgView.frame = CGRectMake(0, 50, itemView.frame.size.width, itemView.frame.size.width)
+            imgView.frame = CGRectMake(0, upperView.frame.origin.y + upperView.frame.size.height, itemView.frame.size.width, itemView.frame.size.width)
             imgView.image = UIImage(named: "placeholder.png")
             imgView.userInteractionEnabled = true
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2), dispatch_get_main_queue()) {
@@ -552,69 +586,93 @@ class DishLinkViewController: UIViewController, iCarouselDataSource, iCarouselDe
             itemView.addSubview(footerView)
             
             //upperView's Subview
-            let profilePic = UIImageView()
-            profilePic.frame = CGRectMake(8, 8, 34, 34)
-            profilePic.backgroundColor = UIColor.clearColor()
-             profilePic.image = UIImage(named: "username.png")
-            profilePic.contentMode = UIViewContentMode.ScaleAspectFit
-//            loadImageAndCache(profilePic, url:(self.dishLinkArray.objectAtIndex(index).objectForKey("userThumb") as? String)!)
-            profilePic.hnk_setImageFromURL(NSURL(string: (self.dishLinkArray.objectAtIndex(index).objectForKey("userThumb") as? String)!)!)
-            profilePic.layer.cornerRadius = 16
-            profilePic.layer.masksToBounds = true
-           
-            upperView.addSubview(profilePic)
-            
-            
-            
-            let statusLabel = TTTAttributedLabel(frame: CGRectMake(50, 0, upperView.frame.size.width - 80, 50))
-            statusLabel.numberOfLines = 0
-            statusLabel.font = UIFont(name: fontBold, size: 14)
-            upperView.addSubview(statusLabel)
-            
-            let lengthRestaurantname = (self.dishLinkArray.objectAtIndex(index).objectForKey("restaurantName") as! String).characters.count
-            
-            var status = ""
-            
-                if(lengthRestaurantname > 1){
-                    status = String(format: "%@ at %@", self.dishLinkArray.objectAtIndex(index).objectForKey("userName") as! String,self.dishLinkArray.objectAtIndex(index).objectForKey("restaurantName") as! String)
-                }
-                else{
-                    status = String(format: "%@ %@", self.dishLinkArray.objectAtIndex(index).objectForKey("userName") as! String,self.dishLinkArray.objectAtIndex(index).objectForKey("restaurantName") as! String)
-                }
-            
-            
-            statusLabel.text = status
-            
-            statusLabel.attributedTruncationToken = NSAttributedString(string: self.dishLinkArray.objectAtIndex(index).objectForKey("userName") as! String, attributes: nil)
-            let nsString = status as NSString
-            let range = nsString.rangeOfString(self.dishLinkArray.objectAtIndex(index).objectForKey("userName") as! String)
-            let url = NSURL(string: "action://users/\("userName")")!
-            statusLabel.addLinkToURL(url, withRange: range)
-            
-            
-            statusLabel.attributedTruncationToken = NSAttributedString(string: self.dishLinkArray.objectAtIndex(index).objectForKey("dishName") as! String, attributes: nil)
-            let nsString1 = status as NSString
-            let range1 = nsString1.rangeOfString(self.dishLinkArray.objectAtIndex(index).objectForKey("dishName") as! String)
-            let trimmedString = "dishName"
-            
-            let url1 = NSURL(string: "action://dish/\(trimmedString)")!
-            statusLabel.addLinkToURL(url1, withRange: range1)
-            
-            if(self.dishLinkArray.objectAtIndex(index).objectForKey("restaurantIsActive") as! String == "1"){
-            statusLabel.attributedTruncationToken = NSAttributedString(string: (self.dishLinkArray.objectAtIndex(index).objectForKey("restaurantName") as! String), attributes: nil)
-            let nsString2 = status as NSString
-            let range2 = nsString2.rangeOfString((self.dishLinkArray.objectAtIndex(index).objectForKey("restaurantName") as! String))
-            let trimmedString1 = "restaurantName"
-            let url2 = NSURL(string: "action://restaurant/\(trimmedString1)")!
-            statusLabel.addLinkToURL(url2, withRange: range2)
+        
+        let lblDishName = UILabel()
+        lblDishName.frame = CGRectMake(0, 0, self.view.frame.size.width, 25)
+        lblDishName.font = UIFont(name: fontName, size: 20)
+        lblDishName.textAlignment = NSTextAlignment.Center
+        lblDishName.text = self.dishLinkArray.objectAtIndex(index).objectForKey("dishName") as! String
+        lblDishName.userInteractionEnabled = true
+        lblDishName.textColor = UIColor.blackColor()
+        lblDishName.tag = index
+        upperView.addSubview(lblDishName)
+        
+        let lengthRestaurantname = (self.dishLinkArray.objectAtIndex(index).objectForKey("restaurantName") as! String).characters.count
+        
+        let lblRestaurantName = UILabel()
+        lblRestaurantName.frame = CGRectMake(0, lblDishName.frame.origin.y + lblDishName.frame.size.height - 4, self.view.frame.size.width, 20)
+        lblRestaurantName.font = UIFont(name: fontName, size: 15)
+        lblRestaurantName.textAlignment = NSTextAlignment.Center
+        //   print(arrDishList)
+        if(lengthRestaurantname > 0){
+            lblRestaurantName.text = String(format: "at %@", (self.dishLinkArray.objectAtIndex(index).objectForKey("restaurantName") as! String))
         }
-            statusLabel.delegate = self
-            statusLabel.tag = index
+        
+        lblRestaurantName.textColor = UIColor.grayColor()
+        lblRestaurantName.tag = index
+        upperView.addSubview(lblRestaurantName)
+        
+        let lblUserName = UILabel()
+        lblUserName.frame = CGRectMake(0, lblRestaurantName.frame.origin.y + lblRestaurantName.frame.size.height, self.view.frame.size.width, 15)
+        lblUserName.textAlignment = NSTextAlignment.Center
+        lblUserName.font = UIFont(name: fontName, size: 12)
+        lblUserName.text = String(format: "by %@", (self.dishLinkArray.objectAtIndex(index).objectForKey("userName") as! String))
+        
+        lblUserName.textColor = UIColor.grayColor()
+        lblUserName.tag = index
+        upperView.addSubview(lblUserName)
+ 
+            
+            
+//            let statusLabel = TTTAttributedLabel(frame: CGRectMake(50, 0, upperView.frame.size.width - 80, 50))
+//            statusLabel.numberOfLines = 0
+//            statusLabel.font = UIFont(name: fontName, size: 14)
+//            upperView.addSubview(statusLabel)
+//            
+//            let lengthRestaurantname = (self.dishLinkArray.objectAtIndex(index).objectForKey("restaurantName") as! String).characters.count
+//            
+//            var status = ""
+//            
+//                if(lengthRestaurantname > 1){
+//                    status = String(format: "%@ at %@", self.dishLinkArray.objectAtIndex(index).objectForKey("userName") as! String,self.dishLinkArray.objectAtIndex(index).objectForKey("restaurantName") as! String)
+//                }
+//                else{
+//                    status = String(format: "%@ %@", self.dishLinkArray.objectAtIndex(index).objectForKey("userName") as! String,self.dishLinkArray.objectAtIndex(index).objectForKey("restaurantName") as! String)
+//                }
+//            
+//            
+//            statusLabel.text = status
+//            
+//            statusLabel.attributedTruncationToken = NSAttributedString(string: self.dishLinkArray.objectAtIndex(index).objectForKey("userName") as! String, attributes: nil)
+//            let nsString = status as NSString
+//            let range = nsString.rangeOfString(self.dishLinkArray.objectAtIndex(index).objectForKey("userName") as! String)
+//            let url = NSURL(string: "action://users/\("userName")")!
+//            statusLabel.addLinkToURL(url, withRange: range)
+//            
+//            
+//            statusLabel.attributedTruncationToken = NSAttributedString(string: self.dishLinkArray.objectAtIndex(index).objectForKey("dishName") as! String, attributes: nil)
+//            let nsString1 = status as NSString
+//            let range1 = nsString1.rangeOfString(self.dishLinkArray.objectAtIndex(index).objectForKey("dishName") as! String)
+//            let trimmedString = "dishName"
+//            
+//            let url1 = NSURL(string: "action://dish/\(trimmedString)")!
+//            statusLabel.addLinkToURL(url1, withRange: range1)
+//            
+//            if(self.dishLinkArray.objectAtIndex(index).objectForKey("restaurantIsActive") as! String == "1"){
+//            statusLabel.attributedTruncationToken = NSAttributedString(string: (self.dishLinkArray.objectAtIndex(index).objectForKey("restaurantName") as! String), attributes: nil)
+//            let nsString2 = status as NSString
+//            let range2 = nsString2.rangeOfString((self.dishLinkArray.objectAtIndex(index).objectForKey("restaurantName") as! String))
+//            let trimmedString1 = "restaurantName"
+//            let url2 = NSURL(string: "action://restaurant/\(trimmedString1)")!
+//            statusLabel.addLinkToURL(url2, withRange: range2)
+//        }
+//            statusLabel.delegate = self
+//            statusLabel.tag = index
 
             
             
             let timeLabel = UILabel()
-            timeLabel.frame = CGRectMake(upperView.frame.size.width - 30, 0, 30, 50)
+             timeLabel.frame = CGRectMake(upperView.frame.size.width - 30, 0, 30, 50)
             timeLabel.text = differenceDate((self.dishLinkArray.objectAtIndex(index).objectForKey("createDate") as? String)!)
             timeLabel.textColor = UIColor.grayColor()
             timeLabel.font = UIFont(name: fontName, size: 12)
@@ -622,31 +680,31 @@ class DishLinkViewController: UIViewController, iCarouselDataSource, iCarouselDe
             
             //FooterSubview
             
-            self.likeLabel = UIImageView()
-            self.likeLabel!.frame = CGRectMake(10, 10, 20, 20)
-            if(self.arrLikeList.objectAtIndex(index) as! String == "0"){
-                self.likeLabel!.image = UIImage(named: "Like Heart.png")
-            }
-            else{
-                self.likeLabel!.image = UIImage(named: "Heart Liked.png")
-            }
-            self.likeLabel!.userInteractionEnabled = true
-            footerView.addSubview(self.likeLabel!)
-            
+        self.likeLabel = UIImageView()
+        self.likeLabel!.frame = CGRectMake(10, 10, 30, 30)
+        if(self.arrLikeList.objectAtIndex(index) as! String == "0"){
+            self.likeLabel!.image = UIImage(named: "Like Heart.png")
+        }
+        else{
+            self.likeLabel!.image = UIImage(named: "Heart Liked.png")
+        }
+        self.likeLabel!.userInteractionEnabled = true
+        footerView.addSubview(self.likeLabel!)
+        
             let tap1 = UITapGestureRecognizer(target: self, action: #selector(DishLinkViewController.singleTapLike(_:)))
             tap1.numberOfTapsRequired = 1
             self.likeLabel!.tag = index
             self.likeLabel!.addGestureRecognizer(tap1)
             
             let numbrLike = UILabel()
-            numbrLike.frame = CGRectMake(40, 10, 18, 18)
+            numbrLike.frame = CGRectMake(50, 14, 22, 22)
             numbrLike.tag = 1099
             numbrLike.text = self.dishLinkArray.objectAtIndex(index).objectForKey("likeCount") as? String
-            numbrLike.font = UIFont(name: fontName, size: 15)
+            numbrLike.font = UIFont(name: fontName, size: 18)
             footerView.addSubview(numbrLike)
             
             let favLabel = UIImageView()
-            favLabel.frame = CGRectMake(75, 7, 25, 25)
+            favLabel.frame = CGRectMake(85, 10, 30, 30)
             if(self.arrFavList.objectAtIndex(index) as! String == "0"){
                 favLabel.image = UIImage(named: "bookmark (1).png")
             }
@@ -662,39 +720,32 @@ class DishLinkViewController: UIViewController, iCarouselDataSource, iCarouselDe
             favLabel.addGestureRecognizer(tap2)
             
             let numbrFav = UILabel()
-            numbrFav.frame = CGRectMake(105, 10, 18, 18)
+            numbrFav.frame = CGRectMake(122, 12, 28, 28)
             numbrFav.tag = 1029
             numbrFav.text = self.dishLinkArray.objectAtIndex(index).objectForKey("bookmarkCount") as? String
-            numbrFav.font = UIFont(name: fontName, size: 15)
+            numbrFav.font = UIFont(name: fontName, size: 20)
             footerView.addSubview(numbrFav)
             
             let openPostImage = UIImageView()
-            openPostImage.frame = CGRectMake(140, 8, 20, 20)
+            openPostImage.frame = CGRectMake(160, 12, 30, 30)
             openPostImage.image = UIImage(named: "Comment Message.png")
             openPostImage.userInteractionEnabled = true
             footerView.addSubview(openPostImage)
             openPostImage.alpha = 1.0
             
             let numbrcom = UILabel()
-            numbrcom.frame = CGRectMake(170, 10, 18, 18)
+            numbrcom.frame = CGRectMake(200, 13, 28, 28)
             numbrcom.tag = 1030
             numbrcom.text = self.dishLinkArray.objectAtIndex(index).objectForKey("commentCount") as? String
-            numbrcom.font = UIFont(name: fontName, size: 15)
+            numbrcom.font = UIFont(name: fontName, size: 20)
             footerView.addSubview(numbrcom)
             
-          //  if((self.dishLinkArray.objectAtIndex(index).objectForKey("tip") as! String).characters.count < 1){
-          //      openPostImage.hidden = true
-         //   }
-            
-//            let tap3 = UITapGestureRecognizer(target: self, action: "singleTapOpenPost:")
-//            tap3.numberOfTapsRequired = 1
-//            openPostImage.tag = index
-//            openPostImage.addGestureRecognizer(tap3)
+
             
             let button: UIButton = UIButton(type: UIButtonType.Custom)
             button.addTarget(self, action: #selector(DishLinkViewController.singleTapOpenPost(_:)), forControlEvents: UIControlEvents.TouchUpInside)
             button.tag = index
-            button.frame = CGRectMake(135, 0, 190, 30)
+            button.frame = CGRectMake(145, 0, 50, 50)
             footerView.addSubview(button)
             
             if(comingFrom == "Restaurant"){
@@ -726,9 +777,16 @@ class DishLinkViewController: UIViewController, iCarouselDataSource, iCarouselDe
                     distanceLabel.font = UIFont(name: fontName, size: 15)
                     footerView.addSubview(distanceLabel)
                     
+                if(dictLocations.valueForKey("latitude") != nil){
+                    distanceLabel.hidden = false
+                }
+                else{
+                      distanceLabel.hidden = true
+                    }
+                    
                 }
             }
-        }
+        
     }
 
     //MARK:- Double Tab Method Of like
@@ -1010,6 +1068,45 @@ class DishLinkViewController: UIViewController, iCarouselDataSource, iCarouselDe
                                 self.navigationController!.visibleViewController!.navigationController!.pushViewController(openPost, animated:true);
         }
     }
+    
+//    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+//        if let touch = touches.first {
+//            let currentPoint = touch.locationInView(conectivityMsg)
+//            // do something with your currentPoint
+//            if(isConnectedToNetwork()){
+//                conectivityMsg.removeFromSuperview()
+//                dispatch_async(dispatch_get_main_queue()) {
+//                    
+//                        self.pageList = 0
+//                        self.webCallDiscoverDish()
+//                    
+//                }
+//            }
+//        }
+//    }
+    
+    func dishNameTapped(sender : UITapGestureRecognizer){
+        if(comingFrom == "HomeDish"){
+            if((self.dishLinkArray.objectAtIndex(sender.view!.tag).objectForKey("restaurantName") as? String)?.characters.count > 0){
+            comingToDish = (self.dishLinkArray.objectAtIndex(sender.view!.tag).objectForKey("restaurantName") as? String)!
+            restaurantProfileId = (self.dishLinkArray.objectAtIndex(sender.view!.tag).objectForKey("checkedInRestaurantId") as? String)!
+            let openPost = self.storyboard!.instantiateViewControllerWithIdentifier("RestaurantProfile") as! RestaurantProfileViewController;
+            self.navigationController!.visibleViewController!.navigationController!.pushViewController(openPost, animated:true);
+            }
+        }
+        else{
+            self.pageList = 0
+            selectedProfileIndex = 0
+            selectedDishHome = self.dishLinkArray.objectAtIndex(sender.view!.tag).objectForKey("dishName") as! String
+            comingToDish =  selectedDishHome
+            //  self.title = comingToDish
+            self.dishLinkArray.removeAllObjects()
+            //     self.backButton?.hidden = false
+            comingFrom = "HomeDish"
+            self.webCallDiscoverDish()
+        }
+    }
+
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()

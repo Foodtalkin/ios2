@@ -12,21 +12,37 @@ var reviewSelected = String()
 
 class ReviewViewController: UIViewController, UITextViewDelegate, UITabBarControllerDelegate {
     
-    @IBOutlet var imgView : UIImageView?
-    @IBOutlet var txtView : UITextView?
+    var imgView = UIImageView()
+    var txtView = UITextView()
+    var viewU = UIView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
+        
+        imgView.frame = CGRectMake(0, 44, self.view.frame.size.width, self.view.frame.size.width)
+        imgView.contentMode = UIViewContentMode.ScaleAspectFill
+        viewU.frame = CGRectMake(0, imgView.frame.origin.y + imgView.frame.size.height, self.view.frame.size.width, self.view.frame.size.height - imgView.frame.size.height)
+        viewU.backgroundColor = UIColor.whiteColor()
+        txtView.frame = CGRectMake(0, 0, viewU.frame.size.width, 80)
+        txtView.text = "Write a review"
+        txtView.textColor = UIColor.lightGrayColor()
+        txtView.backgroundColor = UIColor.clearColor()
+        txtView.font = UIFont(name: fontName, size: 16)
+       // txtView.textColor = UIColor.blackColor()
+        UITextView.appearance().tintColor = UIColor.blackColor()
+        txtView.delegate = self
+        
+        self.view.addSubview(imgView)
+        self.view.addSubview(viewU)
+        viewU.addSubview(txtView)
+        
         self.title = "Review"
         Flurry.logEvent("Review Screen")
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Post", style: .Plain, target: self, action: #selector(ReviewViewController.addTapped))
-        imgView?.image = imageSelected
+        imgView.image = imageSelected
         
-        
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(ReviewViewController.keyboardWillShow(_:)), name:UIKeyboardWillShowNotification, object: nil);
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(ReviewViewController.keyboardWillHide(_:)), name:UIKeyboardWillHideNotification, object: nil);
 
         self.tabBarController?.delegate = self
     }
@@ -36,7 +52,8 @@ class ReviewViewController: UIViewController, UITextViewDelegate, UITabBarContro
     }
     
     override func viewDidAppear(animated: Bool) {
-        txtView?.becomeFirstResponder()
+        self.view.frame.origin.y = -120
+        txtView.becomeFirstResponder()
     }
     
     override func prefersStatusBarHidden() -> Bool {
@@ -45,7 +62,12 @@ class ReviewViewController: UIViewController, UITextViewDelegate, UITabBarContro
     
     func addTapped(){
         if (isConnectedToNetwork()){
-            reviewSelected = (txtView?.text)!
+            if(txtView.text == "Write a review"){
+               reviewSelected = ""
+            }
+            else{
+            reviewSelected = (txtView.text)!
+            }
             isUploadingStart = true
             self.tabBarController?.selectedIndex = 0
             self.tabBarController?.tabBar.hidden = false
@@ -60,33 +82,47 @@ class ReviewViewController: UIViewController, UITextViewDelegate, UITabBarContro
     
     func textView(textView: UITextView, shouldChangeTextInRange range: NSRange, replacementText text: String) -> Bool {
         if (text == "\n") {
-            textView.resignFirstResponder()
+          return false
         }
-        
+        else{
+            
+                    if textView.textColor == UIColor.lightGrayColor() {
+                        textView.text = ""
+                        textView.textColor = UIColor.blackColor()
+                      //  UITextView.appearance().tintColor = UIColor.blackColor()
+                       // textView.text = text
+                        return true
+                    }
+                    else{
         var textFrame = CGRect()
         textFrame = textView.frame;
         textFrame.size.height = textView.contentSize.height+20;
         textView.frame = textFrame;
-        
+     //    UITextView.appearance().tintColor = UIColor.blackColor()
         let newText = (textView.text as NSString).stringByReplacingCharactersInRange(range, withString: text)
         let numberOfChars = newText.characters.count // for Swift use count(newText)
         return numberOfChars < 120;
-    }
-    
-    func textViewDidBeginEditing(textView: UITextView) {
-        if(textView.text == "Write Review"){
-            textView.text = ""
+            }
         }
     }
     
-    func keyboardWillShow(sender: NSNotification) {
-        
-        self.view.frame.origin.y -= 120
-        
+    func textViewDidBeginEditing(textView: UITextView) {
+        UITextView.appearance().tintColor = UIColor.blackColor()
+        if textView.textColor == UIColor.lightGrayColor() {
+           self.performSelector(#selector(ReviewViewController.changePositon(_:)), withObject: textView, afterDelay: 0.01)
+          //  textView.textColor = UIColor.blackColor()
+        }
     }
     
-    func keyboardWillHide(sender: NSNotification) {
-        self.view.frame.origin.y += 120
+    func textViewDidEndEditing(textView: UITextView) {
+        if textView.text.isEmpty {
+            textView.text = "Write a review"
+            textView.textColor = UIColor.lightGrayColor()
+        }
+    }
+    
+    func changePositon(textView : UITextView){
+        textView.selectedRange = NSMakeRange(0, 0);
     }
     
     func tabBarController(tabBarController: UITabBarController, didSelectViewController viewController: UIViewController) {

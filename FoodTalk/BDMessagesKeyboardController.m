@@ -110,11 +110,13 @@
     _textView.inputAccessoryView = self.inputAccessoryView;
     _textView.font = [UIFont fontWithName:@"Helvetica" size:18];
     [_textView setTintColor:[UIColor blackColor]];
-  //  _textView.autocorrectionType = UITextAutocorrectionTypeNo;
+    _textView.autocorrectionType = UITextAutocorrectionTypeNo;
     [_textEditorBackgroundView addSubview:_textView];
     _textView.delegate = self;
     _textView.inputAccessoryView = self.inputAccessoryView;
     _textView.keyboardType = UIKeyboardTypeTwitter;
+    
+    tableView.frame = CGRectMake(0, 64, self.view.frame.size.width, self.view.frame.size.height - _textView.frame.origin.y - 340);
     
     
     _cancelButton = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -140,7 +142,7 @@
     
     [self.view insertSubview:self.accessoryView atIndex:0];
     self.accessoryView.frame = CGRectOffset(self.accessoryView.frame, 0, CGRectGetHeight(self.view.bounds));
-    
+
 }
 
 - (void)viewDidLoad
@@ -557,8 +559,10 @@ static UIView* animationCannotDismissTextEditorView;
                 
                 NSString *search = [names lastObject];
                 if(search == [words lastObject]){
-                   tableView.hidden = NO; 
+                   tableView.hidden = NO;
                 }
+               
+                 _textView.autocorrectionType = UITextAutocorrectionTypeNo;
                 NSString *ser  = [search substringWithRange:NSMakeRange(1, [search length] - 1)];
                 typedName = ser;
                 NSPredicate *resultPredicate = [NSPredicate predicateWithFormat:@"SELF.userName CONTAINS[cd] %@", ser];
@@ -567,12 +571,14 @@ static UIView* animationCannotDismissTextEditorView;
             }
             else{
                 tableView.hidden = YES;
+                _textView.autocorrectionType = UITextAutocorrectionTypeYes;
             }
             
             [tableView reloadData];
         }
         else{
             tableView.hidden = YES;
+            _textView.autocorrectionType = UITextAutocorrectionTypeYes;
         }
 
     }

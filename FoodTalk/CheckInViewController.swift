@@ -12,6 +12,7 @@ import CoreLocation
 var restaurantId = String()
 var selectedRestaurantName = String()
 var isRatedLater : Bool = false
+var imageSelected = UIImage()
 
 class CheckInViewController: UIViewController, UISearchBarDelegate, UITableViewDataSource, UITableViewDelegate, WebServiceCallingDelegate, UIGestureRecognizerDelegate, FloatRatingViewDelegate, UITabBarControllerDelegate, CLLocationManagerDelegate, TTTAttributedLabelDelegate {
     
@@ -45,7 +46,8 @@ class CheckInViewController: UIViewController, UISearchBarDelegate, UITableViewD
     var loaderView  = UIView()
     var searchingLabel = UILabel()
     var activityIndicator1 = UIActivityIndicatorView()
-
+    var btnSettings = UIButton()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -62,7 +64,7 @@ class CheckInViewController: UIViewController, UISearchBarDelegate, UITableViewD
         self.view.bringSubviewToFront(btnAddRestaurant!)
         
         searchBar?.returnKeyType = UIReturnKeyType.Go
-        tableView?.backgroundColor = UIColor(red: 20/255, green: 29/255, blue: 47/255, alpha: 1.0)
+        tableView?.backgroundColor = UIColor.whiteColor()
         self.title = "CheckIn"
         Flurry.logEvent("CheckIn Screen")
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
@@ -70,12 +72,10 @@ class CheckInViewController: UIViewController, UISearchBarDelegate, UITableViewD
         self.navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor()]
         
         self.refreshControl = UIRefreshControl()
-        let attr = [NSForegroundColorAttributeName:UIColor.whiteColor()]
+        let attr = [NSForegroundColorAttributeName:UIColor.grayColor()]
         self.refreshControl.attributedTitle = NSAttributedString(string: "Pull to refresh", attributes:attr)
-        self.refreshControl.tintColor = UIColor.whiteColor()
+        self.refreshControl.tintColor = UIColor.grayColor()
         
-        self.refreshControl.addTarget(self, action: #selector(CheckInViewController.refresh(_:)), forControlEvents: UIControlEvents.ValueChanged)
-        self.tableView!.addSubview(refreshControl)
         
         let button: UIButton = UIButton(type: UIButtonType.Custom)
         button.setImage(UIImage(named: "close png.png"), forState: UIControlState.Normal)
@@ -89,11 +89,21 @@ class CheckInViewController: UIViewController, UISearchBarDelegate, UITableViewD
     }
     
     override func viewWillAppear(animated: Bool) {
+        
+        if(isComingFromDishTag == true){
+//            selectedRestaurantName = ""
+//            restaurantId = ""
+            self.performSelector(#selector(CheckInViewController.openPost), withObject: nil, afterDelay: 0.0)
+            isComingFromDishTag = false
+        }
+        else{
         selectedTabBarIndex = 2
         callInt = 0
         searchActive = false
         searchBar?.resignFirstResponder()
         searchActive = false
+        
+        btnSettings.removeFromSuperview()
         
         self.restaurantDetails = NSMutableArray()
         self.restaurentNameList = NSMutableArray()
@@ -106,21 +116,32 @@ class CheckInViewController: UIViewController, UISearchBarDelegate, UITableViewD
         imgView.image = UIImage(named: "search.png")
         loaderView.addSubview(imgView)
         
-        searchingLabel = UILabel()
-        searchingLabel.frame = CGRectMake(0, 32, self.view.frame.size.width, 40)
+       
+      //  searchingLabel = UILabel()
+        searchingLabel.frame = CGRectMake(0, 32, self.view.frame.size.width, 60)
         searchingLabel.numberOfLines = 0
         searchingLabel.textAlignment = NSTextAlignment.Center
         searchingLabel.text = "Looking for places around you."
-        searchingLabel.textColor = UIColor.whiteColor()
+        searchingLabel.textColor = UIColor.grayColor()
         searchingLabel.font = UIFont(name: fontBold, size: 14)
         loaderView.addSubview(searchingLabel)
         
-        activityIndicator1 = UIActivityIndicatorView(activityIndicatorStyle: UIActivityIndicatorViewStyle.White)
+        activityIndicator1 = UIActivityIndicatorView(activityIndicatorStyle: UIActivityIndicatorViewStyle.Gray)
         activityIndicator1.frame = CGRect(x: self.view.frame.size.width/2 - 15, y: 74, width: 30, height: 30)
         activityIndicator1.startAnimating()
         loaderView.addSubview(activityIndicator1)
         
         loaderView.hidden = false
+        
+        btnSettings.frame = CGRectMake(30, loaderView.frame.origin.y + loaderView.frame.size.height + 10, self.view.frame.size.width - 60, 30)
+        btnSettings.setTitle("Go to Settings", forState: UIControlState.Normal)
+        btnSettings.addTarget(self, action: #selector(CheckInViewController.openSettings), forControlEvents: UIControlEvents.TouchUpInside)
+        btnSettings.backgroundColor = UIColor.blackColor()
+        btnSettings.layer.cornerRadius = 2
+        btnSettings.setTitleColor(UIColor.whiteColor(), forState: UIControlState.Normal)
+        
+        self.view.addSubview(btnSettings)
+        btnSettings.hidden = true
         
         loaderView.backgroundColor = UIColor.clearColor()
         
@@ -129,7 +150,9 @@ class CheckInViewController: UIViewController, UISearchBarDelegate, UITableViewD
         self.tabBarController?.tabBar.hidden = true
         self.tabBarController?.delegate = self
         
-        
+            if(isConnectedToNetwork() == false){
+                loaderView.hidden = true
+            }
         addLocationManager()
         
         if(ratingValue.count > 0){
@@ -141,15 +164,29 @@ class CheckInViewController: UIViewController, UISearchBarDelegate, UITableViewD
            rateLaterView.removeFromSuperview()
         }
         tableView?.reloadData()
+        }
     }
     
     override func viewWillDisappear(animated: Bool) {
         cancelRequest()
+        btnSettings.removeFromSuperview()
+        btnSettings.hidden = true
         super.viewWillDisappear(animated)
     }
     
+    //MARK:- open Settings Method
+    
+    func openSettings(){
+        if let url = NSURL(string: UIApplicationOpenSettingsURLString) {
+            UIApplication.sharedApplication().openURL(url)
+        }
+    }
+    
+    //MARK:- refresh Screen
     func refresh(sender:AnyObject)
     {
+        btnSettings.removeFromSuperview()
+        btnSettings.hidden = true
         restaurantDetails = NSMutableArray()
         restaurentNameList = NSMutableArray()
         self.webServiceCallingForRestaurant()
@@ -187,29 +224,31 @@ class CheckInViewController: UIViewController, UISearchBarDelegate, UITableViewD
         if (cell == nil) {
             cell = UITableViewCell(style:.Default, reuseIdentifier: "CELL")
         }
-        cell.backgroundColor = UIColor(red: 20/255, green: 29/255, blue: 47/255, alpha: 1.0)
+        cell.backgroundColor = UIColor.whiteColor()
         dispatch_async(dispatch_get_main_queue()) {
         let image = UIImageView()
         image.frame = CGRectMake(15, 17, 20, 20)
+            image.layer.cornerRadius = 10
+            image.layer.masksToBounds = true
         image.userInteractionEnabled = true
         image.image = UIImage(named: "restaurant_white.png")
-        image.backgroundColor = UIColor(red: 20/255, green: 29/255, blue: 47/255, alpha: 1.0)
+        image.backgroundColor = UIColor.lightGrayColor()
         cell.contentView.addSubview(image)
         
         let labelText = UILabel()
         labelText.frame = CGRectMake(50, 5, UIScreen.mainScreen().bounds.size.width - 50, 23)
-        labelText.textColor = UIColor.whiteColor()
+        labelText.textColor = UIColor.blackColor()
         labelText.tag = indexPath.row
         labelText.userInteractionEnabled = true
         let gestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(CheckInViewController.doubleTabMethod(_:)))
         labelText.addGestureRecognizer(gestureRecognizer)
-        labelText.backgroundColor = UIColor(red: 20/255, green: 29/255, blue: 47/255, alpha: 1.0)
+        labelText.backgroundColor = UIColor.whiteColor()
         cell.contentView.addSubview(labelText)
         
         let labelText1 = UILabel()
         labelText1.frame = CGRectMake(50, 27, UIScreen.mainScreen().bounds.size.width - 50, 22)
         labelText1.textColor = UIColor.grayColor()
-        labelText1.backgroundColor = UIColor(red: 20/255, green: 29/255, blue: 47/255, alpha: 1.0)
+        labelText1.backgroundColor = UIColor.whiteColor()
         labelText1.tag = indexPath.row
         labelText1.userInteractionEnabled = true
         let gestureRecognizer1 = UITapGestureRecognizer(target: self, action: #selector(CheckInViewController.doubleTabMethod(_:)))
@@ -261,10 +300,64 @@ class CheckInViewController: UIViewController, UISearchBarDelegate, UITableViewD
     //MARK:- SkipButtonMethod
     func openPost(){
         
-        let openPost = self.storyboard!.instantiateViewControllerWithIdentifier("imagePicker") as! XMCCameraViewController;
-        self.navigationController!.pushViewController(openPost, animated:true);
+        let cameraViewController = CameraViewController(croppingEnabled: true, allowsLibraryAccess: true) { [weak self] image, asset in
+            imageSelected = self!.resizeImage(image!)
+            
+            let openPost = self!.storyboard!.instantiateViewControllerWithIdentifier("DishTag") as! DishTagViewController;
+            self!.navigationController!.pushViewController(openPost, animated:true);
+            self!.navigationController?.navigationBarHidden = false
+            self?.dismissViewControllerAnimated(true, completion: nil)
+            
+        }
+     
+        presentViewController(cameraViewController, animated: true, completion: nil)
     }
     
+    func resizeImage(image : UIImage) -> UIImage
+    {
+        var actualHeight = image.size.height as CGFloat;
+        var actualWidth = image.size.width as CGFloat;
+        let maxHeight = 1080.0 as CGFloat
+        let maxWidth = 1080.0 as CGFloat
+        var imgRatio = actualWidth/actualHeight;
+        let maxRatio = maxWidth/maxHeight;
+        let compressionQuality = 0.1 as CGFloat;//50 percent compression
+        
+        if (actualHeight > maxHeight || actualWidth > maxWidth)
+        {
+            if(imgRatio < maxRatio)
+            {
+                //adjust width according to maxHeight
+                imgRatio = maxHeight / actualHeight;
+                actualWidth = imgRatio * actualWidth;
+                actualHeight = maxHeight;
+            }
+            else if(imgRatio > maxRatio)
+            {
+                //adjust height according to maxWidth
+                imgRatio = maxWidth / actualWidth;
+                actualHeight = imgRatio * actualHeight;
+                actualWidth = maxWidth;
+            }
+            else
+            {
+                actualHeight = maxHeight;
+                actualWidth = maxWidth;
+            }
+        }
+        
+        let rect = CGRectMake(0.0, 0.0, actualWidth, actualHeight);
+        UIGraphicsBeginImageContext(rect.size);
+        image.drawInRect(rect);
+        let img = UIGraphicsGetImageFromCurrentImageContext();
+        let imageData = UIImageJPEGRepresentation(img, compressionQuality);
+        UIGraphicsEndImageContext();
+        
+        return UIImage(data: imageData!)!;
+        //      return image
+        
+    }
+
     
     func doubleTabMethod(sender : UITapGestureRecognizer){
         
@@ -418,7 +511,7 @@ class CheckInViewController: UIViewController, UISearchBarDelegate, UITableViewD
         
         if(dict.objectForKey("api") as! String == "restaurant/list"){
             
-          //  dispatch_async(dispatch_get_main_queue()) {
+          
            let arr = dict.objectForKey("restaurants") as! NSArray
            for(var index : Int = 0; index < arr.count; index += 1){
            self.restaurentNameList.addObject(arr.objectAtIndex(index).objectForKey("restaurantName") as! String)
@@ -426,7 +519,7 @@ class CheckInViewController: UIViewController, UISearchBarDelegate, UITableViewD
         }
             self.tableView?.reloadData()
             stopLoading(self.view)
-         //   }
+         
         }
         else if(dict.objectForKey("api") as! String == "post/GetUnreated"){
             dispatch_async(dispatch_get_main_queue()) {
@@ -495,7 +588,13 @@ class CheckInViewController: UIViewController, UISearchBarDelegate, UITableViewD
                 }
             }
         }
+        if(restaurentNameList.count > 0){
         loaderView.hidden = true
+        }
+        else{
+          searchingLabel.text = "No restaurant around :("
+        }
+        btnSettings.hidden = true
         self.refreshControl.endRefreshing()
         
     }
@@ -531,17 +630,18 @@ class CheckInViewController: UIViewController, UISearchBarDelegate, UITableViewD
         
         
         if(callInt == 0){
-            dispatch_async(dispatch_get_main_queue()){
-                self.setUsersClosestCity()
+            if let location:CLLocation = locationManager!.location {
+                Flurry.setLatitude(location.coordinate.latitude,
+                                   longitude: location.coordinate.longitude,
+                                   horizontalAccuracy: 10.0,
+                                   verticalAccuracy: 10.0
+                );
             }
-            
             dispatch_async(dispatch_get_main_queue()){
                 self.webServiceCallingForRestaurant()
             }
-         
         }
         callInt += 1
-        
     }
     
     func locationManager(manager: CLLocationManager, didFailWithError error: NSError) {
@@ -550,11 +650,17 @@ class CheckInViewController: UIViewController, UISearchBarDelegate, UITableViewD
     
     func locationManager(manager: CLLocationManager, didChangeAuthorizationStatus status: CLAuthorizationStatus) {
         if (status == CLAuthorizationStatus.Denied) {
-            let alertView = UIAlertView(title: "Location Disabled", message: "Please enable Location Services in your iPhone Setting to share photos of dishes and where to find them on FoodTalk.", delegate: nil, cancelButtonTitle: "Close")
-            alertView.show()
+            
+               refreshControl.removeFromSuperview()
+                self.searchingLabel.text = "Please enable location services in your privacy settings to post or press skip"
+                self.activityIndicator1.stopAnimating()
+                self.btnSettings.hidden = false
+                self.dismissViewControllerAnimated(true, completion: nil)
+
             
         } else if (status == CLAuthorizationStatus.AuthorizedAlways) {
-            
+            self.refreshControl.addTarget(self, action: #selector(CheckInViewController.refresh(_:)), forControlEvents: UIControlEvents.ValueChanged)
+            self.tableView!.addSubview(refreshControl)
         }
     }
 
@@ -627,30 +733,6 @@ class CheckInViewController: UIViewController, UISearchBarDelegate, UITableViewD
             }
             
             statusLabel.text = status
-            
-//            statusLabel.attributedTruncationToken = NSAttributedString(string: ratingValue.objectForKey("userName") as! String, attributes: nil)
-//            let nsString = status as NSString
-//            let range = nsString.rangeOfString(ratingValue.objectForKey("userName") as! String)
-//            let url = NSURL(string: "action://users/\("userName")")!
-//            statusLabel.addLinkToURL(url, withRange: range)
-//            
-//            
-//            statusLabel.attributedTruncationToken = NSAttributedString(string: ratingValue.objectForKey("dishName") as! String, attributes: nil)
-//            let nsString1 = status as NSString
-//            let range1 = nsString1.rangeOfString(ratingValue.objectForKey("dishName") as! String)
-//            let trimmedString = "dishName"
-//            
-//            let url1 = NSURL(string: "action://dish/\(trimmedString)")!
-//            statusLabel.addLinkToURL(url1, withRange: range1)
-//            
-//            if(ratingValue.objectForKey("restaurantIsActive") as! String == "1"){
-//                statusLabel.attributedTruncationToken = NSAttributedString(string: (ratingValue.objectForKey("restaurantName") as! String), attributes: nil)
-//                let nsString2 = status as NSString
-//                let range2 = nsString2.rangeOfString(ratingValue.objectForKey("restaurantName") as! String)
-//                let trimmedString1 = "restaurantName"
-//                let url2 = NSURL(string: "action://restaurant/\(trimmedString1)")!
-//                statusLabel.addLinkToURL(url2, withRange: range2)
-//            }
             statusLabel.delegate = self
             statusLabel.tag = 0
         
@@ -812,6 +894,20 @@ class CheckInViewController: UIViewController, UISearchBarDelegate, UITableViewD
             if let country = placeMark.addressDictionary?["Country"] as? NSString
             {
                 print(country)
+            }
+        }
+    }
+    
+    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        if let touch = touches.first {
+            let currentPoint = touch.locationInView(conectivityMsg)
+            // do something with your currentPoint
+            if(isConnectedToNetwork()){
+                conectivityMsg.removeFromSuperview()
+                dispatch_async(dispatch_get_main_queue()) {
+                 self.callInt = 0
+                 self.addLocationManager()
+                }
             }
         }
     }

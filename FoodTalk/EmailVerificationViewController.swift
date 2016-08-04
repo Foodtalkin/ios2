@@ -18,14 +18,22 @@ class EmailVerificationViewController: UIViewController, UITextFieldDelegate, We
       
         
         // Do any additional setup after loading the view.
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(EmailVerificationViewController.keyboardWillShow(_:)), name:UIKeyboardWillShowNotification, object: nil);
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(EmailVerificationViewController.keyboardWillHide(_:)), name:UIKeyboardWillHideNotification, object: nil);
+        txtEmail?.autocorrectionType = UITextAutocorrectionType.No
+        
+//        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(EmailVerificationViewController.keyboardWillShow(_:)), name:UIKeyboardWillShowNotification, object: nil);
+//        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(EmailVerificationViewController.keyboardWillHide(_:)), name:UIKeyboardWillHideNotification, object: nil);
+    }
+    
+    override func viewDidAppear(animated: Bool) {
+        txtEmail?.becomeFirstResponder()
+        self.view.frame.origin.y -= 90
     }
     
     override func viewWillDisappear(animated : Bool) {
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: UIKeyboardWillShowNotification, object: nil)
-        
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: UIKeyboardWillHideNotification, object: nil)
+//        NSNotificationCenter.defaultCenter().removeObserver(self, name: UIKeyboardWillShowNotification, object: nil)
+//        
+//        NSNotificationCenter.defaultCenter().removeObserver(self, name: UIKeyboardWillHideNotification, object: nil)
+        self.view.frame.origin.y += 90
     }
     
     @IBAction func submitClick(sender : UIButton){
@@ -118,16 +126,16 @@ class EmailVerificationViewController: UIViewController, UITextFieldDelegate, We
     }
     
     func textFieldShouldReturn(textField: UITextField) -> Bool {
-        textField.resignFirstResponder()
+     //   textField.resignFirstResponder()
         return true
     }
     
     func keyboardWillShow(sender: NSNotification) {
-        self.view.frame.origin.y -= 120
+        self.view.frame.origin.y -= 90
     }
     
     func keyboardWillHide(sender: NSNotification) {
-        self.view.frame.origin.y += 120
+     //   self.view.frame.origin.y += 120
     }
 
 

@@ -13,7 +13,7 @@ var arrDishList = NSMutableArray()
 var comingFrom = String()
 var selectedProfileIndex : Int = 0
 
-class DiscoverViewController: UIViewController, iCarouselDataSource, iCarouselDelegate, WebServiceCallingDelegate, UITabBarControllerDelegate, UIActionSheetDelegate, CLLocationManagerDelegate, TTTAttributedLabelDelegate{
+class DiscoverViewController: UIViewController, iCarouselDataSource, iCarouselDelegate, WebServiceCallingDelegate, UITabBarControllerDelegate, UIActionSheetDelegate, CLLocationManagerDelegate, TTTAttributedLabelDelegate, UIGestureRecognizerDelegate{
     
     @IBOutlet var carousel : iCarousel!
     var pageList : Int = 0
@@ -52,6 +52,9 @@ class DiscoverViewController: UIViewController, iCarouselDataSource, iCarouselDe
     var loaderView  = UIView()
     var searchingLabel = UILabel()
     var activityIndicator1 = UIActivityIndicatorView()
+    var btnSettings = UIButton()
+    
+    var btnNext = UIButton()
     
     override func viewDidLoad()
     {
@@ -77,11 +80,11 @@ class DiscoverViewController: UIViewController, iCarouselDataSource, iCarouselDe
         loaderView.addSubview(imgView)
         
         searchingLabel = UILabel()
-        searchingLabel.frame = CGRectMake(0, 32, self.view.frame.size.width, 40)
+        searchingLabel.frame = CGRectMake(0, 32, self.view.frame.size.width, 60)
         searchingLabel.numberOfLines = 0
         searchingLabel.textAlignment = NSTextAlignment.Center
         searchingLabel.text = "Finding the best dishes around you."
-        searchingLabel.textColor = UIColor.whiteColor()
+        searchingLabel.textColor = UIColor.grayColor()
         searchingLabel.font = UIFont(name: fontBold, size: 14)
         loaderView.addSubview(searchingLabel)
         
@@ -92,7 +95,7 @@ class DiscoverViewController: UIViewController, iCarouselDataSource, iCarouselDe
                 arrFavList = NSMutableArray()
                 locationVal = NSMutableDictionary()
         
-        activityIndicator1 = UIActivityIndicatorView(activityIndicatorStyle: UIActivityIndicatorViewStyle.White)
+        activityIndicator1 = UIActivityIndicatorView(activityIndicatorStyle: UIActivityIndicatorViewStyle.Gray)
         activityIndicator1.frame = CGRect(x: self.view.frame.size.width/2 - 15, y: 74, width: 30, height: 30)
         activityIndicator1.startAnimating()
         loaderView.addSubview(activityIndicator1)
@@ -121,15 +124,40 @@ class DiscoverViewController: UIViewController, iCarouselDataSource, iCarouselDe
         self.navigationItem.rightBarButtonItem = barButton
         barButton.enabled = false
          
-        self.addLocationManager()
+        let tap = UITapGestureRecognizer(target: self, action: #selector(DiscoverViewController.handleTap(_:)))
+        tap.delegate = self
+        self.view.addGestureRecognizer(tap)
+        
     }
+
     
     override func viewWillAppear(animated: Bool) {
+        callInt = 0
         self.tabBarController?.delegate = self
         self.navigationController?.navigationBarHidden = false
         self.navigationItem.backBarButtonItem = nil
     //    navigationItem.rightBarButtonItem?.enabled = true
+        searchingLabel.text = "Finding the best dishes around you."
+        activityIndicator1.startAnimating()
         
+        self.addLocationManager()
+        
+        btnSettings.frame = CGRectMake(30, loaderView.frame.origin.y + loaderView.frame.size.height + 10, self.view.frame.size.width - 60, 30)
+        btnSettings.setTitle("Go to Settings", forState: UIControlState.Normal)
+        btnSettings.addTarget(self, action: #selector(CheckInViewController.openSettings), forControlEvents: UIControlEvents.TouchUpInside)
+        btnSettings.backgroundColor = UIColor.blackColor()
+        btnSettings.layer.cornerRadius = 2
+        btnSettings.setTitleColor(UIColor.whiteColor(), forState: UIControlState.Normal)
+        
+        self.view.addSubview(btnSettings)
+        btnSettings.hidden = true
+        
+        btnNext.frame = CGRectMake(self.view.frame.size.width - 30, self.view.frame.size.height/2 - 25, 30, 50)
+        btnNext.setImage(UIImage(named : "next icon.png"), forState: UIControlState.Normal)
+        btnNext.addTarget(self, action: #selector(DiscoverViewController.openNext), forControlEvents: UIControlEvents.TouchUpInside)
+        btnNext.backgroundColor = UIColor.grayColor()
+        btnNext.hidden = false
+        self.view.addSubview(btnNext)
     }
     
     override func viewWillDisappear(animated: Bool) {
@@ -142,11 +170,25 @@ class DiscoverViewController: UIViewController, iCarouselDataSource, iCarouselDe
         self.navigationController?.popViewControllerAnimated(true)
     }
     
+    //MARK:- open Settings Method
+    
+    func openSettings(){
+        if let url = NSURL(string: UIApplicationOpenSettingsURLString) {
+            UIApplication.sharedApplication().openURL(url)
+        }
+    }
+    
+    //MARK:- nextCarousalIndex
+    
+    func openNext(){
+        carousel.scrollToItemAtIndex(carousel.currentItemIndex + 1, animated: true)
+        btnNext.hidden = true
+    }
+    
     //MARK:- CarousalDelegates
     
     func numberOfItemsInCarousel(carousel: iCarousel) -> Int
     {
-        
         return arrDiscoverValues.count
     }
     
@@ -157,12 +199,13 @@ class DiscoverViewController: UIViewController, iCarouselDataSource, iCarouselDe
         if (view == nil)
         {
             //don't do anything specific to the index within
+            
             if(UIScreen.mainScreen().bounds.size.height < 570){
-              itemView = UIView(frame:CGRect(x:0, y:0, width:carousel.frame.size.width - 40, height:370))
+              itemView = UIView(frame:CGRect(x:0, y:0, width:carousel.frame.size.width, height:carousel.frame.size.height))
               itemView.contentMode = .Top
             }
             else{
-                itemView = UIView(frame:CGRect(x:0, y:0, width:carousel.frame.size.width - 40, height:445))
+                itemView = UIView(frame:CGRect(x:0, y:0, width:carousel.frame.size.width, height:carousel.frame.size.height))
                 itemView.contentMode = .Center
             }
             if(arrDiscoverValues.count > 0){
@@ -194,8 +237,14 @@ class DiscoverViewController: UIViewController, iCarouselDataSource, iCarouselDe
     func carouselCurrentItemIndexDidChange(carousel: iCarousel) {
         
             if(arrDiscoverValues.count > 0){
+                if(carousel.currentItemIndex != 0){
+                    btnNext.hidden = true
+                }
+                else{
+                 //   btnNext.hidden = false
+                }
            if(carousel.currentItemIndex == arrDiscoverValues.count-1){
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5), dispatch_get_main_queue()) {
+            dispatch_async(dispatch_get_main_queue()) {
             self.webCallDiscover()
             }
                 }
@@ -203,22 +252,75 @@ class DiscoverViewController: UIViewController, iCarouselDataSource, iCarouselDe
     }
     
 
-
     //MARK:- AddSubViewsOnCarousal
     
     func addSubViewsOnCarousal(index : Int, itemView : UIView){
         if(arrDiscoverValues.count > 0){
-         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2), dispatch_get_main_queue()) {
+         
+            //MARK:- upperView
         let upperView = UIView()
-        upperView.frame = CGRectMake(0, 0, itemView.frame.size.width, 50)
+            if(UIScreen.mainScreen().bounds.size.height < 570){
+        upperView.frame = CGRectMake(0, 0, itemView.frame.size.width, 65)
+            }
+            else{
+         upperView.frame = CGRectMake(0, 0, itemView.frame.size.width, 80)
+            }
+            
         upperView.backgroundColor = UIColor.whiteColor()
         itemView.addSubview(upperView)
+            
+         let lblDish = UILabel()
+            if(UIScreen.mainScreen().bounds.size.height < 570){
+            lblDish.frame = CGRectMake(0, 3, itemView.frame.size.width, 20)
+            }
+            else{
+            lblDish.frame = CGRectMake(0, 8, itemView.frame.size.width, 20)
+            }
+            lblDish.text = self.arrDiscoverValues.objectAtIndex(index).objectForKey("dishName") as? String
+            lblDish.textAlignment = NSTextAlignment.Center
+            lblDish.font = UIFont(name: fontBold, size : 18)
+            lblDish.userInteractionEnabled = true
+            lblDish.tag = index
+            lblDish.textColor = UIColor(red: 20/255, green: 29/255, blue: 47/255, alpha: 1.0)
+            itemView.addSubview(lblDish)
+            
+            let tapDish = UITapGestureRecognizer(target: self, action: #selector(DiscoverViewController.restaurantOpen(_:)))
+            tapDish.numberOfTapsRequired = 1
+            lblDish.tag = index
+            lblDish.addGestureRecognizer(tapDish)
+            
+        let lblRestaurant = UILabel()
+            lblRestaurant.frame = CGRectMake(0, upperView.frame.size.height/2 - 8, itemView.frame.size.width, 17)
+            lblRestaurant.text = self.arrDiscoverValues.objectAtIndex(index).objectForKey("restaurantName") as? String
+            lblRestaurant.tag = index
+            lblRestaurant.userInteractionEnabled = true
+            lblRestaurant.textAlignment = NSTextAlignment.Center
+            lblRestaurant.font = UIFont(name: fontName, size : 15)
+            lblRestaurant.textColor = UIColor(red: 20/255, green: 29/255, blue: 47/255, alpha: 1.0)
+            itemView.addSubview(lblRestaurant)
+            
+            let tapRest = UITapGestureRecognizer(target: self, action: #selector(DiscoverViewController.restaurantOpen(_:)))
+            tapRest.numberOfTapsRequired = 1
+            lblRestaurant.tag = index
+            lblRestaurant.addGestureRecognizer(tapRest)
+            
+            var distnce = self.arrDiscoverValues.objectAtIndex(index).objectForKey("restaurantDistance")?.floatValue
+            distnce = distnce! / 1000
+         //   distanceLabel.text = String(format: "%.2f KM", distnce!)
+            
+        let lblNumbers = UILabel()
+            lblNumbers.frame = CGRectMake(0, upperView.frame.size.height - 25, itemView.frame.size.width, 17)
+            lblNumbers.text = String(format: "%@ Likes | %.2f KM", (self.arrDiscoverValues.objectAtIndex(index).objectForKey("likeCount") as? String)!, distnce!)
+            lblNumbers.textAlignment = NSTextAlignment.Center
+            lblNumbers.font = UIFont(name: fontName, size : 13)
+            lblNumbers.textColor = UIColor.grayColor()
+            itemView.addSubview(lblNumbers)
         
         let imgView = UIImageView()
-        imgView.frame = CGRectMake(0, 50, itemView.frame.size.width, itemView.frame.size.width)
+        imgView.frame = CGRectMake(0, upperView.frame.origin.y + upperView.frame.size.height, itemView.frame.size.width, itemView.frame.size.width)
         imgView.image = UIImage(named: "placeholder.png")
         imgView.userInteractionEnabled = true
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2), dispatch_get_main_queue()) {
+        dispatch_async(dispatch_get_main_queue()) {
         if(self.arrDiscoverValues.count > 0){
             imgView.hnk_setImageFromURL(NSURL(string: self.arrDiscoverValues.objectAtIndex(index).objectForKey("postImage") as! String)!)
             }
@@ -226,7 +328,7 @@ class DiscoverViewController: UIViewController, iCarouselDataSource, iCarouselDe
         itemView.addSubview(imgView)
             
             
-            let tap = UITapGestureRecognizer(target: self, action: "doubleTabMethod:")
+            let tap = UITapGestureRecognizer(target: self, action: #selector(DiscoverViewController.doubleTabMethod(_:)))
             tap.numberOfTapsRequired = 2
             imgView.tag = index
             imgView.addGestureRecognizer(tap)
@@ -301,175 +403,65 @@ class DiscoverViewController: UIViewController, iCarouselDataSource, iCarouselDe
 
             }
         let footerView = UIView()
-        footerView.frame = CGRectMake(0, imgView.frame.origin.y + imgView.frame.size.height, itemView.frame.size.width, 40)
+        footerView.frame = CGRectMake(0, imgView.frame.origin.y + imgView.frame.size.height, itemView.frame.size.width, itemView.frame.size.height - (imgView.frame.origin.y + imgView.frame.size.height))
         footerView.backgroundColor = UIColor.whiteColor()
         itemView.addSubview(footerView)
         
-        //upperView's Subview
-        let profilePic = UIImageView()
-        profilePic.frame = CGRectMake(8, 8, 34, 34)
-        profilePic.backgroundColor = UIColor.clearColor()
-            profilePic.image = UIImage(named: "username.png")
-            profilePic.contentMode = UIViewContentMode.ScaleAspectFit
-       // loadImageAndCache(profilePic, url:(self.arrDiscoverValues.objectAtIndex(index).objectForKey("userThumb") as? String)!)
-            if(self.arrDiscoverValues.count > 0){
-            profilePic.hnk_setImageFromURL(NSURL(string: (self.arrDiscoverValues.objectAtIndex(index).objectForKey("userThumb") as? String)!)!)
-            }
-        profilePic.layer.cornerRadius = 16
-        profilePic.layer.masksToBounds = true
-      //  profilePic.image = UIImage(named: "username.png")
-        upperView.addSubview(profilePic)
         
-        let statusLabel = TTTAttributedLabel(frame: CGRectMake(50, 0, upperView.frame.size.width - 80, 50))
-            statusLabel.numberOfLines = 4
-            statusLabel.font = UIFont(name: fontBold, size: 14)
-           upperView.addSubview(statusLabel)
-           
-            if(self.arrDiscoverValues.count > 0){
-            let lengthRestaurantname = (self.arrDiscoverValues.objectAtIndex(index).objectForKey("restaurantName") as! String).characters.count
-            
-            
-            var status = ""
-            if(lengthRestaurantname > 1){
-             status = String(format: "%@ is having %@ at %@", self.arrDiscoverValues.objectAtIndex(index).objectForKey("userName") as! String,self.arrDiscoverValues.objectAtIndex(index).objectForKey("dishName") as! String,self.arrDiscoverValues.objectAtIndex(index).objectForKey("restaurantName") as! String)
-            }
-            else{
-              status = String(format: "%@ is having %@ %@", self.arrDiscoverValues.objectAtIndex(index).objectForKey("userName") as! String,self.arrDiscoverValues.objectAtIndex(index).objectForKey("dishName") as! String,self.arrDiscoverValues.objectAtIndex(index).objectForKey("restaurantName") as! String)
-            }
         
-            statusLabel.text = status
-            
-            statusLabel.attributedTruncationToken = NSAttributedString(string: self.arrDiscoverValues.objectAtIndex(index).objectForKey("userName") as! String, attributes: nil)
-            let nsString = status as NSString
-            let range = nsString.rangeOfString(self.arrDiscoverValues.objectAtIndex(index).objectForKey("userName") as! String)
-            let url = NSURL(string: "action://users/\("userName")")!
-            statusLabel.addLinkToURL(url, withRange: range)
-            
-            
-            statusLabel.attributedTruncationToken = NSAttributedString(string: self.arrDiscoverValues.objectAtIndex(index).objectForKey("dishName") as! String, attributes: nil)
-            let nsString1 = status as NSString
-            let range1 = nsString1.rangeOfString(self.arrDiscoverValues.objectAtIndex(index).objectForKey("dishName") as! String)
-            let trimmedString = "dishName"
-            
-            let url1 = NSURL(string: "action://dish/\(trimmedString)")!
-            statusLabel.addLinkToURL(url1, withRange: range1)
-            
-            if(self.arrDiscoverValues.objectAtIndex(index).objectForKey("restaurantIsActive") as! String == "1"){
-            statusLabel.attributedTruncationToken = NSAttributedString(string: (self.arrDiscoverValues.objectAtIndex(index).objectForKey("restaurantName") as? String)!, attributes: nil)
-            let nsString2 = status as NSString
-            let range2 = nsString2.rangeOfString((self.arrDiscoverValues.objectAtIndex(index).objectForKey("restaurantName") as? String)!)
-            let trimmedString1 = "restaurantName"
-            let url2 = NSURL(string: "action://restaurant/\(trimmedString1)")!
-            statusLabel.addLinkToURL(url2, withRange: range2)
-                }
-            }
-            statusLabel.delegate = self
-            statusLabel.tag = index
-            
-        let timeLabel = UILabel()
-        timeLabel.frame = CGRectMake(upperView.frame.size.width - 30, 0, 30, 50)
-            if(self.arrDiscoverValues.count > 0){
-        timeLabel.text = differenceDate((self.arrDiscoverValues.objectAtIndex(index).objectForKey("createDate") as? String)!)
-            }
-        timeLabel.textColor = UIColor.grayColor()
-        timeLabel.font = UIFont(name: fontName, size: 12)
-        upperView.addSubview(timeLabel)
+        //MARK:- FooterSubview
         
-        //FooterSubview
-        if(self.arrDiscoverValues.count > 0){
-        self.likeLabel = UIImageView()
-        self.likeLabel!.frame = CGRectMake(10, 10, 20, 20)
-            if(self.arrLikeList.objectAtIndex(index) as! String == "0"){
-                self.likeLabel!.image = UIImage(named: "Like Heart.png")
-            }
-            else{
-                self.likeLabel!.image = UIImage(named: "Heart Liked.png")
-            }
-        self.likeLabel!.userInteractionEnabled = true
-        footerView.addSubview(self.likeLabel!)
-            
-            let tap1 = UITapGestureRecognizer(target: self, action: "singleTapLike:")
-            tap1.numberOfTapsRequired = 1
-            self.likeLabel!.tag = index
-            self.likeLabel!.addGestureRecognizer(tap1)
-            
-        
-        let numbrLike = UILabel()
-        numbrLike.frame = CGRectMake(40, 10, 18, 18)
-        numbrLike.tag = 1099
-        numbrLike.text = self.arrDiscoverValues.objectAtIndex(index).objectForKey("likeCount") as? String
-        numbrLike.font = UIFont(name: fontName, size: 15)
-        footerView.addSubview(numbrLike)
-        
-        let favLabel = UIImageView()
-        favLabel.frame = CGRectMake(75, 7, 25, 25)
-        if(self.arrFavList.objectAtIndex(index) as! String == "0"){
-            favLabel.image = UIImage(named: "bookmark (1).png")
-            }
-        else{
-            favLabel.image = UIImage(named: "bookmark_red.png")
-            }
-        favLabel.userInteractionEnabled = true
-        footerView.addSubview(favLabel)
-            
-            let tap2 = UITapGestureRecognizer(target: self, action: "singleTapFav:")
-            tap2.numberOfTapsRequired = 1
-            favLabel.tag = index
-            favLabel.addGestureRecognizer(tap2)
-        
-        let numbrFav = UILabel()
-        numbrFav.frame = CGRectMake(105, 10, 18, 18)
-        numbrFav.tag = 1029
-        numbrFav.text = self.arrDiscoverValues.objectAtIndex(index).objectForKey("bookmarkCount") as? String
-        numbrFav.font = UIFont(name: fontName, size: 15)
-        footerView.addSubview(numbrFav)
             
         let openPostImage = UIImageView()
-        openPostImage.frame = CGRectMake(140, 8, 20, 20)
-        openPostImage.image = UIImage(named: "Comment Message.png")
+        openPostImage.frame = CGRectMake(itemView.frame.size.width/2 - 20,  footerView.frame.size.height/2 - 20, 40, 40)
+        openPostImage.image = UIImage(named: "commentNew.png")
         openPostImage.userInteractionEnabled = true
         openPostImage.alpha = 1.0
         footerView.addSubview(openPostImage)
             
-            let numbrcom = UILabel()
-            numbrcom.frame = CGRectMake(170, 10, 18, 18)
-            numbrcom.tag = 1030
-            numbrcom.text = self.arrDiscoverValues.objectAtIndex(index).objectForKey("commentCount") as? String
-            numbrcom.font = UIFont(name: fontName, size: 15)
-            footerView.addSubview(numbrcom)
-            
-            
-//            let tap3 = UITapGestureRecognizer(target: self, action: "singleTapOpenPost:")
-//            tap3.numberOfTapsRequired = 1
-//            openPostImage.tag = index
-//            openPostImage.addGestureRecognizer(tap3)
-//            numbrcom.addGestureRecognizer(tap3)
             
             let button: UIButton = UIButton(type: UIButtonType.Custom)
-            button.addTarget(self, action: "singleTapOpenPost:", forControlEvents: UIControlEvents.TouchUpInside)
+            button.addTarget(self, action: #selector(DiscoverViewController.singleTapOpenPost(_:)), forControlEvents: UIControlEvents.TouchUpInside)
             button.tag = index
-            button.frame = CGRectMake(135, 0, 190, 30)
+            button.frame = CGRectMake(itemView.frame.size.width/2 - 20, 10, 50, 50)
             footerView.addSubview(button)
-            
+      
+            if(self.arrDiscoverValues.count > 0){
+                self.likeLabel = UIImageView()
+                self.likeLabel!.frame = CGRectMake(openPostImage.frame.origin.x / 2 - 20, footerView.frame.size.height/2 - 20, 40, 40)
+                if(self.arrLikeList.objectAtIndex(index) as! String == "0"){
+                    self.likeLabel!.image = UIImage(named: "likeNew.png")
+                }
+                else{
+                    self.likeLabel!.image = UIImage(named: "LikePressed.png")
+                }
+                self.likeLabel!.userInteractionEnabled = true
+                footerView.addSubview(self.likeLabel!)
+                
+                let tap1 = UITapGestureRecognizer(target: self, action: #selector(DiscoverViewController.singleTapLike(_:)))
+                tap1.numberOfTapsRequired = 1
+                self.likeLabel!.tag = index
+                self.likeLabel!.addGestureRecognizer(tap1)
+                
         
-        let distanceLabel = UILabel()
-        distanceLabel.frame = CGRectMake(footerView.frame.size.width - 70, 0, 70, 40)
-            var distnce = Float()
+                let favLabel = UIImageView()
+                favLabel.frame = CGRectMake((itemView.frame.size.width + openPostImage.frame.origin.x)/2 , footerView.frame.size.height/2 - 20, 40, 40)
+                if(self.arrFavList.objectAtIndex(index) as! String == "0"){
+                    favLabel.image = UIImage(named: "FavNew.png")
+                }
+                else{
+                    favLabel.image = UIImage(named: "favPressed.png")
+                }
+                favLabel.userInteractionEnabled = true
+                footerView.addSubview(favLabel)
+                
+                let tap2 = UITapGestureRecognizer(target: self, action: #selector(DiscoverViewController.singleTapFav(_:)))
+                tap2.numberOfTapsRequired = 1
+                favLabel.tag = index
+                favLabel.addGestureRecognizer(tap2)
+       
+            }
         
-            if(self.arrDiscoverValues.objectAtIndex(index).objectForKey("restaurantDistance") is NSNull){
-                distnce = 0.0
-            }
-            else{
-              distnce = (self.arrDiscoverValues.objectAtIndex(index).objectForKey("restaurantDistance")?.floatValue)!
-            }
-        
-        distnce = distnce / 1000
-        distanceLabel.text = String(format: "%.2f KM", distnce)
-        distanceLabel.textColor = UIColor.grayColor()
-        distanceLabel.font = UIFont(name: fontName, size: 15)
-        footerView.addSubview(distanceLabel)
-            }
-        }
         }
     }
     
@@ -503,8 +495,9 @@ class DiscoverViewController: UIViewController, iCarouselDataSource, iCarouselDe
         if(arrLikeList.objectAtIndex((sender.view?.tag)!) as! String == "0"){
             
             carouselIndex = (sender.view?.tag)!
+            arrLikeList.replaceObjectAtIndex((sender.view!.tag), withObject: "1")
             
-            let imageName = UIImage(named: "Like Heart.png")
+            let imageName = UIImage(named: "likeNew.png")
             
             let carouselView = carousel.currentItemView! as UIView
             
@@ -518,7 +511,7 @@ class DiscoverViewController: UIViewController, iCarouselDataSource, iCarouselDe
                             let imgData2 = UIImageJPEGRepresentation(imageName!, 0)
                             
                             if(imgData1 == imgData2 ){
-                                (view1 as! UIImageView).image = UIImage(named: "Heart Liked.png")
+                                (view1 as! UIImageView).image = UIImage(named: "LikePressed.png")
                             }
                             }
                             else if view1.isKindOfClass(UILabel){
@@ -545,7 +538,7 @@ class DiscoverViewController: UIViewController, iCarouselDataSource, iCarouselDe
             delegate = self
         }
         else{
-            self.performSelector("removeDubleTapImage", withObject: nil, afterDelay: 1.0)
+            self.performSelector(#selector(DiscoverViewController.removeDubleTapImage), withObject: nil, afterDelay: 1.0)
         }
     }
     
@@ -570,35 +563,37 @@ class DiscoverViewController: UIViewController, iCarouselDataSource, iCarouselDe
         
         let carouselView = carousel.currentItemView! as UIView
         
-        for view in carouselView.subviews {
-            if view.isKindOfClass(UIView) {
-                
-                if(view.frame.origin.y > 300){
-                    for view1 in view.subviews {
-                         if view1.isKindOfClass(UILabel){
-                            if((view1 as! UILabel).tag == 1099){
-                                if(arrLikeList.objectAtIndex(sender.view!.tag) as! String == "0"){
-                                (view1 as! UILabel).text = String(format: "%d", Int(((view1 as! UILabel).text!))! + 1)
-                                }
-                                else{
-                                 (view1 as! UILabel).text = String(format: "%d", Int(((view1 as! UILabel).text!))! - 1)
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+//        for view in carouselView.subviews {
+//            if view.isKindOfClass(UIView) {
+//                
+//                if(view.frame.origin.y > 300){
+//                    for view1 in view.subviews {
+//                         if view1.isKindOfClass(UILabel){
+//                            if((view1 as! UILabel).tag == 1099){
+//                                if(arrLikeList.objectAtIndex(sender.view!.tag) as! String == "0"){
+//                                (view1 as! UILabel).text = String(format: "%d", Int(((view1 as! UILabel).text!))! + 1)
+//                                }
+//                                else{
+//                                 (view1 as! UILabel).text = String(format: "%d", Int(((view1 as! UILabel).text!))! - 1)
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
         
         
         var methodName = String()
         if(arrLikeList.objectAtIndex(sender.view!.tag) as! String == "0"){
             methodName = addlikeMethod
-            (sender.view as! UIImageView).image = UIImage(named: "Heart Liked.png")
+            (sender.view as! UIImageView).image = UIImage(named: "LikePressed.png")
+            arrLikeList.replaceObjectAtIndex((sender.view!.tag), withObject: "1")
         }
         else{
             methodName = deleteLikeMethod
-            (sender.view as! UIImageView).image = UIImage(named: "Like Heart.png")
+            (sender.view as! UIImageView).image = UIImage(named: "likeNew.png")
+            arrLikeList.replaceObjectAtIndex((sender.view!.tag), withObject: "0")
         }
 
         let url = String(format: "%@%@%@", baseUrl, controllerLike, methodName)
@@ -645,11 +640,11 @@ class DiscoverViewController: UIViewController, iCarouselDataSource, iCarouselDe
         var methodName = String()
         if(arrFavList.objectAtIndex(sender.view!.tag) as! String == "0"){
             methodName = addlikeMethod
-            buttonFav?.image = UIImage(named: "bookmark_red.png")
+            buttonFav?.image = UIImage(named: "favPressed.png")
         }
         else{
             methodName = deleteLikeMethod
-            buttonFav?.image = UIImage(named: "bookmark (1).png")
+            buttonFav?.image = UIImage(named: "FavNew.png")
         }
         let url = String(format: "%@%@%@", baseUrl, controllerBookmark, methodName)
         let sessionId = NSUserDefaults.standardUserDefaults().objectForKey("sessionId")
@@ -920,10 +915,10 @@ class DiscoverViewController: UIViewController, iCarouselDataSource, iCarouselDe
         }
         else if(dict.objectForKey("api") as! String == "like/add"){
             if(dict.objectForKey("api") as! String == "like/add"){
-                arrLikeList.replaceObjectAtIndex((buttonLike?.tag)!, withObject: "1")
+          //      arrLikeList.replaceObjectAtIndex((buttonLike?.tag)!, withObject: "1")
             }
             else{
-                arrLikeList.replaceObjectAtIndex((buttonLike?.tag)!, withObject: "0")
+          //      arrLikeList.replaceObjectAtIndex((buttonLike?.tag)!, withObject: "0")
             }
             stopLoading(self.view)
 
@@ -933,10 +928,10 @@ class DiscoverViewController: UIViewController, iCarouselDataSource, iCarouselDe
         }
         else if(dict.objectForKey("api") as! String == "like/delete"){
             if(dict.objectForKey("api") as! String == "like/add"){
-                arrLikeList.replaceObjectAtIndex((buttonLike?.tag)!, withObject: "1")
+          //      arrLikeList.replaceObjectAtIndex((buttonLike?.tag)!, withObject: "1")
             }
             else{
-                arrLikeList.replaceObjectAtIndex((buttonLike?.tag)!, withObject: "0")
+          //      arrLikeList.replaceObjectAtIndex((buttonLike?.tag)!, withObject: "0")
             }
             stopLoading(self.view)
 
@@ -1106,6 +1101,7 @@ class DiscoverViewController: UIViewController, iCarouselDataSource, iCarouselDe
         }
        stopLoading1(self.view)
         loaderView.hidden = true
+        btnSettings.hidden = true
       //  navigationItem.rightBarButtonItem?.enabled = true
     }
     
@@ -1174,11 +1170,17 @@ class DiscoverViewController: UIViewController, iCarouselDataSource, iCarouselDe
     
     //MARK:- LocationManager
     func addLocationManager(){
+        if(isConnectedToNetwork()){
         locationManager = CLLocationManager()
         locationManager!.delegate = self;
         locationManager!.desiredAccuracy = kCLLocationAccuracyBest
         locationManager!.requestAlwaysAuthorization()
         locationManager!.startUpdatingLocation()
+        }
+        else{
+            internetMsg(self.view)
+            self.tabBarController?.tabBar.userInteractionEnabled = true
+        }
     }
     
     //MARK:- UserLocations Methods
@@ -1193,17 +1195,37 @@ class DiscoverViewController: UIViewController, iCarouselDataSource, iCarouselDe
         locationVal!.setObject(long, forKey: "longitute")
         locationVal!.setObject(lat, forKey: "latitude")
         
-        if(callInt == 0){NSUserDefaults.standardUserDefaults()
-                self.performSelector("webCallDiscover", withObject: nil, afterDelay: 0.1)
+        if(callInt == 0){
+            
+            if let location:CLLocation = locationManager!.location {
+                Flurry.setLatitude(location.coordinate.latitude,
+                                   longitude: location.coordinate.longitude,
+                                   horizontalAccuracy: 10.0,
+                                   verticalAccuracy: 10.0
+                );
+            }
+            
+            NSUserDefaults.standardUserDefaults()
+                self.performSelector(#selector(DiscoverViewController.webCallDiscover), withObject: nil, afterDelay: 0.1)
         }
-        callInt++
+        callInt += 1
     }
     
     func locationManager(manager: CLLocationManager, didChangeAuthorizationStatus status: CLAuthorizationStatus) {
         if (status == CLAuthorizationStatus.Denied) {
-            let alertView = UIAlertView(title: "Location Disabled", message: "Please enable Location Services in your iPhone Setting to share photos of dishes and where to find them on FoodTalk.", delegate: nil, cancelButtonTitle: "Close")
-            alertView.show()
+
             self.tabBarController?.tabBar.userInteractionEnabled = true
+            searchingLabel.text = "Please allow location access to see nearby dishes."
+            activityIndicator.stopAnimating()
+            activityIndicator1.stopAnimating()
+            
+
+                self.searchingLabel.text = "Please enable location services in your privacy settings to discover best dishes around you"
+                self.activityIndicator1.stopAnimating()
+                self.btnSettings.hidden = false
+                self.dismissViewControllerAnimated(true, completion: nil)
+
+            
             
         } else if (status == CLAuthorizationStatus.AuthorizedAlways) {
             
@@ -1246,6 +1268,13 @@ class DiscoverViewController: UIViewController, iCarouselDataSource, iCarouselDe
                             self.navigationController!.visibleViewController!.navigationController!.pushViewController(openPost, animated:true);
         }
     }
+    
+    func restaurantOpen(sender : UITapGestureRecognizer){
+        restaurantProfileId = (self.arrDiscoverValues.objectAtIndex((sender.view?.tag)!).objectForKey("checkedInRestaurantId") as? String)!
+        
+        let openPost = self.storyboard!.instantiateViewControllerWithIdentifier("RestaurantProfile") as! RestaurantProfileViewController;
+        self.navigationController!.visibleViewController!.navigationController!.pushViewController(openPost, animated:true);
+    }
 
     
     func tabBarController(tabBarController: UITabBarController, didSelectViewController viewController: UIViewController) {
@@ -1265,6 +1294,18 @@ class DiscoverViewController: UIViewController, iCarouselDataSource, iCarouselDe
         }
         self.navigationController?.popToRootViewControllerAnimated(false)
     }
+    
+    func handleTap(sender: UITapGestureRecognizer? = nil) {
+        if(sender?.view != carousel){
+            if(isConnectedToNetwork()){
+                conectivityMsg.removeFromSuperview()
+                callInt = 0
+                self.addLocationManager()
+            }
+        }
+    }
+    
+
 
 
 }

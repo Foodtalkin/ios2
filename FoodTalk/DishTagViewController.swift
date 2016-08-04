@@ -9,7 +9,7 @@
 import UIKit
 
 var dishNameSelected = String()
-
+var isComingFromDishTag = false
 
 class DishTagViewController: UIViewController, UITextFieldDelegate, UITableViewDataSource, UITableViewDelegate, UITabBarControllerDelegate {
     
@@ -30,15 +30,16 @@ class DishTagViewController: UIViewController, UITextFieldDelegate, UITableViewD
         imageView?.image = imageSelected
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Next", style: .Plain, target: self, action: #selector(DishTagViewController.addTapped))
         navigationItem.rightBarButtonItem?.enabled = false
-
+        UITextField.appearance().tintColor = UIColor.blackColor()
         
-   //     txtDishName!.autocorrectionType = UITextAutocorrectionType.No
+        txtDishName!.autocorrectionType = UITextAutocorrectionType.Yes
+        txtDishName?.keyboardType = UIKeyboardType.ASCIICapable
         self.tabBarController?.delegate = self
     }
     
     override func viewDidAppear(animated: Bool) {
         txtDishName?.becomeFirstResponder()
-        self.view.frame.origin.y -= 120
+        self.view.frame.origin.y -= 130
     }
     
     func addTapped(){
@@ -55,13 +56,17 @@ class DishTagViewController: UIViewController, UITextFieldDelegate, UITableViewD
         super.viewWillDisappear(animated)
         
         if (self.isMovingFromParentViewController()){
-            self.navigationController?.navigationBarHidden = true
-            for controller in self.navigationController!.viewControllers as Array {
-                if controller.isKindOfClass(XMCCameraViewController) {
-                    self.navigationController?.popToViewController(((self.navigationController?.viewControllers)! as NSArray).objectAtIndex(1) as! UIViewController, animated: true)
-                    break
-                }
-            }
+//            self.navigationController?.navigationBarHidden = true
+//            for controller in self.navigationController!.viewControllers as Array {
+////                if controller.isKindOfClass(XMCCameraViewController) {
+////                    self.navigationController?.popToViewController(((self.navigationController?.viewControllers)! as NSArray).objectAtIndex(1) as! UIViewController, animated: true)
+////                    break
+////                }
+//            }
+            isComingFromDishTag = true
+         //   selectedRestaurantName = ""
+            restaurantId = ""
+            self.navigationController?.popViewControllerAnimated(true)
         }
     }
     
@@ -78,7 +83,7 @@ class DishTagViewController: UIViewController, UITextFieldDelegate, UITableViewD
     func textFieldDidBeginEditing(textField: UITextField) {
         searchActive = true;
         tableView = UITableView()
-        tableView.frame = CGRectMake(0, 164, self.view.frame.size.width, 220)
+        tableView.frame = CGRectMake(0, 170, self.view.frame.size.width, imageView!.frame.size.height - 112)
         tableView.dataSource = self
         tableView.delegate = self
         tableView.hidden = true
@@ -93,7 +98,13 @@ class DishTagViewController: UIViewController, UITextFieldDelegate, UITableViewD
 
     func textField(textField: UITextField, shouldChangeCharactersInRange range: NSRange, replacementString string: String) -> Bool {
         
-        if(range.length + range.location < 60){
+        if(range.length + range.location < 32){
+            
+            if string.characters.count == 0 && range.length > 0 {
+                // Back pressed
+                return true
+            }
+            
             if((textField.text?.characters.count)! + (string.characters.count - range.length) < 1){
                 tableView.hidden = true
             }
@@ -115,7 +126,7 @@ class DishTagViewController: UIViewController, UITextFieldDelegate, UITableViewD
             navigationItem.rightBarButtonItem?.enabled = true
         }
         
-        let aSet = NSCharacterSet(charactersInString:"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_. ").invertedSet
+        let aSet = NSCharacterSet(charactersInString:"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ").invertedSet
         let compSepByCharInSet = string.componentsSeparatedByCharactersInSet(aSet)
         let numberFiltered = compSepByCharInSet.joinWithSeparator("")
         
@@ -132,13 +143,17 @@ class DishTagViewController: UIViewController, UITextFieldDelegate, UITableViewD
                 searchActive = true;
             }
             self.tableView.reloadData()
-            
+     //    let selectedRange: UITextRange? = textField.selectedTextRange
         textField.text = (textField.text! as NSString).stringByReplacingCharactersInRange(range, withString: numberFiltered.lowercaseString)
         
         return false
         }
         else{
             tableView.hidden = true
+        }
+        if string.characters.count == 0 && range.length > 0 {
+            // Back pressed
+            return true
         }
         return false
     }

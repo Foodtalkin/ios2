@@ -52,6 +52,7 @@ class OpenPostViewController: UIViewController, UITableViewDataSource, UITableVi
     var heightComment : Int = 0
     var lineCount = 0;
     var lineCount1 = 0;
+    var viewBottom = UIView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -126,13 +127,14 @@ class OpenPostViewController: UIViewController, UITableViewDataSource, UITableVi
         
         
         dispatch_async(dispatch_get_main_queue()) {
+            print("function Called friendList")
         self.webServiceForFriendList()
         }
         
         self.tableView!.contentInset = UIEdgeInsetsMake(0, 0, 80, 0);
         tableView!.registerNib(UINib(nibName: "CardViewCell", bundle: nil), forCellReuseIdentifier: "CardCell")
         //      tableView?.backgroundColor = UIColor(red: 20/255, green: 29/255, blue: 46/255, alpha: 1.0)
-        tableView?.separatorColor = UIColor.grayColor()
+        tableView?.separatorColor = UIColor.clearColor()
         tableView?.showsHorizontalScrollIndicator = false
         tableView?.showsVerticalScrollIndicator = false
         tableView?.allowsMultipleSelectionDuringEditing = true
@@ -143,7 +145,7 @@ class OpenPostViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     override func viewDidAppear(animated: Bool) {
-      //  _kbCtrl.showOnViewController(self, adjustingScrollView: self.tableView, forScrollViewSubview: nil)
+      //  _kbCtrl.showOnViewController(self, adjustingScrollView: self.tableView, xforScrollViewSubview: nil)
     }
     
     override func viewWillDisappear(animated : Bool) {
@@ -158,16 +160,18 @@ class OpenPostViewController: UIViewController, UITableViewDataSource, UITableVi
             self.navigationController?.navigationBarHidden = true
         }
         
-        
             cancelRequest()
     }
     
     override func viewWillAppear(animated: Bool) {
-        
+        self.navigationController?.navigationBarHidden = true
+        viewBottom.removeFromSuperview()
+        self.tabBarController?.tabBar.hidden = true
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(OpenPostViewController.keyboardWillShow(_:)), name:UIKeyboardWillShowNotification, object: nil);
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(OpenPostViewController.keyboardWillHide(_:)), name:UIKeyboardWillHideNotification, object: nil);
       //  showLoader(self.view)
         self.navigationController?.navigationBarHidden = false
+        tableView?.reloadData()
     }
 
     //MARK:- Gesture delegates
@@ -259,11 +263,16 @@ class OpenPostViewController: UIViewController, UITableViewDataSource, UITableVi
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
+        if(dictInfoPost.count > 0){
         if( (dictInfoPost.objectForKey("tip") as? String)?.characters.count > 0){
         return arrCommentsList.count + 2
         }
         else{
         return arrCommentsList.count + 1
+        }
+        }
+        else{
+            return 0
         }
         
     }
@@ -302,13 +311,22 @@ class OpenPostViewController: UIViewController, UITableViewDataSource, UITableVi
                 cell.imageProfilePicture!.hnk_setImageFromURL(NSURL(string: userPicUrl)!)
             
             let userPostImage = dictInfoPost.objectForKey("postImage") as! String
+            let userPostImage1 = NSURL(string: dictInfoPost.objectForKey("postImage") as! String)
+            let pathExtention = userPostImage1!.pathExtension
+              //  print(pathExtention)
+                if(pathExtention == "gif"){
                 dispatch_async(dispatch_get_main_queue()) {
            
+                    cell.imageDishPost?.image = UIImage.gifWithURL(userPostImage)
+                }
+                }
+                else{
                     cell.imageDishPost!.hnk_setImageFromURL(NSURL(string: userPostImage)!)
                 }
                 
             cell.imageProfilePicture?.layer.cornerRadius = 19
             cell.imageProfilePicture?.layer.masksToBounds = true
+                
                 
                 var status = String(format: "%@ is having %@ at %@", dictInfoPost.objectForKey("userName") as! String,dictInfoPost.objectForKey("dishName") as! String,dictInfoPost.objectForKey("restaurantName") as! String)
                 
@@ -316,6 +334,9 @@ class OpenPostViewController: UIViewController, UITableViewDataSource, UITableVi
                 
                 if(lengthRestaurantname < 1){
                     status = String(format: "%@ is having %@ %@", dictInfoPost.objectForKey("userName") as! String,dictInfoPost.objectForKey("dishName") as! String,dictInfoPost.objectForKey("restaurantName") as! String)
+                }
+                else{
+                   status = String(format: "%@ is having %@ at %@, %@", dictInfoPost.objectForKey("userName") as! String,dictInfoPost.objectForKey("dishName") as! String,dictInfoPost.objectForKey("restaurantName") as! String, dictInfoPost.objectForKey("restaurantRegion") as! String)
                 }
                 
                 
@@ -346,7 +367,6 @@ class OpenPostViewController: UIViewController, UITableViewDataSource, UITableVi
                 cell.labelStatus?.delegate = self
                 cell.labelStatus?.tag = indexPath.row
                 
-                
                 let tap = UITapGestureRecognizer(target: self, action: #selector(OpenPostViewController.doubleTabMethod(_:)))
                 tap.numberOfTapsRequired = 2
                 cell.imageDishPost?.tag = indexPath.row
@@ -357,10 +377,12 @@ class OpenPostViewController: UIViewController, UITableViewDataSource, UITableVi
                 
                 
                 cell.selectionStyle = UITableViewCellSelectionStyle.None
+                
                 createActionsView(cell)
+                
             }
             else{
-                
+                viewBottom.removeFromSuperview()
             }
             
             return cell
@@ -435,6 +457,7 @@ class OpenPostViewController: UIViewController, UITableViewDataSource, UITableVi
             }
             
             var userPicUrl = String()
+            if(self.arrCommentsList.count > 0){
             if((dictInfoPost.objectForKey("tip") as? String)?.characters.count > 0){
                 userPicUrl = self.arrCommentsList.objectAtIndex(indexPath.row - 2).objectForKey("userImage") as! String
             }
@@ -442,71 +465,74 @@ class OpenPostViewController: UIViewController, UITableViewDataSource, UITableVi
                 userPicUrl = self.arrCommentsList.objectAtIndex(indexPath.row - 1).objectForKey("userImage") as! String
             }
             
-            let imgUser = UIImageView()
-            imgUser.frame = CGRectMake(12, 10, 39, 39)
-            imgUser.tag = 13334
-            dispatch_async(dispatch_get_main_queue()) {
-            imgUser.hnk_setImageFromURL(NSURL(string: userPicUrl)!)
-            }
+//            let imgUser = UIImageView()
+//            imgUser.frame = CGRectMake(12, 10, 39, 39)
+//            imgUser.tag = 13334
+//            dispatch_async(dispatch_get_main_queue()) {
+//            imgUser.hnk_setImageFromURL(NSURL(string: userPicUrl)!)
+//            }
+//            
+//            
+//            imgUser.layer.cornerRadius = 19
+//            imgUser.layer.masksToBounds = true
             
             
-            imgUser.layer.cornerRadius = 19
-            imgUser.layer.masksToBounds = true
-            
-            let btnUserName = UIButton()
-            btnUserName.frame = CGRectMake(60, 10, 150, 16)
-            btnUserName.titleLabel?.font = UIFont(name: fontBold, size: 16)
-            if((dictInfoPost.objectForKey("tip") as? String)?.characters.count > 0){
-            btnUserName.tag = 111112
-            }
-            else{
-            btnUserName.tag = 111112
-            }
-            btnUserName.contentHorizontalAlignment = UIControlContentHorizontalAlignment.Left
-            btnUserName.setTitleColor(UIColor(red: 3/255, green: 105/255, blue: 219/255, alpha: 1.0), forState: UIControlState.Normal)
-            btnUserName.titleLabel?.textAlignment = NSTextAlignment.Left
-            if((dictInfoPost.objectForKey("tip") as? String)?.characters.count > 0){
-                btnUserName.setTitle(arrCommentsList.objectAtIndex(indexPath.row - 2).objectForKey("userName") as? String, forState: UIControlState.Normal)
-            }
-            else{
-                btnUserName.setTitle(arrCommentsList.objectAtIndex(indexPath.row - 1).objectForKey("userName") as? String, forState: UIControlState.Normal)
-            }
+//            let btnUserName = UIButton()
+//            btnUserName.frame = CGRectMake(12, 10, 70, 16)
+//            btnUserName.titleLabel?.font = UIFont(name: fontBold, size: 16)
+//            if((dictInfoPost.objectForKey("tip") as? String)?.characters.count > 0){
+//            btnUserName.tag = 111112
+//            }
+//            else{
+//            btnUserName.tag = 111112
+//            }
+//            btnUserName.contentHorizontalAlignment = UIControlContentHorizontalAlignment.Left
+//            btnUserName.setTitleColor(UIColor(red: 3/255, green: 105/255, blue: 219/255, alpha: 1.0), forState: UIControlState.Normal)
+//            btnUserName.titleLabel?.textAlignment = NSTextAlignment.Left
+//            
+//            if((dictInfoPost.objectForKey("tip") as? String)?.characters.count > 0){
+//                btnUserName.setTitle(arrCommentsList.objectAtIndex(indexPath.row - 2).objectForKey("userName") as? String, forState: UIControlState.Normal)
+//            }
+//            else{
+//                btnUserName.setTitle(arrCommentsList.objectAtIndex(indexPath.row - 1).objectForKey("userName") as? String, forState: UIControlState.Normal)
+//            }
            
             
             
-            let btnFullName = UIButton()
-            btnFullName.frame = CGRectMake(60, 30, 150, 14)
-            btnFullName.titleLabel?.font = UIFont(name: fontName, size: 15)
-            if((dictInfoPost.objectForKey("tip") as? String)?.characters.count > 0){
-            btnFullName.tag = 222223
-            }
-            else{
-            btnFullName.tag = 222223
-            }
-            btnFullName.contentHorizontalAlignment = UIControlContentHorizontalAlignment.Left
-            btnFullName.setTitleColor(UIColor(red: 3/255, green: 105/255, blue: 219/255, alpha: 1.0), forState: UIControlState.Normal)
-            if((dictInfoPost.objectForKey("tip") as? String)?.characters.count > 0){
-            btnFullName.setTitle(arrCommentsList.objectAtIndex(indexPath.row - 2).objectForKey("fullName") as? String, forState: UIControlState.Normal)
-            }
-            else{
-            btnFullName.setTitle(arrCommentsList.objectAtIndex(indexPath.row - 1).objectForKey("fullName") as? String, forState: UIControlState.Normal)
-            }
+//            let btnFullName = UIButton()
+//            btnFullName.frame = CGRectMake(60, 30, 150, 14)
+//            btnFullName.titleLabel?.font = UIFont(name: fontName, size: 15)
+//            if((dictInfoPost.objectForKey("tip") as? String)?.characters.count > 0){
+//            btnFullName.tag = 222223
+//            }
+//            else{
+//            btnFullName.tag = 222223
+//            }
+//            btnFullName.contentHorizontalAlignment = UIControlContentHorizontalAlignment.Left
+//            btnFullName.setTitleColor(UIColor(red: 3/255, green: 105/255, blue: 219/255, alpha: 1.0), forState: UIControlState.Normal)
+//            if((dictInfoPost.objectForKey("tip") as? String)?.characters.count > 0){
+//            btnFullName.setTitle(arrCommentsList.objectAtIndex(indexPath.row - 2).objectForKey("fullName") as? String, forState: UIControlState.Normal)
+//            }
+//            else{
+//            btnFullName.setTitle(arrCommentsList.objectAtIndex(indexPath.row - 1).objectForKey("fullName") as? String, forState: UIControlState.Normal)
+//            }
             
-            let lblTime = UILabel()
-            lblTime.frame = CGRectMake(tableView.frame.size.width - 30, 10, 30, 20)
-            lblTime.textColor = UIColor.grayColor()
-            lblTime.font = UIFont(name: fontName, size: 13)
-            
+//            let lblTime = UILabel()
+//            lblTime.frame = CGRectMake(tableView.frame.size.width - 30, 10, 30, 20)
+//            lblTime.textColor = UIColor.grayColor()
+//            lblTime.font = UIFont(name: fontName, size: 13)
+//          
+            var commentTime = String()
             if((dictInfoPost.objectForKey("tip") as? String)?.characters.count > 0){
-            lblTime.text = differenceDate((arrCommentsList.objectAtIndex(indexPath.row - 2).objectForKey("createDate") as? String)!)
+            commentTime = differenceDate((arrCommentsList.objectAtIndex(indexPath.row - 2).objectForKey("createDate") as? String)!)
             }
             else{
-             lblTime.text = differenceDate((arrCommentsList.objectAtIndex(indexPath.row - 1).objectForKey("createDate") as? String)!)
+             commentTime = differenceDate((arrCommentsList.objectAtIndex(indexPath.row - 1).objectForKey("createDate") as? String)!)
             }
-            lblTime.tag = 10234
+//            lblTime.tag = 10234
             
             let btnTapUser = UIButton(type: UIButtonType.Custom)
-            btnTapUser.frame = CGRectMake(60, 5, 150, 34)
+            btnTapUser.frame = CGRectMake(10, 5, 40, 20)
             btnTapUser.backgroundColor = UIColor.clearColor()
             if((dictInfoPost.objectForKey("tip") as? String)?.characters.count > 0){
                 btnTapUser.tag = indexPath.row - 2
@@ -517,25 +543,26 @@ class OpenPostViewController: UIViewController, UITableViewDataSource, UITableVi
              btnTapUser.addTarget(self, action: #selector(OpenPostViewController.userBtnTap(_:)), forControlEvents: UIControlEvents.TouchUpInside)
             
             var comnt = String()
+                
             if((dictInfoPost.objectForKey("tip") as? String)?.characters.count > 0){
-            comnt = String(format: "%@", arrCommentsList.objectAtIndex(indexPath.row-2).objectForKey("comment") as! String)
+            comnt = String(format: "%@ %@", (arrCommentsList.objectAtIndex(indexPath.row - 2).objectForKey("userName") as? String)!,arrCommentsList.objectAtIndex(indexPath.row-2).objectForKey("comment") as! String)
             }
             else{
-            comnt = String(format: "%@", arrCommentsList.objectAtIndex(indexPath.row-1).objectForKey("comment") as! String)
+            comnt = String(format: "%@ %@", (arrCommentsList.objectAtIndex(indexPath.row - 1).objectForKey("userName") as? String)!,arrCommentsList.objectAtIndex(indexPath.row-1).objectForKey("comment") as! String)
             }
             comnt = comnt.stringByReplacingOccurrencesOfString("\\", withString: "")
             
-            commentLabel = TTTAttributedLabel(frame: CGRectMake(60, 0, cell.contentView.frame.size.width - 60, 70))
+            commentLabel = TTTAttributedLabel(frame: CGRectMake(0, 0, cell.contentView.frame.size.width - 30, 70))
             
             commentLabel?.tag = 2223
-            commentLabel?.font = UIFont(name: fontName,size: 17)
+            commentLabel?.font = UIFont(name: fontName,size: 16)
             commentLabel?.numberOfLines = 0
-            
             commentLabel?.delegate = self
        
             let nsString = comnt as NSString
             commentLabel?.text = ""
             commentLabel?.text = nsString as String
+                
             commentLabel?.backgroundColor = UIColor.clearColor()
             commentLabel!.clipsToBounds = true
             commentLabel?.sizeToFit()
@@ -548,73 +575,73 @@ class OpenPostViewController: UIViewController, UITableViewDataSource, UITableVi
             
             if(lineCount1 == 0){
                  if(commentLabel!.text!.isIncludingEmoji()){
-                   commentLabel?.frame = CGRectMake(60, 8, cell.contentView.frame.size.width - 70, 40)
+                   commentLabel?.frame = CGRectMake(10, 0, cell.contentView.frame.size.width - 10, 20)
                 }
                  else{
-                   commentLabel?.frame = CGRectMake(60, 3, cell.contentView.frame.size.width - 70, 40)
+                   commentLabel?.frame = CGRectMake(10, 0, cell.contentView.frame.size.width - 10, 20)
                 }
                 
             }
             else if(lineCount1 == 1){
                 if(commentLabel!.text!.isIncludingEmoji()){
-                    commentLabel?.frame = CGRectMake(60, 38, cell.contentView.frame.size.width - 70, 55)
+                    commentLabel?.frame = CGRectMake(10, 0, cell.contentView.frame.size.width - 10, 55)
                 }
                 else{
-                    commentLabel?.frame = CGRectMake(60, 33, cell.contentView.frame.size.width - 70, 55)
+                    commentLabel?.frame = CGRectMake(10, 0, cell.contentView.frame.size.width - 10, 55)
                 }
                 
             }
             else if(lineCount1 == 2){
                 if(commentLabel!.text!.isIncludingEmoji()){
-                    commentLabel?.frame = CGRectMake(60, 52, cell.contentView.frame.size.width - 70, 65)
+                    commentLabel?.frame = CGRectMake(10, 0, cell.contentView.frame.size.width - 10, 65)
                 }
                 else{
-                    commentLabel?.frame = CGRectMake(60, 42, cell.contentView.frame.size.width - 70, 65)
+                    commentLabel?.frame = CGRectMake(10, 0, cell.contentView.frame.size.width - 10, 65)
                 }
                 
             }
             else if(lineCount1 == 3){
                 if(commentLabel!.text!.isIncludingEmoji()){
-                   commentLabel?.frame = CGRectMake(60, 55, cell.contentView.frame.size.width - 70, 100)
+                   commentLabel?.frame = CGRectMake(10, 0, cell.contentView.frame.size.width - 10, 100)
                 }
                 else{
-                   commentLabel?.frame = CGRectMake(60, 45, cell.contentView.frame.size.width - 70, 100)
+                   commentLabel?.frame = CGRectMake(10, 0, cell.contentView.frame.size.width - 10, 100)
                 }
                 
             }
             else if(lineCount1 == 4){
                 if(commentLabel!.text!.isIncludingEmoji()){
-                    commentLabel?.frame = CGRectMake(60, 55, cell.contentView.frame.size.width - 70, 100)
+                    commentLabel?.frame = CGRectMake(10, 0, cell.contentView.frame.size.width - 10, 100)
                 }
                 else{
-                    commentLabel?.frame = CGRectMake(60, 45, cell.contentView.frame.size.width - 70, 100)
+                    commentLabel?.frame = CGRectMake(10, 0, cell.contentView.frame.size.width - 10, 100)
                 }
                 
             }
             else if(lineCount1 == 5){
                 if(commentLabel!.text!.isIncludingEmoji()){
-                    commentLabel?.frame = CGRectMake(60, 55, cell.contentView.frame.size.width - 70, 120)
+                    commentLabel?.frame = CGRectMake(10, 0, cell.contentView.frame.size.width - 10, 120)
                 }
                 else{
-                    commentLabel?.frame = CGRectMake(60, 45, cell.contentView.frame.size.width - 70, 120)
+                    commentLabel?.frame = CGRectMake(10, 0, cell.contentView.frame.size.width - 10, 120)
                 }
                 
             }
             else if(lineCount1 == 6){
                 if(commentLabel!.text!.isIncludingEmoji()){
-                    commentLabel?.frame = CGRectMake(60, 55, cell.contentView.frame.size.width - 70, 140)
+                    commentLabel?.frame = CGRectMake(10, 0, cell.contentView.frame.size.width - 10, 140)
                 }
                 else{
-                    commentLabel?.frame = CGRectMake(60, 45, cell.contentView.frame.size.width - 70, 120)
+                    commentLabel?.frame = CGRectMake(10, 0, cell.contentView.frame.size.width - 10, 120)
                 }
                 
             }
             else{
                 if(commentLabel!.text!.isIncludingEmoji()){
-                    commentLabel?.frame = CGRectMake(60, 55, cell.contentView.frame.size.width - 70, 150)
+                    commentLabel?.frame = CGRectMake(10, 0, cell.contentView.frame.size.width - 10, 150)
                 }
                 else{
-                    commentLabel?.frame = CGRectMake(60, 45, cell.contentView.frame.size.width - 70, 130)
+                    commentLabel?.frame = CGRectMake(10, 0, cell.contentView.frame.size.width - 10, 130)
                 }
             }
             
@@ -652,12 +679,25 @@ class OpenPostViewController: UIViewController, UITableViewDataSource, UITableVi
                 for(var indexing = 0; indexing < ranges.count; indexing++){
                     let range = ranges[indexing] as NSRange
                     let url = NSURL(string: String(format: "action://users/mentionUserName%d",index))!
+                   
                     commentLabel!.addLinkToURL(url, withRange: range)
                 }
                 commentLabel!.adjustsFontSizeToFitWidth  = true;
                // commentLabel?.sizeToFit()
             }
-            
+            var range = NSRange()
+                if((dictInfoPost.objectForKey("tip") as? String)?.characters.count > 0){
+                    commentLabel?.attributedTruncationToken = NSAttributedString(string: (arrCommentsList.objectAtIndex(indexPath.row - 2).objectForKey("userName") as? String)!, attributes: nil)
+                    range = nsString.rangeOfString((arrCommentsList.objectAtIndex(indexPath.row - 2).objectForKey("userName") as? String)!)
+                }
+                else{
+                   commentLabel?.attributedTruncationToken = NSAttributedString(string: (arrCommentsList.objectAtIndex(indexPath.row - 1).objectForKey("userName") as? String)!, attributes: nil)
+                    range = nsString.rangeOfString((arrCommentsList.objectAtIndex(indexPath.row - 1).objectForKey("userName") as? String)!)
+                }
+                    
+                    let url = NSURL(string: "action://users/\("userTap")")!
+                    commentLabel!.addLinkToURL(url, withRange: range)
+                
             
             if((cell.contentView.viewWithTag(13334)) != nil){
                cell.contentView.viewWithTag(13334)!.removeFromSuperview()
@@ -697,12 +737,13 @@ class OpenPostViewController: UIViewController, UITableViewDataSource, UITableVi
                 cell.contentView.viewWithTag(10001)!.removeFromSuperview()
             }
             
-            cell.contentView.addSubview(imgUser)
-            cell.contentView.addSubview(btnUserName)
-            cell.contentView.addSubview(btnFullName)
-            cell.contentView.addSubview(lblTime)
+        //    cell.contentView.addSubview(imgUser)
+        //    cell.contentView.addSubview(btnUserName)
+       //     cell.contentView.addSubview(btnFullName)
+       //     cell.contentView.addSubview(lblTime)
             cell.contentView.addSubview(lineH)
             cell.contentView.addSubview(btnTapUser)
+            }
         }
             
             if((cell.contentView.viewWithTag(233)) != nil){
@@ -737,7 +778,75 @@ class OpenPostViewController: UIViewController, UITableViewDataSource, UITableVi
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
         
         if(indexPath.row == 0){
-        return 430
+            if(UIScreen.mainScreen().bounds.size.height > 570 && UIScreen.mainScreen().bounds.size.height < 1140){
+                let lineCount = numberOfLinesStatus(indexPath)
+                
+                
+                if(UIScreen.mainScreen().bounds.size.height < 730){
+                    if(lineCount == 1.0){
+                        return 480
+                    }
+                    else if(lineCount == 2.0){
+                        return 480
+                    }
+                    else if(lineCount == 3.0){
+                        return 510
+                    }
+                    else if(lineCount == 4.0){
+                        return 520
+                    }
+                    else if(lineCount == 100){
+                        return 480
+                    }
+                    else {
+                        return 540
+                    }
+                }
+                else{
+                    if(lineCount == 1.0){
+                        return 520
+                    }
+                    else if(lineCount == 2.0){
+                        return 520
+                    }
+                    else if(lineCount == 3.0){
+                        return 530
+                    }
+                    else if(lineCount == 4.0){
+                        return 560
+                    }
+                    else if(lineCount == 100){
+                        return 520
+                    }
+                    else {
+                        return 580
+                    }
+                }
+
+            }
+            else{
+                let lineCount = numberOfLinesStatus(indexPath)
+                
+                
+                if(lineCount == 1.0){
+                    return 420
+                }
+                else if(lineCount == 2.0){
+                    return 420
+                }
+                else if(lineCount == 3.0){
+                    return 440
+                }
+                else if(lineCount == 4.0){
+                    return 460
+                }
+                else if(lineCount == 100.0){
+                    return 420
+                }
+                else {
+                    return 480
+                }
+            }
         }
         else if(indexPath.row == 1){
            if( (dictInfoPost.objectForKey("tip") as? String)?.characters.count > 0){
@@ -781,71 +890,71 @@ class OpenPostViewController: UIViewController, UITableViewDataSource, UITableVi
             lineCount = rHeight/charSize
             
             if(lineCount1 == 5){
-                heightComment = 165
+                heightComment = 130
                 if(commentLabel!.text!.isIncludingEmoji()){
-                    return 185
+                    return 120
                 }
                 else{
-                    return 175
+                    return 110
                 }
             }
             else if(lineCount1 == 4){
-                heightComment = 165
+                heightComment = 110
                 if(commentLabel!.text!.isIncludingEmoji()){
-                   return 170
+                   return 110
                 }
                 else{
-                    return 160
+                    return 90
                 }
             }
             else if(lineCount1 == 3){
-                heightComment = 155
+                heightComment = 90
                 if(commentLabel!.text!.isIncludingEmoji()){
-                   return 165
+                   return 80
                 }
                 else{
-                    return 155
+                    return 70
                 }
                 
             }
             else if(lineCount1 == 2){
-                heightComment = 115
+                heightComment = 70
                 if(commentLabel!.text!.isIncludingEmoji()){
-                    return 125
+                    return 70
                 }
                 else{
-                    return 115
+                    return 60
                 }
                 
             }
             else if(lineCount1 == 1){
-                heightComment = 90
+                heightComment = 40
                 if(commentLabel!.text!.isIncludingEmoji()){
-                    return 90
+                    return 40
                 }
                 else{
-                    return 90
+                    return 40
                 }
                 
             }
             else if(lineCount1 == 0){
                 
-                heightComment = 85
+                heightComment = 40
                 if(commentLabel!.text!.isIncludingEmoji()){
-                    return 85
+                    return 40
                 }
                 else{
-                    return 85
+                    return 40
                 }
                 
             }
             else{
-                heightComment = 175
+                heightComment = 130
                 if(commentLabel!.text!.isIncludingEmoji()){
-                    return 185
+                    return 140
                 }
                 else{
-                    return 165
+                    return 130
                 }
             }
             }
@@ -859,76 +968,153 @@ class OpenPostViewController: UIViewController, UITableViewDataSource, UITableVi
             lineCount = rHeight/charSize
             
             if(lineCount1 == 5){
-                heightComment = 165
+                heightComment = 130
                 if(commentLabel!.text!.isIncludingEmoji()){
-                   return 185
+                    return 120
                 }
                 else{
-                    return 175
+                    return 110
                 }
             }
             else if(lineCount1 == 4){
-                heightComment = 165
+                heightComment = 110
                 if(commentLabel!.text!.isIncludingEmoji()){
-                   return 170
+                    return 110
                 }
                 else{
-                   return 160
+                    return 90
                 }
             }
             else if(lineCount1 == 3){
-                heightComment = 165
-                if(commentLabel!.text!.isIncludingEmoji()){
-                   return 165
-                }
-                else{
-                   return 155
-                }
-           
-            }
-            else if(lineCount1 == 2){
-                heightComment = 125
-                if(commentLabel!.text!.isIncludingEmoji()){
-                    return 125
-                }
-                else{
-                   return 115
-                }
-            
-            }
-            else if(lineCount1 == 1){
                 heightComment = 90
                 if(commentLabel!.text!.isIncludingEmoji()){
-                    return 90
+                    return 80
                 }
                 else{
-                    return 90
+                    return 70
                 }
-             
+                
+            }
+            else if(lineCount1 == 2){
+                heightComment = 70
+                if(commentLabel!.text!.isIncludingEmoji()){
+                    return 70
+                }
+                else{
+                    return 60
+                }
+                
+            }
+            else if(lineCount1 == 1){
+                heightComment = 40
+                if(commentLabel!.text!.isIncludingEmoji()){
+                    return 40
+                }
+                else{
+                    return 40
+                }
+                
             }
             else if(lineCount1 == 0){
                 
-                heightComment = 85
+                heightComment = 40
                 if(commentLabel!.text!.isIncludingEmoji()){
-                    return 85
+                    return 40
                 }
                 else{
-                  return 85
+                    return 40
                 }
                 
             }
             else{
-                heightComment = 175
+                heightComment = 130
                 if(commentLabel!.text!.isIncludingEmoji()){
-                    return 205
+                    return 140
                 }
                 else{
-                    return 180
+                    return 130
                 }
             }
         }
         return CGFloat (heightComment)
     }
+    
+    func numberLinesLabel(indexPath : NSIndexPath) -> CGFloat{
+        if(dictInfoPost.count > 0){
+            let labelText = UILabel()
+            labelText.font = UIFont(name: fontName, size: 16)
+            labelText.frame = CGRectMake(10, 0, self.view.frame.size.width - 10, 70)
+            labelText.numberOfLines = 0
+            
+            labelText.lineBreakMode = NSLineBreakMode.ByWordWrapping
+            var status = ""
+            var lengthRestaurantname = 0
+            lengthRestaurantname = (dictInfoPost.objectForKey("restaurantName") as! String).characters.count
+            if(dictInfoPost.count > 0){
+                if(lengthRestaurantname > 1){
+                    status = String(format: "%@ is having %@ at %@, %@", dictInfoPost.objectForKey("userName") as! String,dictInfoPost.objectForKey("dishName") as! String,dictInfoPost.objectForKey("restaurantName") as! String, dictInfoPost.objectForKey("restaurantRegion") as! String)
+                }
+                
+                if(lengthRestaurantname < 1){
+                    status = String(format: "%@ is having %@", dictInfoPost.objectForKey("userName") as! String,dictInfoPost.objectForKey("dishName") as! String)
+                }
+                labelText.text = status
+                labelText.sizeToFit()
+                
+                let textSize = CGSizeMake(labelText.frame.size.width, CGFloat(Float.infinity));
+                let rHeight = lroundf(Float(labelText.sizeThatFits(textSize).height))
+                let charSize = lroundf(Float(labelText.font.lineHeight));
+                let lineCount1 = rHeight/charSize
+                
+                let myCGFloat = CGFloat(lineCount1)
+                
+                return myCGFloat
+            }
+            return 100
+        }
+        else{
+            return 100
+        }
+    }
+    
+    func numberOfLinesStatus(indexPath : NSIndexPath) -> CGFloat{
+        if(dictInfoPost.count > 0){
+            let labelText = UILabel()
+            labelText.font = UIFont(name: fontName, size: 16)
+            labelText.frame = CGRectMake(47, 0, self.view.frame.size.width - 47-39, 70)
+            labelText.numberOfLines = 0
+            
+            labelText.lineBreakMode = NSLineBreakMode.ByWordWrapping
+            var status = ""
+            var lengthRestaurantname = 0
+            lengthRestaurantname = (dictInfoPost.objectForKey("restaurantName") as! String).characters.count
+            if(dictInfoPost.count > 0){
+                if(lengthRestaurantname > 1){
+                    status = String(format: "%@ is having %@ at %@, %@", dictInfoPost.objectForKey("userName") as! String,dictInfoPost.objectForKey("dishName") as! String,dictInfoPost.objectForKey("restaurantName") as! String, dictInfoPost.objectForKey("restaurantRegion") as! String)
+                }
+                
+                if(lengthRestaurantname < 1){
+                    status = String(format: "%@ is having %@", dictInfoPost.objectForKey("userName") as! String,dictInfoPost.objectForKey("dishName") as! String)
+                }
+                labelText.text = status
+                labelText.sizeToFit()
+                
+                let textSize = CGSizeMake(labelText.frame.size.width, CGFloat(Float.infinity));
+                let rHeight = lroundf(Float(labelText.sizeThatFits(textSize).height))
+                let charSize = lroundf(Float(labelText.font.lineHeight));
+                let lineCount1 = rHeight/charSize
+                
+                let myCGFloat = CGFloat(lineCount1)
+                
+                return myCGFloat
+            }
+            return 100
+        }
+        else{
+            return 100
+        }
+    }
+
 
     func tableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath) {
       //  self.tableView?.bringSubviewToFront(btnCommentView)
@@ -1169,9 +1355,17 @@ class OpenPostViewController: UIViewController, UITableViewDataSource, UITableVi
     //MARK:- cellActionButtons and Values
     
     func createActionsView(cell : CardViewCell){
-        let viewBottom = UIView()
-        viewBottom.frame = CGRectMake(0, cell.frame.size.height - 41, UIScreen.mainScreen().bounds.size.width + 20, 45)
-//        viewBottom.tag = 22
+      
+        viewBottom.removeFromSuperview()
+        viewBottom = UIView()
+            if(UIScreen.mainScreen().bounds.size.height < 570){
+                print("cell height",cell.contentView.frame.size.height)
+        viewBottom.frame = CGRectMake(0, cell.imageDishPost!.frame.origin.y + self.view.frame.size.width, UIScreen.mainScreen().bounds.size.width, 40)
+            }
+            else{
+             viewBottom.frame = CGRectMake(0, cell.imageDishPost!.frame.origin.y + self.view.frame.size.width + 10, UIScreen.mainScreen().bounds.size.width, 45)
+            }
+
         viewBottom.backgroundColor = UIColor.whiteColor()
         cell.contentView.addSubview(viewBottom)
         
@@ -1244,12 +1438,12 @@ class OpenPostViewController: UIViewController, UITableViewDataSource, UITableVi
         
         let btnMore1 = UIButton(type: UIButtonType.Custom) as UIButton
         btnMore1.frame = CGRectMake( UIScreen.mainScreen().bounds.size.width - 50, 10, 50, 50)
-        btnMore1.addTarget(self, action: "reportDeleteMethod:", forControlEvents: UIControlEvents.TouchUpInside)
+        btnMore1.addTarget(self, action: #selector(OpenPostViewController.reportDeleteMethod(_:)), forControlEvents: UIControlEvents.TouchUpInside)
         btnMore1.backgroundColor = UIColor.clearColor()
         btnMore1.tag = 22
         btnMore1.titleLabel?.textAlignment = NSTextAlignment.Center
         viewBottom.addSubview(btnMore1)
-        
+     //   }
         self.setRatings(cell)
     }
 
@@ -1317,14 +1511,14 @@ class OpenPostViewController: UIViewController, UITableViewDataSource, UITableVi
         if(imgLikeDubleTap == nil){
         imgLikeDubleTap = UIImageView()
         }
-        self.imgLikeDubleTap?.frame = CGRectMake(160, 160, 0, 0)
+        self.imgLikeDubleTap?.frame = CGRectMake(self.view.frame.size.width/2, self.view.frame.size.width/2, 0, 0)
         imgLikeDubleTap?.image = UIImage(named: "heart.png")
         imgLikeDubleTap?.backgroundColor = UIColor.clearColor()
         sender.view?.addSubview((imgLikeDubleTap)!)
         
         UIView.animateWithDuration(0.2, animations: {
             self.imgLikeDubleTap?.hidden = false
-            self.imgLikeDubleTap?.frame = CGRectMake(70, 70, (sender.view?.frame.size.width)! - 140, (sender.view?.frame.size.height)! - 140)
+            self.imgLikeDubleTap?.frame = CGRectMake(self.view.frame.size.width/2 - 100, self.view.frame.size.width/2 - 100, 200, 200)
         })
         
     var methodName = String()
@@ -1497,6 +1691,8 @@ class OpenPostViewController: UIViewController, UITableViewDataSource, UITableVi
         webServiceCallingPost(url, parameters: params)
             
         delegate = self
+            NSUserDefaults.standardUserDefaults().setObject(nil, forKey: "userIds")
+            NSUserDefaults.standardUserDefaults().setObject(nil, forKey: "userNames")
         }
         else{
             internetMsg(self.view)
@@ -1575,7 +1771,7 @@ class OpenPostViewController: UIViewController, UITableViewDataSource, UITableVi
     //MARK:- WebService Delegates
     
     func getDataFromWebService(dict : NSMutableDictionary){
-        
+       
         if(dict.objectForKey("api") as! String == "comment/add"){
            
             if(dict.objectForKey("status") as! String == "OK"){
@@ -1620,7 +1816,7 @@ class OpenPostViewController: UIViewController, UITableViewDataSource, UITableVi
         }
             
         else if(dict.objectForKey("api") as! String == "follower/listFollowed"){
-            
+            print("response came of friendList")
             if(dict.objectForKey("status") as! String == "OK"){
                userFriendsList = dict.objectForKey("followedUsers") as! NSMutableArray
             }
@@ -1646,6 +1842,7 @@ class OpenPostViewController: UIViewController, UITableViewDataSource, UITableVi
         else if(dict.objectForKey("api") as! String == "post/get"){
             
             if(dict.objectForKey("status") as! String == "OK"){
+               
                 dictInfoPost = dict.objectForKey("post") as! NSDictionary
                 if(dictInfoPost.objectForKey("iLikedIt") as! String == "0"){
                    isLiked = false
@@ -1698,14 +1895,14 @@ class OpenPostViewController: UIViewController, UITableViewDataSource, UITableVi
                     self.navigationController!.visibleViewController!.navigationController!.pushViewController(openPost, animated:true);
                 }
                 else if(dict.objectForKey("errorCode")!.isEqual(3)){
-                    let indexPath = NSIndexPath(forRow: 0, inSection: 0)
-                    let cell = tableView?.cellForRowAtIndexPath(indexPath) as! CardViewCell
+//                    let indexPath = NSIndexPath(forRow: 0, inSection: 0)
+//                    let cell = tableView?.cellForRowAtIndexPath(indexPath) as! CardViewCell
                     let lblAlert = UILabel()
-                    lblAlert.frame = CGRectMake(0, cell.frame.size.height/2, cell.frame.size.width, 30)
+                    lblAlert.frame = CGRectMake(0, self.view.frame.size.height/2, self.view.frame.size.width, 30)
                     lblAlert.text = "This Post is not available."
                     lblAlert.textAlignment = NSTextAlignment.Center
                     lblAlert.font = UIFont(name: fontBold, size: 18)
-                    cell.contentView.addSubview(lblAlert)
+                    self.view.addSubview(lblAlert)
                 }
                 
             }
@@ -2183,6 +2380,41 @@ class OpenPostViewController: UIViewController, UITableViewDataSource, UITableVi
             let openPost = self.storyboard!.instantiateViewControllerWithIdentifier("RestaurantProfile") as! RestaurantProfileViewController;
             self.navigationController!.visibleViewController!.navigationController!.pushViewController(openPost, animated:true);
         }
+        else if(url == NSURL(string: "action://users/\("userTap")")){
+            var indexPath: NSIndexPath!
+            
+            
+            if let superview = label.superview {
+                if let cell = superview.superview as? UITableViewCell {
+                    indexPath = tableView!.indexPathForCell(cell)
+                }
+            }
+            
+            if((dictInfoPost.objectForKey("tip") as? String)?.characters.count > 0){
+            if(arrCommentsList.objectAtIndex(indexPath.row - 2).objectForKey("userName") as? String != userLoginAllInfo.objectForKey("profile")?.objectForKey("userName") as? String){
+                isUserInfo = false
+            }
+            else{
+                isUserInfo = true
+            }
+            postDictHome = arrCommentsList.objectAtIndex(indexPath.row - 2) as! NSDictionary
+            }
+            else{
+                if(arrCommentsList.objectAtIndex(indexPath.row - 1).objectForKey("userName") as? String != userLoginAllInfo.objectForKey("profile")?.objectForKey("userName") as? String){
+                    isUserInfo = false
+                }
+                else{
+                    isUserInfo = true
+                }
+                postDictHome = arrCommentsList.objectAtIndex(indexPath.row - 1) as! NSDictionary
+            }
+            
+            openProfileId = (postDictHome.objectForKey("userId") as? String)!
+            postImageOrgnol = (postDictHome.objectForKey("userImage") as? String)!
+            postImagethumb = (postDictHome.objectForKey("userThumb") as? String)!
+            let openPost = self.storyboard!.instantiateViewControllerWithIdentifier("UserProfile") as! UserProfileViewController;
+            self.navigationController!.visibleViewController!.navigationController!.pushViewController(openPost, animated:true);
+        }
     }
     
     func userBtnTap(sender : UIButton){
@@ -2200,6 +2432,26 @@ class OpenPostViewController: UIViewController, UITableViewDataSource, UITableVi
         let openPost = self.storyboard!.instantiateViewControllerWithIdentifier("UserProfile") as! UserProfileViewController;
         self.navigationController!.visibleViewController!.navigationController!.pushViewController(openPost, animated:true);
     }
+    
+    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        if let touch = touches.first {
+            let currentPoint = touch.locationInView(conectivityMsg)
+            // do something with your currentPoint
+            if(isConnectedToNetwork()){
+                conectivityMsg.removeFromSuperview()
+                dispatch_async(dispatch_get_main_queue()) {
+                    self.webserviceData()
+                }
+                
+                self.performSelector(#selector(OpenPostViewController.webServiceCallComments), withObject: nil, afterDelay: 0.0)
+                
+                dispatch_async(dispatch_get_main_queue()) {
+                    self.webServiceForFriendList()
+                }
+            }
+        }
+    }
+    
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
